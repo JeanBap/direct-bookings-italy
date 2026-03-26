@@ -257,7 +257,7 @@
 
     .card-image {
       position: relative;
-      height: 200px;
+      height: 240px;
       overflow: hidden;
     }
 
@@ -349,8 +349,8 @@
     }
 
     .h-card-image {
-      flex: 0 0 150px;
-      height: 150px;
+      flex: 0 0 200px;
+      align-self: stretch;
       border-radius: 4px;
       overflow: hidden;
       position: relative;
@@ -420,19 +420,23 @@
     /* SEARCH */
     .search-container {
       display: grid;
-      grid-template-columns: 250px 1fr;
-      gap: 2rem;
-      padding: 2rem;
-      max-width: 1400px;
-      margin: 0 auto;
+      grid-template-columns: 20% 40% 40%;
+      gap: 0;
+      padding: 0;
+      max-width: 100%;
+      margin: 0;
+      height: calc(100vh - 60px);
+      overflow: hidden;
     }
 
     .filter-sidebar {
-      position: sticky;
-      top: 80px;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1rem;
+      padding: 1rem;
+      overflow-y: auto;
+      border-right: 1px solid var(--border-light);
+      background: #fafafa;
     }
 
     .filter-group {
@@ -482,7 +486,9 @@
     .results-area {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.75rem;
+      padding: 1rem;
+      overflow-y: auto;
     }
 
     .results-header {
@@ -660,6 +666,31 @@
       border-radius: 8px;
       margin-top: 1.5rem;
     }
+
+    .search-map-panel {
+      position: relative;
+      border-left: 1px solid var(--border-light);
+    }
+    .search-map-panel .leaflet-container {
+      height: 100% !important;
+      width: 100% !important;
+    }
+    .map-toggle-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1001;
+      background: #fff;
+      border: 2px solid var(--primary-blue);
+      color: var(--primary-blue);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .map-toggle-btn:hover { background: var(--primary-blue); color: #fff; }
 
     .detail-right {
       display: flex;
@@ -1340,37 +1371,66 @@
     }
 
     @media (max-width: 768px) {
-      .search-container {
-        grid-template-columns: 1fr;
-      }
-      .filter-sidebar {
-        position: static;
-        top: auto;
-      }
-      .detail-grid {
-        grid-template-columns: 1fr;
-      }
-      .detail-right {
-        position: static;
-        top: auto;
-      }
-      .chat-container {
-        grid-template-columns: 1fr;
-        height: auto;
-      }
-      .chat-sidebar {
-        display: none;
-      }
-      .info-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .property-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      }
-      .value-props {
-        grid-template-columns: 1fr;
-      }
+      .navbar { padding: 0.5rem 1rem; }
+      .navbar-logo { font-size: 1.1rem; gap: 4px; }
+      .navbar-logo img { height: 28px; }
+      .navbar-links { gap: 0.5rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .navbar-link { font-size: 0.8rem; padding: 0.3rem 0; white-space: nowrap; }
+      .btn-primary, .btn-secondary { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+      .hero { padding: 2rem 1rem; }
+      .hero-content h1 { font-size: 1.6rem; }
+      .hero-content p { font-size: 0.95rem; margin-bottom: 1rem; }
+      .search-bar { flex-direction: column; }
+      .search-bar input, .search-bar select, .search-bar button { width: 100%; }
+      .value-props { grid-template-columns: 1fr; padding: 1.5rem 1rem; gap: 1rem; }
+      .featured-section { padding: 1rem; }
+      .section-title { font-size: 1.3rem; }
+      .property-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .card-image { height: 200px; }
+      .search-container { grid-template-columns: 1fr; height: auto; overflow: visible; }
+      .filter-sidebar { border-right: none; border-bottom: 1px solid var(--border-light); overflow: visible; }
+      .search-map-panel { display: none; }
+      .results-area { overflow: visible; }
+      .filter-group { margin-bottom: 0.5rem; }
+      .horizontal-card { flex-direction: column; }
+      .h-card-image { flex: none; width: 100%; height: 180px; }
+      .h-card-content { padding: 0; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .detail-right { position: static; top: auto; }
+      .detail-hero { height: 200px; }
+      .detail-hero img { height: 100%; }
+      .detail-left h1 { font-size: 1.3rem; }
+      .info-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+      .chat-container { grid-template-columns: 1fr; height: auto; }
+      .chat-sidebar { display: none; }
       .booking-channels { flex-wrap: wrap; }
+      .booking-channel { padding: 4px 8px; font-size: 0.72rem; }
+      .blog-grid { grid-template-columns: 1fr; }
+      .blog-article h1 { font-size: 1.4rem; }
+      .about-container { padding: 1.5rem 1rem; }
+      .about-stats { grid-template-columns: 1fr; gap: 0.75rem; }
+      .about-stat-value { font-size: 1.5rem; }
+      .why-section { padding: 1.5rem 1rem; }
+      .why-grid { grid-template-columns: 1fr; }
+      .why-content h2 { font-size: 1.3rem; }
+      .map-filters { flex-direction: column; gap: 6px; top: 5px; left: 5px; padding: 8px 10px; }
+      .map-filters select, .map-filters input { width: 100%; font-size: 0.75rem; padding: 5px 8px; }
+      .dashboard-container { padding: 1rem; }
+      .dashboard-tabs { flex-wrap: wrap; gap: 0.25rem; }
+      .dashboard-tab { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
+      .modal { max-width: 95vw; margin: 1rem; padding: 1rem; max-height: 90vh; overflow-y: auto; }
+      .footer { padding: 1rem; }
+      .footer-links { flex-wrap: wrap; gap: 0.5rem; }
+      .price-tag { font-size: 1.3rem; }
+    }
+    @media (max-width: 480px) {
+      .navbar-links { gap: 0.3rem; }
+      .navbar-link { font-size: 0.72rem; }
+      .hero-content h1 { font-size: 1.3rem; }
+      .property-grid { grid-template-columns: 1fr; }
+      .info-grid { grid-template-columns: 1fr; }
+      .dashboard-tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+      .dashboard-tab { white-space: nowrap; flex-shrink: 0; }
     }
     .booking-channels {
       display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.75rem;
@@ -1431,7 +1491,6 @@
     .promoted-badge { position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 0.3rem 0.7rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; }
     .promote-section { background: linear-gradient(135deg, #fff7ed, #fffbeb); border: 2px solid #f59e0b; border-radius: 12px; padding: 1.5rem; margin-top: 1rem; }
     .promote-section h3 { color: #d97706; margin-bottom: 0.5rem; }
-    @media (max-width: 768px) { .about-stats, .why-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -1597,6 +1656,7 @@
     }
 
     function getHeroImage(prop) {
+      if (prop.googleImage) return prop.googleImage;
       return REGION_PHOTOS[prop.regionCode] || REGION_PHOTOS[0];
     }
 
@@ -1746,7 +1806,22 @@
     function getPlatformChannels(prop) {
       var platforms = [];
       if (prop.hasGoogle) {
-        platforms.push({ key: 'google', icon: '🔍', label: 'Google', url: 'https://www.google.com/travel/hotels/s/' + encodeURIComponent(prop.name + ' ' + prop.comune + ' Italy') });
+        platforms.push({ key: 'google', icon: '🔍', label: 'Google', url: 'https://www.google.com/search?q=' + encodeURIComponent(prop.name + ' ' + prop.comune + ' Italy hotel') + '&udm=47' });
+      }
+      // Check if the host added Airbnb/Booking links
+      if (prop.claimedBy) {
+        var hostData = JSON.parse(localStorage.getItem('ad_user') || '{}');
+        if (hostData.id === prop.claimedBy) {
+          if (hostData.airbnbLink) platforms.push({ key: 'airbnb', icon: '🏠', label: 'Airbnb', url: hostData.airbnbLink });
+          if (hostData.bookingLink) platforms.push({ key: 'booking', icon: '🅱', label: 'Booking.com', url: hostData.bookingLink });
+        } else {
+          var allUsers = JSON.parse(localStorage.getItem('ad_users') || '[]');
+          var host = allUsers.find(function(u) { return u.id === prop.claimedBy; });
+          if (host) {
+            if (host.airbnbLink) platforms.push({ key: 'airbnb', icon: '🏠', label: 'Airbnb', url: host.airbnbLink });
+            if (host.bookingLink) platforms.push({ key: 'booking', icon: '🅱', label: 'Booking.com', url: host.bookingLink });
+          }
+        }
       }
       return platforms;
     }
@@ -1759,39 +1834,33 @@
       var platforms = getPlatformChannels(prop);
       if (direct.length === 0 && platforms.length === 0) return null;
 
-      function renderChannel(ch) {
-        return e(ch.url ? 'a' : 'span', {
-          key: ch.key,
-          className: 'booking-channel active',
-          href: ch.url || undefined,
-          target: ch.url ? '_blank' : undefined,
-          rel: ch.url ? 'noopener noreferrer' : undefined,
-          onClick: ch.url ? function(evt) { evt.stopPropagation(); } : undefined,
-          title: ch.label
-        }, e('span', { className: 'channel-icon' }, ch.icon), ch.label);
+      // Merge into single row: one icon per channel type
+      var allChannels = [];
+      if (direct.length > 0) {
+        allChannels.push({ key: 'direct', icon: '🏡', label: 'DIRECT', url: direct[0].url, type: 'direct' });
       }
+      platforms.forEach(function(p) {
+        if (p.key === 'google') allChannels.push({ key: 'google', icon: '🔍', label: 'GOOGLE', url: p.url, type: 'platform' });
+        else if (p.key === 'airbnb') allChannels.push({ key: 'airbnb', icon: '🏠', label: 'AIRBNB', url: p.url, type: 'platform' });
+        else if (p.key === 'booking') allChannels.push({ key: 'booking', icon: '🅱', label: 'BOOKING', url: p.url, type: 'platform' });
+      });
 
-      if (compact) {
-        return e('div', { style: { marginTop: '0.5rem' } },
-          direct.length > 0 ? e('div', { className: 'booking-channels', style: { marginBottom: '4px' } },
-            e('span', { style: { fontSize: '0.65rem', fontWeight: 700, color: '#2e7d32', textTransform: 'uppercase', letterSpacing: '0.5px', marginRight: '4px' } }, 'Direct:'),
-            direct.map(renderChannel)
-          ) : null,
-          platforms.length > 0 ? e('div', { className: 'booking-channels' },
-            e('span', { style: { fontSize: '0.65rem', fontWeight: 700, color: '#1565c0', textTransform: 'uppercase', letterSpacing: '0.5px', marginRight: '4px' } }, 'Platforms:'),
-            platforms.map(renderChannel)
-          ) : null
-        );
-      }
-      return e('div', { className: 'booking-channel-section' },
-        direct.length > 0 ? e('div', { style: { marginBottom: '0.75rem' } },
-          e('h4', { style: { color: '#2e7d32' } }, 'Direct Booking Channels'),
-          e('div', { className: 'booking-channels' }, direct.map(renderChannel))
-        ) : null,
-        platforms.length > 0 ? e('div', null,
-          e('h4', { style: { color: '#1565c0' } }, 'Platform Channels'),
-          e('div', { className: 'booking-channels' }, platforms.map(renderChannel))
-        ) : null
+      return e('div', { className: 'booking-channels', style: compact ? { marginTop: '0.5rem' } : { marginTop: '1rem' } },
+        allChannels.map(function(ch) {
+          var bgColor = ch.type === 'direct' ? '#e8f5e9' : '#e3f2fd';
+          var borderColor = ch.type === 'direct' ? '#4caf50' : '#90caf9';
+          var textColor = ch.type === 'direct' ? '#2e7d32' : '#1565c0';
+          return e(ch.url ? 'a' : 'span', {
+            key: ch.key,
+            className: 'booking-channel active',
+            href: ch.url || undefined,
+            target: ch.url ? '_blank' : undefined,
+            rel: ch.url ? 'noopener noreferrer' : undefined,
+            onClick: ch.url ? function(evt) { evt.stopPropagation(); } : undefined,
+            title: ch.label,
+            style: { background: bgColor, borderColor: borderColor, color: textColor, fontWeight: 700, fontSize: compact ? '0.7rem' : '0.8rem', letterSpacing: '0.3px' }
+          }, e('span', { className: 'channel-icon' }, ch.icon), ch.label);
+        })
       );
     }
 
@@ -1819,7 +1888,6 @@
           e('div', { className: 'h-card-meta' }, prop.type + ' • ' + prop.region),
           e('div', { className: 'h-card-stats' },
             e('span', null, prop.beds + ' beds'),
-            e('span', null, prop.baths + ' baths'),
             prop.googleRating ? e('span', { style: { color: '#f59e0b', fontWeight: 600 } }, prop.googleRating.toFixed(1) + '/5 (' + prop.googleReviews.toLocaleString() + ')') : e('span', null, renderStars(prop.stars))
           ),
           prop.googleDesc ? e('div', { style: { fontSize: '0.8rem', color: '#666', marginTop: '0.25rem', lineHeight: 1.3 } }, prop.googleDesc) : null,
@@ -1843,7 +1911,7 @@
       var featuredListings = useMemo(function() {
         return listings.filter(function(l) { return l.hasGoogle && l.googleRating; })
           .sort(function(a, b) { return (b.googleRating * 1000 + b.googleReviews) - (a.googleRating * 1000 + a.googleReviews); })
-          .slice(0, 6);
+          .slice(0, 12);
       }, [listings]);
 
       var stateQuery = useState('');
@@ -1904,11 +1972,13 @@
         if (ev.key === 'Enter') handleSearch();
       };
 
+      var sc = JSON.parse(localStorage.getItem('ad_site_content') || 'null') || {};
+
       return e('div', null,
         e('div', { className: 'hero' },
           e('div', { className: 'hero-content' },
-            e('h1', null, 'Book Direct in Italy'),
-            e('p', null, '63,000+ direct accommodations with no middleman fees'),
+            e('h1', null, sc.heroTitle || 'Book Direct in Italy'),
+            e('p', null, sc.heroSubtitle || '63,000+ direct accommodations with no middleman fees'),
             e('div', { className: 'search-bar', style: { position: 'relative' } },
               e('div', { style: { position: 'relative', flex: 1 } },
                 e('input', {
@@ -1943,25 +2013,8 @@
             )
           )
         ),
-        e('div', { className: 'value-props' },
-          e('div', { className: 'value-prop' },
-            e('div', { className: 'value-prop-icon' }, '🔒'),
-            e('h3', null, 'Direct Booking'),
-            e('p', null, 'Book directly with hosts, no middleman')
-          ),
-          e('div', { className: 'value-prop' },
-            e('div', { className: 'value-prop-icon' }, '💰'),
-            e('h3', null, 'Best Prices'),
-            e('p', null, 'Lower prices without commission fees')
-          ),
-          e('div', { className: 'value-prop' },
-            e('div', { className: 'value-prop-icon' }, '⭐'),
-            e('h3', null, 'Verified Properties'),
-            e('p', null, 'All accommodations verified and rated')
-          )
-        ),
         e('div', { className: 'featured-section' },
-          e('h2', { className: 'section-title' }, 'Featured Properties'),
+          e('h2', { className: 'section-title' }, sc.featuredTitle || 'Featured Properties'),
           e('div', { className: 'property-grid' },
             featuredListings.map(function(prop) {
               return e(PropertyCard, { key: prop.id, prop: prop, onSelect: onSelectProperty });
@@ -2063,6 +2116,8 @@
 
       var filteredListings = useMemo(function() {
         var result = listings.filter(function(l) {
+          // Hide listings with zero contact details
+          if (!l.website && !l.hasGoogle && !l.verified) return false;
           if (resolvedCity && l.comune.toUpperCase() !== resolvedCity.toUpperCase()) return false;
           if (neighborhood && l.neighborhood !== neighborhood) return false;
           if (selectedType && l.type !== selectedType) return false;
@@ -2111,9 +2166,72 @@
         setCurrentPage(1);
       };
 
+      // Map state
+      var stateShowMap = useState(true);
+      var showMap = stateShowMap[0];
+      var setShowMap = stateShowMap[1];
+      var mapRef = useRef(null);
+      var mapInstanceRef = useRef(null);
+      var markersRef = useRef(null);
+
+      // Update map markers when filtered listings change
+      useEffect(function() {
+        if (!showMap || !mapRef.current) return;
+        var L = window.L;
+        if (!L) return;
+
+        // Initialize map if needed
+        if (!mapInstanceRef.current) {
+          mapInstanceRef.current = L.map(mapRef.current, { zoomControl: true }).setView([42.5, 12.5], 6);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' }).addTo(mapInstanceRef.current);
+        }
+        var map = mapInstanceRef.current;
+
+        // Clear old markers
+        if (markersRef.current) {
+          map.removeLayer(markersRef.current);
+        }
+
+        // Add markers for visible listings (max 500 for performance)
+        var markerGroup = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true });
+        var mapListings = filteredListings.filter(function(l) { return l.lat && l.lon; }).slice(0, 500);
+        mapListings.forEach(function(l) {
+          var price = l.googlePrice || estimatePrice(l);
+          var marker = L.circleMarker([l.lat, l.lon], {
+            radius: 6,
+            fillColor: l.hasGoogle ? '#4285f4' : (l.website ? '#2e7d32' : '#f59e0b'),
+            color: '#333', weight: 1, opacity: 0.8, fillOpacity: 0.8
+          });
+          marker.bindPopup('<b>' + l.name + '</b><br>' + l.type + '<br>' + l.comune + '<br>\u20AC' + price + '/night');
+          marker.on('click', function() { onSelectProperty(l); });
+          markerGroup.addLayer(marker);
+        });
+        map.addLayer(markerGroup);
+        markersRef.current = markerGroup;
+
+        // Fit bounds if we have a city selected
+        if (mapListings.length > 0 && resolvedCity) {
+          var bounds = L.latLngBounds(mapListings.map(function(l) { return [l.lat, l.lon]; }));
+          map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+        }
+
+        // Invalidate size after render
+        setTimeout(function() { map.invalidateSize(); }, 100);
+      }, [filteredListings, showMap]);
+
+      // Cleanup map on unmount
+      useEffect(function() {
+        return function() {
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.remove();
+            mapInstanceRef.current = null;
+          }
+        };
+      }, []);
+
       return e('div', null,
         showModal && e(PropertyTypeInfoModal, { onClose: function() { setShowModal(false); } }),
-        e('div', { className: 'search-container' },
+        e('div', { className: 'search-container', style: showMap ? {} : { gridTemplateColumns: '20% 80%' } },
           e('div', { className: 'filter-sidebar' },
             e('div', { className: 'filter-group' },
               e('label', { className: 'filter-label' }, 'City'),
@@ -2121,15 +2239,16 @@
                 e('input', {
                   className: 'filter-select',
                   type: 'text',
-                  placeholder: 'Search ' + allCommunes.length + ' cities...',
+                  placeholder: 'Search cities...',
                   value: city,
                   onChange: function(ev) { var v = ev.target.value; setCity(v); setNeighborhood(''); setCurrentPage(1); },
                   list: 'city-datalist',
-                  autoComplete: 'off'
+                  autoComplete: 'off',
+                  style: { width: '100%', boxSizing: 'border-box' }
                 }),
                 city && e('button', {
                   onClick: function() { setCity(''); setNeighborhood(''); setCurrentPage(1); },
-                  style: { position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#666', padding: '2px 6px' }
+                  style: { position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: '1rem', cursor: 'pointer', color: '#666', padding: '2px 4px' }
                 }, 'x'),
                 e('datalist', { id: 'city-datalist' },
                   allCommunes.map(function(c) { return e('option', { key: c, value: c }); })
@@ -2138,34 +2257,34 @@
             ),
             city && e('div', { className: 'filter-group' },
               e('label', { className: 'filter-label' }, 'Neighborhood'),
-              e('select', { className: 'filter-select', value: neighborhood, onChange: function(ev) { setNeighborhood(ev.target.value); setCurrentPage(1); } },
+              e('select', { className: 'filter-select', value: neighborhood, onChange: function(ev) { setNeighborhood(ev.target.value); setCurrentPage(1); }, style: { width: '100%' } },
                 e('option', { value: '' }, 'All neighborhoods'),
                 (neighborhoodsByComune[resolvedCity] || []).map(function(n) { return e('option', { key: n, value: n }, n); })
               )
             ),
             e('div', { className: 'filter-group' },
               e('label', { className: 'filter-label' },
-                'Property Type ',
-                e('span', { className: 'help-icon', onClick: function() { setShowModal(true); }, style: { display: 'inline-block', width: '18px', height: '18px', background: 'var(--primary-blue)', color: '#fff', borderRadius: '50%', textAlign: 'center', lineHeight: '18px', fontSize: '0.75rem', marginLeft: '0.3rem', cursor: 'pointer' } }, '?')
+                'Type ',
+                e('span', { onClick: function() { setShowModal(true); }, style: { display: 'inline-block', width: '16px', height: '16px', background: 'var(--primary-blue)', color: '#fff', borderRadius: '50%', textAlign: 'center', lineHeight: '16px', fontSize: '0.65rem', cursor: 'pointer' } }, '?')
               ),
-              e('select', { className: 'filter-select', value: selectedType, onChange: function(ev) { setSelectedType(ev.target.value); setCurrentPage(1); } },
+              e('select', { className: 'filter-select', value: selectedType, onChange: function(ev) { setSelectedType(ev.target.value); setCurrentPage(1); }, style: { width: '100%' } },
                 e('option', { value: '' }, 'All types'),
                 ['Affittacamere', 'Agriturismo', 'Altro', 'B&B', 'Campeggio', 'Hotel', 'Residence', 'Villaggio Turistico'].map(function(t) { return e('option', { key: t, value: t }, t); })
               )
             ),
             e('div', { className: 'filter-group' },
-              e('label', { className: 'filter-label' }, 'Min Stars: ' + minStars),
+              e('label', { className: 'filter-label' }, 'Stars: ' + minStars + '+'),
               e('input', { type: 'range', min: '0', max: '5', value: minStars, className: 'slider', style: { width: '100%' }, onChange: function(ev) { setMinStars(parseInt(ev.target.value)); setCurrentPage(1); } })
             ),
             e('div', { className: 'filter-group' },
-              e('label', { className: 'filter-label' }, 'Min Beds: ' + minBeds),
+              e('label', { className: 'filter-label' }, 'Beds: ' + minBeds + '+'),
               e('input', { type: 'range', min: '0', max: '10', value: minBeds, className: 'slider', style: { width: '100%' }, onChange: function(ev) { setMinBeds(parseInt(ev.target.value)); setCurrentPage(1); } })
             ),
             e('div', { className: 'filter-group' },
-              e('label', { className: 'filter-label' }, 'Booking Type'),
-              e('select', { className: 'filter-select', value: bookingFilter, onChange: function(ev) { setBookingFilter(ev.target.value); setCurrentPage(1); } },
-                e('option', { value: '' }, 'All properties'),
-                e('option', { value: 'direct' }, 'Direct booking available'),
+              e('label', { className: 'filter-label' }, 'Booking'),
+              e('select', { className: 'filter-select', value: bookingFilter, onChange: function(ev) { setBookingFilter(ev.target.value); setCurrentPage(1); }, style: { width: '100%' } },
+                e('option', { value: '' }, 'All'),
+                e('option', { value: 'direct' }, 'Direct booking'),
                 e('option', { value: 'google' }, 'Google verified'),
                 e('option', { value: 'website' }, 'Has website')
               )
@@ -2177,21 +2296,24 @@
                   return e('button', {
                     key: amen,
                     className: 'amenity-toggle' + (selectedAmenities.has(amen) ? ' active' : ''),
-                    onClick: function() { handleAmenityToggle(amen); }
+                    onClick: function() { handleAmenityToggle(amen); },
+                    style: { fontSize: '0.8rem', padding: '4px 8px' }
                   }, AMENITY_LABELS[amen]);
                 })
               )
+            ),
+            e('div', { style: { marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #ddd' } },
+              e('button', { className: 'map-toggle-btn', onClick: function() { setShowMap(!showMap); }, style: { position: 'static', width: '100%' } }, showMap ? 'Hide Map' : 'Show Map')
             )
           ),
           e('div', { className: 'results-area' },
-            e('div', { className: 'results-header' },
-              e('div', { className: 'results-count' }, filteredListings.length.toLocaleString() + ' properties found' + (resolvedCity ? ' in ' + resolvedCity : '')),
-              e('div', { className: 'sort-buttons' },
-                e('button', { className: 'sort-btn' + (sortBy === 'relevant' ? ' active' : ''), onClick: function() { setSortBy('relevant'); } }, 'Relevant'),
-                e('button', { className: 'sort-btn' + (sortBy === 'name' ? ' active' : ''), onClick: function() { setSortBy('name'); } }, 'Name'),
-                e('button', { className: 'sort-btn' + (sortBy === 'rated' ? ' active' : ''), onClick: function() { setSortBy('rated'); } }, 'Top Rated'),
-                e('button', { className: 'sort-btn' + (sortBy === 'price_low' ? ' active' : ''), onClick: function() { setSortBy('price_low'); } }, 'Price Low'),
-                e('button', { className: 'sort-btn' + (sortBy === 'price_high' ? ' active' : ''), onClick: function() { setSortBy('price_high'); } }, 'Price High')
+            e('div', { className: 'results-header', style: { flexWrap: 'wrap', gap: '0.5rem' } },
+              e('div', { className: 'results-count', style: { fontSize: '0.9rem' } }, filteredListings.length.toLocaleString() + ' properties' + (resolvedCity ? ' in ' + resolvedCity : '')),
+              e('div', { className: 'sort-buttons', style: { flexWrap: 'wrap' } },
+                e('button', { className: 'sort-btn' + (sortBy === 'relevant' ? ' active' : ''), onClick: function() { setSortBy('relevant'); } }, 'Best'),
+                e('button', { className: 'sort-btn' + (sortBy === 'rated' ? ' active' : ''), onClick: function() { setSortBy('rated'); } }, 'Rated'),
+                e('button', { className: 'sort-btn' + (sortBy === 'price_low' ? ' active' : ''), onClick: function() { setSortBy('price_low'); } }, 'Price'),
+                e('button', { className: 'sort-btn' + (sortBy === 'name' ? ' active' : ''), onClick: function() { setSortBy('name'); } }, 'A-Z')
               )
             ),
             paginatedListings.map(function(prop) {
@@ -2204,7 +2326,10 @@
                 return e('button', { key: pg, className: 'page-btn' + (pg === currentPage ? ' active' : ''), onClick: function() { setCurrentPage(pg); window.scrollTo(0, 0); } }, pg);
               })
             )
-          )
+          ),
+          showMap ? e('div', { className: 'search-map-panel' },
+            e('div', { ref: mapRef, style: { width: '100%', height: '100%' } })
+          ) : null
         )
       );
     }
@@ -2542,10 +2667,6 @@
                   e('div', { className: 'info-label' }, 'Rooms')
                 ),
                 e('div', { className: 'info-item' },
-                  e('div', { className: 'info-value' }, prop.baths),
-                  e('div', { className: 'info-label' }, 'Bathrooms')
-                ),
-                e('div', { className: 'info-item' },
                   e('div', { className: 'info-value' }, renderStars(prop.stars)),
                   e('div', { className: 'info-label' }, 'Rating')
                 )
@@ -2564,6 +2685,19 @@
                 )
               ),
               e(BookingChannels, { prop: prop, compact: false }),
+              (function() {
+                // Show Google Calendar availability if host configured it
+                if (!prop.claimedBy) return null;
+                var allUsers = JSON.parse(localStorage.getItem('ad_users') || '[]');
+                var host = allUsers.find(function(u) { return u.id === prop.claimedBy; });
+                var calId = host && host.googleCalendarId;
+                if (!calId) return null;
+                var calSrc = 'https://calendar.google.com/calendar/embed?src=' + encodeURIComponent(calId) + '&mode=MONTH&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&showTz=0&height=400';
+                return e('div', { style: { marginTop: '1.5rem' } },
+                  e('h3', { style: { marginBottom: '0.75rem' } }, 'Availability Calendar'),
+                  e('iframe', { src: calSrc, style: { width: '100%', height: '400px', border: '1px solid #ddd', borderRadius: '8px' }, frameBorder: '0', scrolling: 'no' })
+                );
+              })(),
               prop.lat && prop.lon ? e('div', { className: 'map-embed', id: 'detail-map-' + prop.id, ref: function(el) {
                 if (el && !el.dataset.init) {
                   el.dataset.init = 'true';
@@ -2908,7 +3042,10 @@
         sharePhone: (user && user.sharePhone) || false,
         shareWhatsapp: (user && user.shareWhatsapp) || false,
         phone: (user && user.phone) || '',
-        whatsapp: (user && user.whatsapp) || ''
+        whatsapp: (user && user.whatsapp) || '',
+        airbnbLink: (user && user.airbnbLink) || '',
+        bookingLink: (user && user.bookingLink) || '',
+        googleCalendarId: (user && user.googleCalendarId) || ''
       });
       var settings = stateSettings[0];
       var setSettings = stateSettings[1];
@@ -2944,6 +3081,22 @@
           e('div', { className: 'form-group' },
             e('label', { className: 'form-label' }, 'WhatsApp Number'),
             e('input', { className: 'form-input', type: 'tel', value: settings.whatsapp, onChange: function(evt) { setSettings(Object.assign({}, settings, { whatsapp: evt.target.value })); } })
+          ),
+          e('h2', { style: { marginTop: '2rem', fontSize: '1.2rem' } }, 'Booking Platform Links'),
+          e('p', { style: { fontSize: '0.85rem', color: '#666', marginBottom: '1rem' } }, 'Add your Airbnb or Booking.com property links. Guests will see these as booking options on your listing.'),
+          e('div', { className: 'form-group' },
+            e('label', { className: 'form-label' }, 'Airbnb Link'),
+            e('input', { className: 'form-input', type: 'url', placeholder: 'https://www.airbnb.com/rooms/...', value: settings.airbnbLink, onChange: function(evt) { setSettings(Object.assign({}, settings, { airbnbLink: evt.target.value })); } })
+          ),
+          e('div', { className: 'form-group' },
+            e('label', { className: 'form-label' }, 'Booking.com Link'),
+            e('input', { className: 'form-input', type: 'url', placeholder: 'https://www.booking.com/hotel/...', value: settings.bookingLink, onChange: function(evt) { setSettings(Object.assign({}, settings, { bookingLink: evt.target.value })); } })
+          ),
+          e('h2', { style: { marginTop: '2rem', fontSize: '1.2rem' } }, 'Availability Calendar'),
+          e('p', { style: { fontSize: '0.85rem', color: '#666', marginBottom: '1rem' } }, 'Connect your Google Calendar to show availability on your listing. Paste your calendar ID (found in Google Calendar Settings > Integrate calendar).'),
+          e('div', { className: 'form-group' },
+            e('label', { className: 'form-label' }, 'Google Calendar ID'),
+            e('input', { className: 'form-input', type: 'text', placeholder: 'your-calendar-id@group.calendar.google.com', value: settings.googleCalendarId, onChange: function(evt) { setSettings(Object.assign({}, settings, { googleCalendarId: evt.target.value })); } })
           ),
           e('button', { className: 'btn-primary', onClick: handleSave, style: { marginTop: '1.5rem' } }, 'Save Settings'),
           settingsNotice ? e('div', { style: { marginTop: '0.75rem', padding: '0.75rem 1rem', borderRadius: '8px', background: '#e8f5e9', color: '#2e7d32', fontWeight: 500 } }, settingsNotice) : null
@@ -3232,15 +3385,24 @@
       var stateEmailLogs = useState([]);
       var emailLogs = stateEmailLogs[0];
       var setEmailLogs = stateEmailLogs[1];
-      var stateTemplateIt = useState('Caro proprietario,\n\nDesideriamo invitarvi a lisciare la vostra proprietà su Direct Bookings Italy.\n\nAccedi: [LINK]?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim\n\nSaluti cordiali,\nDirect Bookings Italy');
+      var stateTemplateIt = useState('Gentile proprietario di [PROPERTY_NAME],\n\nLa sua struttura a [PROPERTY_CITY] e\' gia\' presente su DirectBookingsItaly.com con i dati pubblici del registro turistico.\n\nPuo\' rivendicarla GRATUITAMENTE e scegliere come ricevere prenotazioni:\n\nVeda il suo profilo: https://directbookingsitaly.com/#/property/[PROPERTY_ID]/[SLUG]?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim&utm_content=[PROPERTY_ID]\n\nVantaggi:\n- Zero commissioni - i viaggiatori la contattano direttamente\n- Profilo verificato con foto e recensioni Google\n- Completamente gratuito, per sempre\n\nPuo\' anche aggiungere il link della sua struttura su Airbnb o Booking.com al suo profilo, cosi\' i viaggiatori possono prenotare attraverso la piattaforma che preferisce.\n\nBasta registrarsi su directbookingsitaly.com come proprietario e cercare il nome della sua struttura.\n\nCordiali saluti,\nIl Team DirectBookingsItaly.com\ninfo@directbookingsitaly.com');
       var templateIt = stateTemplateIt[0];
       var setTemplateIt = stateTemplateIt[1];
-      var stateTemplateEn = useState('Dear Property Owner,\n\nWe invite you to list your property on Direct Bookings Italy.\n\nClaim your property: [LINK]?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim\n\nBest regards,\nDirect Bookings Italy');
+      var stateTemplateEn = useState('Dear owner of [PROPERTY_NAME],\n\nYour property in [PROPERTY_CITY] is already listed on DirectBookingsItaly.com using public tourism registry data.\n\nYou can claim it for FREE and choose how you receive bookings:\n\nView your listing: https://directbookingsitaly.com/#/property/[PROPERTY_ID]/[SLUG]?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim&utm_content=[PROPERTY_ID]\n\nBenefits:\n- Zero commission - travelers contact you directly\n- Verified profile with Google photos and reviews\n- Completely free, forever\n\nYou can also add your Airbnb or Booking.com link to your profile, so guests can book through whichever platform you prefer.\n\nJust register at directbookingsitaly.com as a host and search for your property name.\n\nBest regards,\nThe DirectBookingsItaly.com Team\ninfo@directbookingsitaly.com');
       var templateEn = stateTemplateEn[0];
       var setTemplateEn = stateTemplateEn[1];
       var stateEditTemplate = useState(null);
       var editTemplate = stateEditTemplate[0];
       var setEditTemplate = stateEditTemplate[1];
+      var stateSelectedListings = useState([]);
+      var selectedListings = stateSelectedListings[0];
+      var setSelectedListings = stateSelectedListings[1];
+      var stateCampaignLanguage = useState('en');
+      var campaignLanguage = stateCampaignLanguage[0];
+      var setCampaignLanguage = stateCampaignLanguage[1];
+      var stateShowCampaignSelector = useState(false);
+      var showCampaignSelector = stateShowCampaignSelector[0];
+      var setShowCampaignSelector = stateShowCampaignSelector[1];
 
       var loadLocalStorage = function() {
         var saved = JSON.parse(localStorage.getItem('dbi_outreach_stats') || '{"emailsSent":0,"whatsappSent":0,"linkClicks":0,"claims":0}');
@@ -3265,11 +3427,21 @@
       };
 
       var sendBrevoEmail = function(to, subject, htmlContent) {
+        // Check unsubscribe list
+        var unsubs = JSON.parse(localStorage.getItem('dbi_unsubscribed') || '[]');
+        if (unsubs.indexOf(to) !== -1) {
+          var newLogs = emailLogs.slice();
+          newLogs.unshift({ timestamp: new Date().toLocaleString(), email: to, subject: subject, status: 'skipped (unsubscribed)' });
+          if (newLogs.length > 20) newLogs = newLogs.slice(0, 20);
+          setEmailLogs(newLogs);
+          return;
+        }
         var payload = {
           sender: { email: senderEmail, name: senderName },
           to: [{ email: to }],
           subject: subject,
-          htmlContent: htmlContent
+          htmlContent: htmlContent,
+          headers: { 'List-Unsubscribe': '<https://directbookingsitaly.com/#/unsubscribe?email=' + encodeURIComponent(to) + '>' }
         };
         var xhr = new XMLHttpRequest();
         xhr.open('POST', 'https://api.brevo.com/v3/smtp/email', true);
@@ -3300,10 +3472,80 @@
         setTestEmail('');
       };
 
+      var handleSendEmailCampaign = function(selectedListings, language) {
+        if (!selectedListings || selectedListings.length === 0) { alert('Please select listings to email'); return; }
+        if (!apiKey) { alert('Please configure your API key'); return; }
+        setEmailStatus('in-progress');
+        var template = language === 'it' ? templateIt : templateEn;
+        var sent = 0;
+        var failed = 0;
+        var processNext = function(index) {
+          if (index >= selectedListings.length) {
+            setEmailStatus('completed');
+            alert('Campaign sent! ' + sent + ' emails sent, ' + failed + ' failed.');
+            return;
+          }
+          var listing = selectedListings[index];
+          if (!listing.email) {
+            processNext(index + 1);
+            return;
+          }
+          var htmlContent = generateEmailContent(listing, template);
+          var subject = language === 'it' ? 'Reclama la tua proprietà su Direct Bookings Italy' : 'Claim Your Property on Direct Bookings Italy';
+          sendBrevoEmail(listing.email, subject, htmlContent);
+          sent = sent + 1;
+          setTimeout(function() { processNext(index + 1); }, 500);
+        };
+        processNext(0);
+      };
+
+      var generatePropertyUrl = function(prop) {
+        var slug = (prop.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 60);
+        return 'https://directbookingsitaly.com/#/property/' + prop.id + '/' + slug + '?utm_source=outreach&utm_medium=whatsapp&utm_campaign=owner_claim&utm_content=' + prop.id;
+      };
+
+      var generateEmailContent = function(prop, template, recipientEmail) {
+        var slug = (prop.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 60);
+        var directPrefix = (prop.website || prop.verified) ? 'book-direct/' : '';
+        var propertyUrl = 'https://directbookingsitaly.com/#/property/' + directPrefix + prop.id + '/' + slug + '?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim&utm_content=' + prop.id;
+        var content = template.replace(/\[PROPERTY_NAME\]/g, prop.name || 'Your Property')
+          .replace(/\[PROPERTY_ID\]/g, prop.id)
+          .replace(/\[SLUG\]/g, slug)
+          .replace(/\[PROPERTY_CITY\]/g, prop.comune || prop.city || 'Italy')
+          .replace(/\[PROPERTY_REGION\]/g, prop.region || '');
+        var bodyHtml = '<p>' + content.replace(/\n/g, '</p><p>') + '</p>';
+
+        // Wrap in full HTML email with tracking pixel + unsubscribe
+        var emailId = 'e_' + prop.id + '_' + Date.now();
+        var unsubUrl = 'https://directbookingsitaly.com/#/unsubscribe?email=' + encodeURIComponent(recipientEmail || '') + '&id=' + prop.id;
+        var trackPixelUrl = 'https://directbookingsitaly.com/api/track?type=open&eid=' + emailId + '&pid=' + prop.id + '&email=' + encodeURIComponent(recipientEmail || '');
+
+        return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
+          + '<body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px;">'
+          + '<div style="background:#003580;padding:20px;text-align:center;border-radius:8px 8px 0 0;">'
+          + '<h2 style="color:#fff;margin:0;font-size:18px;">Direct Bookings Italy</h2>'
+          + '</div>'
+          + '<div style="padding:20px;background:#fff;border:1px solid #ddd;border-top:none;">'
+          + bodyHtml
+          + '<div style="margin-top:20px;padding-top:15px;border-top:1px solid #eee;text-align:center;">'
+          + '<a href="' + propertyUrl + '" style="display:inline-block;background:#003580;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;">View Your Listing</a>'
+          + '</div>'
+          + '</div>'
+          + '<div style="padding:15px;text-align:center;font-size:11px;color:#999;border-top:1px solid #eee;">'
+          + '<p>DirectBookingsItaly.com | info@directbookingsitaly.com</p>'
+          + '<p><a href="' + unsubUrl + '" style="color:#999;text-decoration:underline;">Unsubscribe</a> | <a href="https://directbookingsitaly.com/#/about" style="color:#999;text-decoration:underline;">About Us</a></p>'
+          + '</div>'
+          + '<img src="' + trackPixelUrl + '" width="1" height="1" style="display:none;" alt="" />'
+          + '</body></html>';
+      };
+
       var handleDownloadWhatsappCsv = function() {
-        var csv = 'phone_number,property_name\n';
+        var csv = 'phone_number,property_name,property_url\n';
         listings.slice(0, 100).forEach(function(l) {
-          if (l.phone) csv += l.phone + ',' + l.name + '\n';
+          if (l.phone) {
+            var url = generatePropertyUrl(l);
+            csv += l.phone + ',"' + l.name + '","' + url + '"\n';
+          }
         });
         var blob = new Blob([csv], { type: 'text/csv' });
         var url = URL.createObjectURL(blob);
@@ -3328,7 +3570,8 @@
           e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#f59e0b' } }, stats.emailsSent.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Emails Sent')),
           e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#8b5cf6' } }, stats.whatsappSent.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'WhatsApp Sent')),
           e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#ec4899' } }, stats.linkClicks.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Link Clicks')),
-          e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#0d7377' } }, stats.claims.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Claims from Outreach'))
+          e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#0d7377' } }, stats.claims.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Claims from Outreach')),
+          e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#dc2626' } }, JSON.parse(localStorage.getItem('dbi_unsubscribed') || '[]').length), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Unsubscribed'))
         ),
         e('div', { style: { borderTop: '2px solid #ddd', paddingTop: '2rem' } },
           e('h3', { style: { marginBottom: '1rem' } }, 'Email Campaign'),
@@ -3373,6 +3616,47 @@
               )
             ) : null
           ),
+          e('div', cardSty,
+            e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' } },
+              e('h4', { style: { margin: 0 } }, 'Send Campaign to Properties'),
+              e('button', { onClick: function() { setShowCampaignSelector(!showCampaignSelector); }, style: { background: '#0066d4', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' } }, showCampaignSelector ? 'Hide Selector' : 'Select Properties')
+            ),
+            showCampaignSelector ? e('div', { style: { background: '#f3f4f6', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' } },
+              e('div', { style: { marginBottom: '0.75rem' } },
+                e('label', { style: { display: 'block', fontWeight: 600, marginBottom: '0.25rem' } }, 'Campaign Language:'),
+                e('select', { value: campaignLanguage, onChange: function(ev) { setCampaignLanguage(ev.target.value); }, style: { width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' } },
+                  e('option', { value: 'en' }, 'English'),
+                  e('option', { value: 'it' }, 'Italian')
+                )
+              ),
+              e('div', { style: { marginBottom: '0.75rem' } },
+                e('label', { style: { display: 'block', fontWeight: 600, marginBottom: '0.25rem' } }, 'Select properties with email:'),
+                e('div', { style: { maxHeight: '300px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '4px', padding: '0.5rem', background: '#fff' } },
+                  listings.filter(function(l) { return l.email; }).map(function(l) {
+                    var isSelected = selectedListings.indexOf(l.id) !== -1;
+                    return e('label', { key: l.id, style: { display: 'flex', alignItems: 'center', padding: '0.5rem', cursor: 'pointer', marginBottom: '0.25rem' } },
+                      e('input', { type: 'checkbox', checked: isSelected, onChange: function(ev) {
+                        var newSelected = selectedListings.slice();
+                        if (ev.target.checked) {
+                          newSelected.push(l.id);
+                        } else {
+                          newSelected = newSelected.filter(function(id) { return id !== l.id; });
+                        }
+                        setSelectedListings(newSelected);
+                      }, style: { marginRight: '0.5rem', cursor: 'pointer' } }),
+                      e('span', null, l.name + ' (' + l.comune + ')')
+                    );
+                  })
+                )
+              ),
+              e('div', { style: { display: 'flex', gap: '0.5rem' } },
+                e('button', { onClick: function() { setSelectedListings(listings.filter(function(l) { return l.email; }).map(function(l) { return l.id; })); }, style: { background: '#0d7377', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' } }, 'Select All'),
+                e('button', { onClick: function() { setSelectedListings([]); }, style: { background: '#888', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' } }, 'Clear All'),
+                e('button', { onClick: function() { var toSend = listings.filter(function(l) { return selectedListings.indexOf(l.id) !== -1; }); handleSendEmailCampaign(toSend, campaignLanguage); }, style: { background: '#16a34a', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', marginLeft: 'auto' } }, 'Send Campaign (' + selectedListings.length + ')')
+              )
+            ) : null,
+            e('p', { style: { color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' } }, 'Selected: ' + selectedListings.length + ' properties')
+          ),
           e('div', { style: { background: '#fff', border: '1px solid #ddd', borderRadius: '8px', padding: '1rem' } },
             e('h4', null, 'Recent Sends (Last 20)'),
             emailLogs.length === 0 ? e('p', { style: { color: '#888', fontSize: '0.9rem' } }, 'No sends yet') :
@@ -3383,6 +3667,48 @@
                   e('span', { style: { background: log.status === 'sent' ? '#dcfce7' : '#fee2e2', color: log.status === 'sent' ? '#166534' : '#991b1b', padding: '2px 8px', borderRadius: '4px', fontWeight: 500 } }, log.status.toUpperCase())
                 );
               })
+            )
+          )
+        ),
+        e('div', { style: { borderTop: '2px solid #ddd', paddingTop: '1.5rem', marginTop: '1.5rem' } },
+          e('h3', { style: { marginBottom: '0.75rem' } }, 'Email Tracking'),
+          e('div', { style: { background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' } },
+            e('p', { style: { fontSize: '0.9rem', color: '#166534', lineHeight: 1.6, margin: 0 } },
+              'All emails include: a 1x1 tracking pixel (records opens when loaded), UTM-tagged links with property IDs (tracks clicks), '
+              + 'List-Unsubscribe header (one-click unsubscribe in Gmail/Outlook), and unsubscribe link in footer. '
+              + 'Click data appears in the Link Clicks counter above. Unsubscribed addresses are automatically skipped.'
+            )
+          ),
+          e('div', { style: { display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' } },
+            e('div', { style: { flex: 1, minWidth: '200px', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', padding: '1rem' } },
+              e('h4', { style: { fontSize: '0.9rem', marginBottom: '0.5rem' } }, 'Click Tracking Log'),
+              (function() {
+                var tracks = JSON.parse(localStorage.getItem('dbi_outreach_tracks') || '[]');
+                if (tracks.length === 0) return e('p', { style: { color: '#888', fontSize: '0.85rem' } }, 'No clicks tracked yet');
+                return e('div', { style: { maxHeight: '200px', overflowY: 'auto' } },
+                  tracks.slice().reverse().slice(0, 20).map(function(t, i) {
+                    return e('div', { key: i, style: { fontSize: '0.8rem', padding: '4px 0', borderBottom: '1px solid #f5f5f5' } },
+                      e('span', { style: { color: '#888' } }, t.timestamp ? t.timestamp.substring(0, 16).replace('T', ' ') : ''),
+                      ' ',
+                      e('span', { style: { fontWeight: 600 } }, t.medium || ''),
+                      ' ',
+                      e('span', { style: { color: '#666' } }, 'pid:' + (t.content || 'n/a'))
+                    );
+                  })
+                );
+              })()
+            ),
+            e('div', { style: { flex: 1, minWidth: '200px', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', padding: '1rem' } },
+              e('h4', { style: { fontSize: '0.9rem', marginBottom: '0.5rem' } }, 'Unsubscribed Emails'),
+              (function() {
+                var unsubs = JSON.parse(localStorage.getItem('dbi_unsubscribed') || '[]');
+                if (unsubs.length === 0) return e('p', { style: { color: '#888', fontSize: '0.85rem' } }, 'None yet');
+                return e('div', { style: { maxHeight: '200px', overflowY: 'auto' } },
+                  unsubs.map(function(em, i) {
+                    return e('div', { key: i, style: { fontSize: '0.85rem', padding: '3px 0', borderBottom: '1px solid #f5f5f5' } }, em);
+                  })
+                );
+              })()
             )
           )
         ),
@@ -3457,6 +3783,44 @@
       var notice = stateNotice[0];
       var setNotice = stateNotice[1];
 
+      // Site Editor state
+      var defaultSiteContent = {
+        heroTitle: 'Book Direct in Italy. Save More.',
+        heroSubtitle: 'Skip the middleman fees. Connect directly with 63,000+ Italian property hosts.',
+        heroButton: 'Search Properties',
+        vp1Title: 'Save 15-20%',
+        vp1Text: 'Book direct and avoid platform commission fees',
+        vp2Title: 'Direct Contact',
+        vp2Text: 'Communicate directly with your host',
+        vp3Title: '63,000+ Properties',
+        vp3Text: 'Hotels, B&Bs, agriturismos and villas across all of Italy',
+        featuredTitle: 'Featured Properties',
+        footerText: '2026 DirectBookingsItaly.com - Book Direct in Italy',
+        contactEmail: 'info@directbookingsitaly.com',
+        privacyText: '',
+        termsText: '',
+        customLinks: '[]'
+      };
+      var savedSiteContent = JSON.parse(localStorage.getItem('ad_site_content') || 'null');
+      var stateSiteContent = useState(savedSiteContent || defaultSiteContent);
+      var siteContent = stateSiteContent[0];
+      var setSiteContent = stateSiteContent[1];
+      var stateSiteEditField = useState(null);
+      var siteEditField = stateSiteEditField[0];
+      var setSiteEditField = stateSiteEditField[1];
+
+      var handleSaveSiteContent = function() {
+        localStorage.setItem('ad_site_content', JSON.stringify(siteContent));
+        setNotice({ type: 'success', text: 'Site content saved. Changes will appear on the live site.' });
+        setSiteEditField(null);
+      };
+
+      var handleSiteFieldChange = function(field, value) {
+        var updated = Object.assign({}, siteContent);
+        updated[field] = value;
+        setSiteContent(updated);
+      };
+
       var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
       var conversations = JSON.parse(localStorage.getItem('ad_conversations') || '[]');
 
@@ -3514,6 +3878,7 @@
           e('button', { className: 'dashboard-tab' + (adminTab === 'conversations' ? ' active' : ''), onClick: function() { setAdminTab('conversations'); } }, 'Messages'),
           e('button', { className: 'dashboard-tab' + (adminTab === 'featured' ? ' active' : ''), onClick: function() { setAdminTab('featured'); } }, 'Featured'),
           e('button', { className: 'dashboard-tab' + (adminTab === 'outreach' ? ' active' : ''), onClick: function() { setAdminTab('outreach'); } }, 'Outreach'),
+          e('button', { className: 'dashboard-tab' + (adminTab === 'siteeditor' ? ' active' : ''), onClick: function() { setAdminTab('siteeditor'); } }, 'Site Editor'),
           e('button', { className: 'dashboard-tab', onClick: props.onBack, style: { marginLeft: 'auto' } }, 'Exit Admin')
         ),
         notice ? e('div', { style: { padding: '0.75rem 1rem', margin: '0.5rem 0', borderRadius: '8px', background: notice.type === 'success' ? '#e8f5e9' : '#fce4ec', color: notice.type === 'success' ? '#2e7d32' : '#c62828', fontWeight: 500 } }, notice.text) : null,
@@ -3618,7 +3983,65 @@
               );
             })
           ) : null,
-          adminTab === 'outreach' ? e(OutreachTab, { listings: listings }) : null
+          adminTab === 'outreach' ? e(OutreachTab, { listings: listings }) : null,
+          adminTab === 'siteeditor' ? e('div', sty,
+            e('h3', null, 'Site Content Editor'),
+            e('p', { style: { color: '#666', marginBottom: '1rem', fontSize: '0.9rem' } }, 'Edit text, headings, and links across the site. Changes are saved to localStorage and applied on page load.'),
+            e('div', { style: { display: 'grid', gap: '1rem' } },
+              // Hero Section
+              e('div', { style: { background: '#f0f4ff', padding: '1rem', borderRadius: '8px', border: '1px solid #ccc' } },
+                e('h4', { style: { color: 'var(--primary-blue)', marginBottom: '0.75rem' } }, 'Hero Section'),
+                e('div', { style: { display: 'grid', gap: '0.5rem' } },
+                  e('label', { className: 'form-label' }, 'Main Heading'),
+                  e('input', { className: 'form-input', value: siteContent.heroTitle, onChange: function(ev) { handleSiteFieldChange('heroTitle', ev.target.value); } }),
+                  e('label', { className: 'form-label' }, 'Subtitle'),
+                  e('input', { className: 'form-input', value: siteContent.heroSubtitle, onChange: function(ev) { handleSiteFieldChange('heroSubtitle', ev.target.value); } }),
+                  e('label', { className: 'form-label' }, 'Button Text'),
+                  e('input', { className: 'form-input', value: siteContent.heroButton, onChange: function(ev) { handleSiteFieldChange('heroButton', ev.target.value); } })
+                )
+              ),
+              // Value Props
+              e('div', { style: { background: '#f0fff4', padding: '1rem', borderRadius: '8px', border: '1px solid #ccc' } },
+                e('h4', { style: { color: '#2e7d32', marginBottom: '0.75rem' } }, 'Value Propositions'),
+                [['vp1Title', 'vp1Text', 'Card 1'], ['vp2Title', 'vp2Text', 'Card 2'], ['vp3Title', 'vp3Text', 'Card 3']].map(function(vp) {
+                  return e('div', { key: vp[2], style: { marginBottom: '0.5rem' } },
+                    e('strong', { style: { fontSize: '0.85rem' } }, vp[2]),
+                    e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.5rem', marginTop: '0.25rem' } },
+                      e('input', { className: 'form-input', placeholder: 'Title', value: siteContent[vp[0]], onChange: function(ev) { handleSiteFieldChange(vp[0], ev.target.value); } }),
+                      e('input', { className: 'form-input', placeholder: 'Description', value: siteContent[vp[1]], onChange: function(ev) { handleSiteFieldChange(vp[1], ev.target.value); } })
+                    )
+                  );
+                })
+              ),
+              // Featured & Footer
+              e('div', { style: { background: '#fff9f0', padding: '1rem', borderRadius: '8px', border: '1px solid #ccc' } },
+                e('h4', { style: { color: 'var(--secondary-orange)', marginBottom: '0.75rem' } }, 'Sections & Footer'),
+                e('div', { style: { display: 'grid', gap: '0.5rem' } },
+                  e('label', { className: 'form-label' }, 'Featured Section Title'),
+                  e('input', { className: 'form-input', value: siteContent.featuredTitle, onChange: function(ev) { handleSiteFieldChange('featuredTitle', ev.target.value); } }),
+                  e('label', { className: 'form-label' }, 'Footer Text'),
+                  e('input', { className: 'form-input', value: siteContent.footerText, onChange: function(ev) { handleSiteFieldChange('footerText', ev.target.value); } }),
+                  e('label', { className: 'form-label' }, 'Contact Email'),
+                  e('input', { className: 'form-input', type: 'email', value: siteContent.contactEmail, onChange: function(ev) { handleSiteFieldChange('contactEmail', ev.target.value); } })
+                )
+              ),
+              // Custom Links
+              e('div', { style: { background: '#f5f0ff', padding: '1rem', borderRadius: '8px', border: '1px solid #ccc' } },
+                e('h4', { style: { color: '#7c3aed', marginBottom: '0.75rem' } }, 'Custom Links (JSON)'),
+                e('p', { style: { fontSize: '0.8rem', color: '#666', marginBottom: '0.5rem' } }, 'Format: [{"label":"Link Name","url":"https://...","position":"navbar|footer"}]'),
+                e('textarea', { className: 'form-input', rows: '3', value: siteContent.customLinks, onChange: function(ev) { handleSiteFieldChange('customLinks', ev.target.value); }, style: { fontFamily: 'monospace', fontSize: '0.8rem' } })
+              ),
+              // Save button
+              e('div', { style: { display: 'flex', gap: '0.5rem', marginTop: '0.5rem' } },
+                e('button', { className: 'cta-button', onClick: handleSaveSiteContent }, 'Save All Changes'),
+                e('button', { className: 'back-btn', onClick: function() {
+                  setSiteContent(defaultSiteContent);
+                  localStorage.removeItem('ad_site_content');
+                  setNotice({ type: 'success', text: 'Reset to defaults.' });
+                } }, 'Reset to Defaults')
+              )
+            )
+          ) : null
         )
       );
     }
@@ -3627,10 +4050,9 @@
       var user = props.user;
       var onLogout = props.onLogout;
       var listings = props.listings;
-      var stateTab = useState('profile');
+      var stateTab = useState('trips');
       var tab = stateTab[0];
       var setTab = stateTab[1];
-      var isHost = user && user.role === 'host';
 
       var handleSaveSettings = function(settings) {
         var updated = Object.assign({}, user, settings);
@@ -3641,37 +4063,19 @@
         e('div', { className: 'dashboard-container' },
           e('div', { className: 'dashboard-header' },
             e('h1', null, 'Welcome, ' + (user ? user.name : 'Guest')),
-            e('p', null, 'Manage your ' + (isHost ? 'properties and bookings' : 'account and messages'))
+            e('p', null, 'Manage your account, trips, and properties')
           ),
           e('div', { className: 'dashboard-tabs' },
-            e('button', { className: 'dashboard-tab' + (tab === 'profile' ? ' active' : ''), onClick: function() { setTab('profile'); } }, 'Profile'),
-            !isHost ? e('button', { className: 'dashboard-tab' + (tab === 'saved' ? ' active' : ''), onClick: function() { setTab('saved'); } }, 'Saved Properties') : null,
+            e('button', { className: 'dashboard-tab' + (tab === 'trips' ? ' active' : ''), onClick: function() { setTab('trips'); } }, 'My Trips'),
             e('button', { className: 'dashboard-tab' + (tab === 'messages' ? ' active' : ''), onClick: function() { setTab('messages'); } }, 'Messages'),
-            isHost ? e('button', { className: 'dashboard-tab' + (tab === 'properties' ? ' active' : ''), onClick: function() { setTab('properties'); } }, 'My Properties') : null,
-            isHost ? e('button', { className: 'dashboard-tab' + (tab === 'settings' ? ' active' : ''), onClick: function() { setTab('settings'); } }, 'Settings') : null
+            e('button', { className: 'dashboard-tab' + (tab === 'properties' ? ' active' : ''), onClick: function() { setTab('properties'); } }, 'My Properties'),
+            e('button', { className: 'dashboard-tab' + (tab === 'settings' ? ' active' : ''), onClick: function() { setTab('settings'); } }, 'Settings')
           ),
           e('div', { className: 'dashboard-content' },
-            tab === 'profile' ? e('div', null,
-              e('h2', null, 'Profile Information'),
-              e('div', { className: 'profile-form' },
-                e('div', { className: 'form-group' },
-                  e('label', { className: 'form-label' }, 'Name'),
-                  e('input', { className: 'form-input', type: 'text', value: user ? user.name : '', disabled: true })
-                ),
-                e('div', { className: 'form-group' },
-                  e('label', { className: 'form-label' }, 'Email'),
-                  e('input', { className: 'form-input', type: 'email', value: user ? user.email : '', disabled: true })
-                ),
-                e('div', { className: 'form-group' },
-                  e('label', { className: 'form-label' }, 'Role'),
-                  e('input', { className: 'form-input', type: 'text', value: user ? (user.role === 'host' ? 'Property Owner' : 'Guest') : '', disabled: true })
-                ),
-                user && user.bio ? e('div', { className: 'form-group' },
-                  e('label', { className: 'form-label' }, 'Bio'),
-                  e('textarea', { className: 'form-textarea', value: user.bio, disabled: true })
-                ) : null
-              ),
-              !isHost && user ? (function() {
+            tab === 'trips' ? e('div', null,
+              e('h2', null, 'My Trips & Saved Properties'),
+              user ? e(SavedPropertiesTab, { user: user, listings: listings, onSelectProperty: function() {} }) : e('div', null, 'Please log in to view your saved properties.'),
+              (function() {
                 var allConvs = JSON.parse(localStorage.getItem('ad_conversations') || '[]');
                 var myInquiries = allConvs.filter(function(c) { return c.guestId === user.id; });
                 if (myInquiries.length === 0) return null;
@@ -3699,12 +4103,11 @@
                     })
                   )
                 );
-              })() : null
+              })()
             ) : null,
-            tab === 'saved' && !isHost ? e(SavedPropertiesTab, { user: user, listings: listings, onSelectProperty: function() {} }) : null,
             tab === 'messages' ? e(MessagesTab, { user: user }) : null,
-            tab === 'properties' && isHost ? e(MyPropertiesTab, { user: user, listings: listings }) : null,
-            tab === 'settings' && isHost ? e(SettingsTab, { user: user, onSaveSettings: handleSaveSettings }) : null
+            tab === 'properties' ? e(MyPropertiesTab, { user: user, listings: listings }) : null,
+            tab === 'settings' ? e(SettingsTab, { user: user, onSaveSettings: handleSaveSettings }) : null
           )
         )
       );
@@ -3715,9 +4118,6 @@
       var stateMode = useState('login');
       var mode = stateMode[0];
       var setMode = stateMode[1];
-      var stateSignupRole = useState('guest');
-      var signupRole = stateSignupRole[0];
-      var setSignupRole = stateSignupRole[1];
       var stateEmail = useState('');
       var email = stateEmail[0];
       var setEmail = stateEmail[1];
@@ -3761,7 +4161,6 @@
           email: email,
           password: password,
           name: name,
-          role: signupRole,
           phone: '',
           whatsapp: '',
           bio: '',
@@ -3797,16 +4196,6 @@
             )
           ) : e('div', null,
             e('h2', null, 'Create Account'),
-            e('div', { className: 'signup-cards' },
-              e('div', { className: 'signup-card' + (signupRole === 'guest' ? ' selected' : ''), onClick: function() { setSignupRole('guest'); } },
-                e('div', { className: 'signup-card-icon' }, '🏖️'),
-                e('div', { className: 'signup-card-title' }, 'I\'m a Guest')
-              ),
-              e('div', { className: 'signup-card' + (signupRole === 'host' ? ' selected' : ''), onClick: function() { setSignupRole('host'); } },
-                e('div', { className: 'signup-card-icon' }, '🏠'),
-                e('div', { className: 'signup-card-title' }, 'I\'m a Host')
-              )
-            ),
             e('div', { className: 'form-group' },
               e('label', { className: 'form-label' }, 'Full Name'),
               e('input', { className: 'form-input', type: 'text', placeholder: 'Your name', value: name, onChange: function(evt) { setName(evt.target.value); } })
@@ -3838,11 +4227,9 @@
 
       var unreadCount = 0;
       if (user && conversations) {
-        if (user.role === 'guest') {
-          unreadCount = conversations.filter(function(c) { return c.guestId === user.id && c.unreadGuest > 0; }).reduce(function(sum, c) { return sum + c.unreadGuest; }, 0);
-        } else if (user.role === 'host') {
-          unreadCount = conversations.filter(function(c) { return c.hostId === user.id && c.unreadHost > 0; }).reduce(function(sum, c) { return sum + c.unreadHost; }, 0);
-        }
+        var asGuest = conversations.filter(function(c) { return c.guestId === user.id && c.unreadGuest > 0; }).reduce(function(sum, c) { return sum + c.unreadGuest; }, 0);
+        var asHost = conversations.filter(function(c) { return c.hostId === user.id && c.unreadHost > 0; }).reduce(function(sum, c) { return sum + c.unreadHost; }, 0);
+        unreadCount = asGuest + asHost;
       }
 
       return e('nav', { className: 'navbar' },
@@ -3885,9 +4272,10 @@
       var stateModal = useState(null);
       var modal = stateModal[0];
       var setModal = stateModal[1];
+      var sc = JSON.parse(localStorage.getItem('ad_site_content') || 'null') || {};
       return e('footer', { className: 'footer' },
         modal && e(FooterModal, { title: modal, onClose: function() { setModal(null); } }),
-        e('p', null, '© 2026 DirectBookingsItaly.com - Book Direct in Italy'),
+        e('p', null, '© ' + (sc.footerText || '2026 DirectBookingsItaly.com - Book Direct in Italy')),
         e('div', { className: 'footer-links' },
           e('a', { href: '#/about', onClick: function(ev) { ev.preventDefault(); window.location.hash = '#/about'; window.scrollTo(0, 0); } }, 'About Us'),
           e('a', { href: '#', onClick: function(ev) { ev.preventDefault(); setModal('Privacy'); } }, 'Privacy'),
@@ -3935,11 +4323,16 @@
             setPageState({ postSlug: postSlug });
           }
         } else if (hash.startsWith('property/')) {
-          var propId = hash.split('/')[1];
+          var propPath = hash.substring(9);
+          var propId = propPath.split('/')[0];
           if (propId) {
             setCurrentPage('detail');
             setPageState({ propertyId: propId });
           }
+        } else if (hash.startsWith('unsubscribe')) {
+          setCurrentPage('unsubscribe');
+          var uParams = new URLSearchParams(hash.split('?')[1] || '');
+          setPageState({ unsubEmail: uParams.get('email') || '' });
         }
         var savedConvs = localStorage.getItem('ad_conversations');
         if (savedConvs) {
@@ -3954,6 +4347,7 @@
             source: utmSource,
             medium: urlParams.get('utm_medium') || '',
             campaign: urlParams.get('utm_campaign') || '',
+            content: urlParams.get('utm_content') || '',
             page: window.location.hash || '#/home'
           };
           var tracks = JSON.parse(localStorage.getItem('dbi_outreach_tracks') || '[]');
@@ -4001,7 +4395,7 @@
         setNavHistory(newHistory);
         setCurrentPage('detail');
         setPageState({ propertyId: prop.id });
-        var slug = (prop.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 60);
+        var slug = (prop.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 30);
         window.location.hash = '#/property/' + prop.id + '/' + slug;
         window.scrollTo(0, 0);
       };
@@ -4029,6 +4423,30 @@
         currentPage === 'blog' ? e(BlogPage, { onNavigate: handleNavigate }) :
         currentPage === 'blogpost' ? e(BlogPost, { slug: pageState.postSlug, handleBack: function() { handleNavigate('blog'); }, onNavigate: handleNavigate }) :
         currentPage === 'about' ? e(AboutPage, { onNavigate: handleNavigate }) :
+        currentPage === 'unsubscribe' ? (function() {
+          var unsubEmail = pageState.unsubEmail || '';
+          var stateUnsub = useState(false);
+          var unsubDone = stateUnsub[0];
+          var setUnsubDone = stateUnsub[1];
+          var handleUnsub = function() {
+            var unsubs = JSON.parse(localStorage.getItem('dbi_unsubscribed') || '[]');
+            if (unsubs.indexOf(unsubEmail) === -1) unsubs.push(unsubEmail);
+            localStorage.setItem('dbi_unsubscribed', JSON.stringify(unsubs));
+            setUnsubDone(true);
+          };
+          return e('div', { style: { maxWidth: '500px', margin: '4rem auto', padding: '2rem', textAlign: 'center' } },
+            e('h2', null, 'Unsubscribe'),
+            !unsubDone ? e('div', null,
+              e('p', { style: { color: '#666', marginBottom: '1rem' } }, 'Unsubscribe ' + (unsubEmail || 'this address') + ' from DirectBookingsItaly.com emails?'),
+              e('button', { className: 'cta-button', onClick: handleUnsub, style: { background: '#dc2626' } }, 'Confirm Unsubscribe'),
+              e('p', { style: { color: '#999', fontSize: '0.85rem', marginTop: '1rem' } }, 'You will no longer receive outreach emails from us.')
+            ) : e('div', null,
+              e('p', { style: { color: '#2e7d32', fontWeight: 600, fontSize: '1.1rem' } }, 'You have been unsubscribed.'),
+              e('p', { style: { color: '#666', marginTop: '0.5rem' } }, 'We will not send any more emails to this address.'),
+              e('a', { href: '#/home', style: { color: 'var(--primary-blue)', marginTop: '1rem', display: 'inline-block' } }, 'Go to homepage')
+            )
+          );
+        })() :
         e('div', null),
         e(Footer, null)
       );
