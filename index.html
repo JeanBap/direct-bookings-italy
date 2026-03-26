@@ -99,20 +99,21 @@
       border-radius: 50%;
       width: 18px;
       height: 18px;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 700;
       margin-left: 0.3rem;
     }
 
     .btn-primary {
-      background: var(--primary-blue);
-      color: #fff;
-      border: none;
       padding: 0.6rem 1.2rem;
+      background: var(--primary-blue);
+      color: white;
+      border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 0.95rem;
-      transition: background 0.2s;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
     }
 
     .btn-primary:hover {
@@ -120,40 +121,35 @@
     }
 
     .btn-secondary {
-      background: transparent;
-      color: var(--primary-blue);
-      border: 1px solid var(--primary-blue);
       padding: 0.6rem 1.2rem;
+      background: var(--border-light);
+      color: var(--text-dark);
+      border: 1px solid var(--border-light);
       border-radius: 4px;
       cursor: pointer;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      font-weight: 600;
       transition: all 0.2s;
     }
 
     .btn-secondary:hover {
-      background: var(--primary-blue);
-      color: #fff;
+      background: #eee;
     }
 
-    /* HERO SECTION */
+    /* HERO */
     .hero {
-      background: linear-gradient(135deg, var(--primary-blue) 0%, #004ba8 100%);
-      color: #fff;
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
       padding: 4rem 2rem;
+      color: white;
       text-align: center;
     }
 
-    .hero-content {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .hero h1 {
+    .hero-content h1 {
       font-size: 2.5rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
     }
 
-    .hero p {
+    .hero-content p {
       font-size: 1.1rem;
       margin-bottom: 2rem;
       opacity: 0.95;
@@ -162,35 +158,26 @@
     .search-bar {
       display: flex;
       gap: 0.5rem;
-      background: #fff;
-      border-radius: 4px;
-      padding: 0.5rem;
-      max-width: 500px;
+      max-width: 600px;
       margin: 0 auto;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     }
 
-    .search-bar input, .search-bar select {
-      flex: 1;
+    .search-bar input,
+    .search-bar select {
+      padding: 0.8rem 1rem;
       border: none;
-      padding: 0.75rem;
-      font-size: 1rem;
-      outline: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
     }
 
     .search-bar button {
-      padding: 0.75rem 1.5rem;
+      padding: 0.8rem 1.5rem;
       background: var(--secondary-orange);
-      color: #fff;
+      color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
       font-weight: 600;
-      transition: background 0.2s;
-    }
-
-    .search-bar button:hover {
-      background: #a94f1f;
     }
 
     /* VALUE PROPS */
@@ -198,72 +185,60 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 2rem;
-      max-width: 1200px;
-      margin: 3rem auto;
-      padding: 0 2rem;
+      padding: 3rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
     .value-prop {
       text-align: center;
-      padding: 1.5rem;
     }
 
     .value-prop-icon {
       font-size: 2.5rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
     }
 
     .value-prop h3 {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       margin-bottom: 0.5rem;
-      color: var(--primary-blue);
     }
 
-    .value-prop p {
-      font-size: 0.95rem;
-      color: var(--text-light);
-    }
-
-    /* FEATURED SECTION */
+    /* FEATURED */
     .featured-section {
+      padding: 2rem 2rem;
       max-width: 1400px;
-      margin: 3rem auto;
-      padding: 0 2rem;
+      margin: 0 auto;
     }
 
     .section-title {
       font-size: 1.8rem;
-      margin-bottom: 2rem;
-      color: var(--text-dark);
+      margin-bottom: 1.5rem;
     }
 
     .property-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 2rem;
+      gap: 1.5rem;
     }
 
     /* PROPERTY CARD */
     .property-card {
-      border: 1px solid var(--border-light);
-      border-radius: 6px;
+      border-radius: 8px;
       overflow: hidden;
-      background: #fff;
-      transition: all 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: all 0.3s;
     }
 
     .property-card:hover {
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
       transform: translateY(-4px);
     }
 
     .card-image {
       position: relative;
-      width: 100%;
-      height: 180px;
-      background: var(--bg-light);
+      height: 200px;
       overflow: hidden;
     }
 
@@ -273,39 +248,27 @@
       object-fit: cover;
     }
 
-    .sample-label {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      padding: 0.25rem 0.5rem;
-      font-size: 0.75rem;
-      border-radius: 3px;
-    }
-
     .verified-badge {
       position: absolute;
-      top: 0.5rem;
-      left: 0.5rem;
+      top: 10px;
+      left: 10px;
       background: var(--success);
-      color: #fff;
-      padding: 0.3rem 0.6rem;
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
       font-size: 0.75rem;
-      border-radius: 3px;
-      font-weight: 600;
-    }
-
-    .price-tag {
-      color: var(--secondary-orange);
       font-weight: 700;
-      font-size: 1.1rem;
     }
 
-    .price-tag-small {
-      color: var(--secondary-orange);
-      font-weight: 600;
-      font-size: 0.9rem;
+    .sample-label {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
     }
 
     .card-content {
@@ -313,10 +276,9 @@
     }
 
     .card-name {
+      font-weight: 700;
       font-size: 1rem;
-      font-weight: 600;
       margin-bottom: 0.3rem;
-      color: var(--text-dark);
     }
 
     .card-meta {
@@ -326,49 +288,51 @@
     }
 
     .card-stars {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
+      color: var(--secondary-orange);
       margin-bottom: 0.5rem;
-      color: #ffc107;
     }
 
     .card-amenities {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.4rem;
+      gap: 0.3rem;
       margin-bottom: 0.5rem;
     }
 
     .amenity-chip {
       background: var(--bg-light);
-      padding: 0.25rem 0.5rem;
-      border-radius: 12px;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
       font-size: 0.75rem;
-      color: var(--text-dark);
+      color: var(--text-light);
     }
 
-    /* HORIZONTAL CARD (Search Results) */
+    .price-tag-small {
+      font-weight: 700;
+      color: var(--primary-blue);
+      font-size: 0.95rem;
+    }
+
+    /* HORIZONTAL CARD */
     .horizontal-card {
       display: flex;
+      gap: 1rem;
+      padding: 1rem;
       border: 1px solid var(--border-light);
-      border-radius: 6px;
-      overflow: hidden;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: all 0.3s;
+      border-radius: 8px;
       cursor: pointer;
-      margin-bottom: 1.5rem;
+      transition: all 0.2s;
     }
 
     .horizontal-card:hover {
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .h-card-image {
-      width: 280px;
-      height: 200px;
-      flex-shrink: 0;
-      background: var(--bg-light);
-      position: relative;
+      flex: 0 0 150px;
+      height: 150px;
+      border-radius: 4px;
       overflow: hidden;
     }
 
@@ -380,171 +344,110 @@
 
     .h-card-content {
       flex: 1;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
     }
 
     .h-card-header {
-      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 0.5rem;
     }
 
     .h-card-name {
-      font-size: 1.15rem;
-      font-weight: 600;
-      margin-bottom: 0.3rem;
+      font-weight: 700;
+      font-size: 1.1rem;
     }
 
     .h-card-meta {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--text-light);
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.5rem;
     }
 
     .h-card-price {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--secondary-orange);
+      font-weight: 700;
+      color: var(--primary-blue);
+      font-size: 1rem;
       margin-bottom: 0.5rem;
     }
 
     .h-card-stats {
       display: flex;
-      gap: 1.5rem;
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
+      gap: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
     }
 
     .h-card-amenities {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-top: 0.5rem;
-    }
-
-    .h-card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      gap: 0.3rem;
+      margin-bottom: 0.5rem;
     }
 
     .h-card-button {
+      padding: 0.5rem 1rem;
       background: var(--primary-blue);
-      color: #fff;
+      color: white;
       border: none;
-      padding: 0.6rem 1.2rem;
       border-radius: 4px;
       cursor: pointer;
+      font-size: 0.85rem;
       font-weight: 600;
-      transition: background 0.2s;
     }
 
-    .h-card-button:hover {
-      background: var(--primary-blue-light);
-    }
-
-    /* SIDEBAR FILTERS */
+    /* SEARCH */
     .search-container {
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 250px 1fr;
       gap: 2rem;
+      padding: 2rem;
       max-width: 1400px;
-      margin: 2rem auto;
-      padding: 0 2rem;
+      margin: 0 auto;
     }
 
     .filter-sidebar {
-      background: #fff;
-      border: 1px solid var(--border-light);
-      border-radius: 6px;
-      padding: 1.5rem;
-      height: fit-content;
       position: sticky;
       top: 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
     }
 
     .filter-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .filter-group:last-child {
-      margin-bottom: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
     .filter-label {
-      display: block;
       font-weight: 600;
-      margin-bottom: 0.5rem;
-      font-size: 0.95rem;
-      color: var(--text-dark);
+      font-size: 0.9rem;
     }
 
-    .filter-label .help-icon {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      background: var(--primary-blue);
-      color: #fff;
-      border-radius: 50%;
-      text-align: center;
-      line-height: 18px;
-      font-size: 0.75rem;
-      margin-left: 0.3rem;
-      cursor: pointer;
-    }
-
-    .filter-input, .filter-select {
-      width: 100%;
+    .filter-select {
       padding: 0.6rem;
       border: 1px solid var(--border-light);
       border-radius: 4px;
-      font-size: 0.95rem;
-      font-family: inherit;
-    }
-
-    .filter-checkbox {
-      width: auto;
-      margin-right: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .filter-option {
-      display: flex;
-      align-items: center;
-      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
     }
 
     .slider {
-      width: 100%;
-      height: 4px;
-      background: var(--border-light);
-      border-radius: 2px;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    .slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
-      background: var(--primary-blue);
       cursor: pointer;
-      border-radius: 50%;
     }
 
     .amenities-chips {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 0.5rem;
     }
 
     .amenity-toggle {
-      padding: 0.4rem 0.8rem;
+      padding: 0.5rem 0.8rem;
       border: 1px solid var(--border-light);
-      border-radius: 20px;
-      background: #fff;
+      background: white;
+      border-radius: 4px;
       cursor: pointer;
       font-size: 0.85rem;
       transition: all 0.2s;
@@ -552,30 +455,35 @@
 
     .amenity-toggle.active {
       background: var(--primary-blue);
-      color: #fff;
+      color: white;
       border-color: var(--primary-blue);
     }
 
-    .results-area { flex: 1; }
+    .results-area {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
 
     .results-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1.5rem;
-      padding: 1rem;
-      background: var(--bg-light);
-      border-radius: 6px;
     }
 
-    .results-count { font-size: 0.95rem; color: var(--text-light); }
+    .results-count {
+      font-weight: 600;
+    }
 
-    .sort-buttons { display: flex; gap: 0.5rem; }
+    .sort-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
 
     .sort-btn {
-      padding: 0.5rem 1rem;
-      background: #fff;
+      padding: 0.5rem 0.8rem;
       border: 1px solid var(--border-light);
+      background: white;
       border-radius: 4px;
       cursor: pointer;
       font-size: 0.85rem;
@@ -584,7 +492,7 @@
 
     .sort-btn.active {
       background: var(--primary-blue);
-      color: #fff;
+      color: white;
       border-color: var(--primary-blue);
     }
 
@@ -592,97 +500,58 @@
       display: flex;
       justify-content: center;
       gap: 0.5rem;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border-light);
+      margin: 2rem 0;
     }
 
     .page-btn {
       padding: 0.5rem 0.8rem;
       border: 1px solid var(--border-light);
-      background: #fff;
-      cursor: pointer;
+      background: white;
       border-radius: 4px;
-      font-size: 0.9rem;
-      min-width: 40px;
+      cursor: pointer;
+      font-size: 0.85rem;
     }
 
     .page-btn.active {
       background: var(--primary-blue);
-      color: #fff;
+      color: white;
       border-color: var(--primary-blue);
     }
 
-    .page-btn.ellipsis { cursor: default; border: none; }
+    .page-btn.ellipsis {
+      cursor: default;
+    }
 
     .empty-state {
       text-align: center;
-      padding: 3rem 2rem;
-      color: var(--text-light);
+      padding: 3rem;
     }
 
-    .empty-state h3 { margin-bottom: 0.5rem; color: var(--text-dark); }
-
-    /* MODAL */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-
-    .modal {
-      background: #fff;
-      border-radius: 6px;
-      padding: 2rem;
-      max-width: 700px;
-      width: 90%;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .modal-close {
-      float: right;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--text-light);
-      background: none;
-      border: none;
-    }
-
-    .property-type-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .type-card {
-      padding: 1rem;
-      border: 1px solid var(--border-light);
-      border-radius: 6px;
-    }
-
-    .type-name { font-weight: 600; color: var(--primary-blue); margin-bottom: 0.5rem; }
-    .type-desc { font-size: 0.85rem; color: var(--text-light); margin-bottom: 0.5rem; line-height: 1.4; }
-    .type-tax { font-size: 0.85rem; color: var(--secondary-orange); font-weight: 500; }
-
-    /* PROPERTY DETAIL */
+    /* DETAIL PAGE */
     .detail-page {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 2rem;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .back-btn {
+      padding: 0.5rem 1rem;
+      background: var(--bg-light);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .back-btn:hover {
+      background: var(--border-light);
     }
 
     .detail-hero {
-      position: relative;
       width: 100%;
       height: 400px;
-      background: var(--bg-light);
-      border-radius: 6px;
+      border-radius: 8px;
       overflow: hidden;
       margin-bottom: 2rem;
     }
@@ -695,92 +564,42 @@
 
     .detail-grid {
       display: grid;
-      grid-template-columns: 1fr 350px;
+      grid-template-columns: 2fr 1fr;
       gap: 2rem;
     }
 
     .detail-left {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 6px;
-      border: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
     }
 
     .detail-left h1 {
       font-size: 2rem;
-      margin-bottom: 0.5rem;
-      color: var(--text-dark);
     }
 
-    .detail-left .property-type {
-      font-size: 0.95rem;
+    .property-type {
+      font-size: 1rem;
       color: var(--text-light);
-      margin-bottom: 1rem;
     }
 
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      background: var(--bg-light);
-      border: 1px solid var(--border-light);
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: var(--text-dark);
-      margin: 1rem 2rem;
-      transition: all 0.2s;
-    }
-
-    .back-btn:hover {
-      background: var(--primary-blue);
-      color: #fff;
-      border-color: var(--primary-blue);
-    }
-
-    .claim-btn {
-      background: var(--success);
-      color: #fff;
-      border: none;
-      padding: 0.8rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
-      width: 100%;
-      margin-bottom: 1rem;
-      transition: background 0.2s;
-    }
-
-    .claim-btn:hover {
-      background: #0a5c5f;
-    }
-
-    .notification-banner {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      border-radius: 6px;
-      padding: 1rem 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .notification-banner p {
-      font-size: 0.9rem;
-      color: #856404;
+    .price-tag {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-blue);
     }
 
     .info-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+      gap: 1rem;
     }
 
     .info-item {
+      text-align: center;
       padding: 1rem;
       background: var(--bg-light);
-      border-radius: 6px;
-      text-align: center;
+      border-radius: 4px;
     }
 
     .info-value {
@@ -796,78 +615,53 @@
     }
 
     .address-section {
-      margin-bottom: 2rem;
-      padding-bottom: 2rem;
-      border-bottom: 1px solid var(--border-light);
+      padding: 1.5rem;
+      background: var(--bg-light);
+      border-radius: 4px;
     }
 
     .address-label {
+      font-weight: 600;
       font-size: 0.9rem;
-      color: var(--text-light);
       margin-bottom: 0.3rem;
     }
 
     .address-text {
-      font-size: 1rem;
-      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--text-dark);
     }
 
     .amenities-section h3 {
       margin-bottom: 1rem;
-      color: var(--text-dark);
     }
 
     .map-embed {
       width: 100%;
-      height: 300px;
-      border-radius: 6px;
-      margin-top: 1rem;
-      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      margin-top: 1.5rem;
     }
 
     .detail-right {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 6px;
-      border: 1px solid var(--border-light);
-      height: fit-content;
-      position: sticky;
-      top: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .notification-banner {
+      padding: 1rem;
+      background: var(--success);
+      color: white;
+      border-radius: 4px;
+    }
+
+    .contact-section {
+      padding: 1.5rem;
+      background: var(--bg-light);
+      border-radius: 4px;
     }
 
     .contact-section h3 {
       margin-bottom: 1rem;
-      color: var(--text-dark);
-    }
-
-    .host-info {
-      background: var(--bg-light);
-      padding: 1rem;
-      border-radius: 4px;
-      margin-bottom: 1.5rem;
-      font-size: 0.9rem;
-    }
-
-    .host-info strong {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: var(--primary-blue);
-    }
-
-    .website-link {
-      display: block;
-      background: var(--primary-blue);
-      color: #fff;
-      padding: 0.8rem;
-      text-align: center;
-      text-decoration: none;
-      border-radius: 4px;
-      margin-bottom: 1.5rem;
-      transition: background 0.2s;
-    }
-
-    .website-link:hover {
-      background: var(--primary-blue-light);
     }
 
     .form-group {
@@ -876,40 +670,55 @@
 
     .form-label {
       display: block;
-      font-size: 0.9rem;
       font-weight: 600;
-      margin-bottom: 0.3rem;
-      color: var(--text-dark);
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
     }
 
-    .form-input, .form-textarea, .form-select {
+    .form-input,
+    .form-select {
       width: 100%;
-      padding: 0.6rem;
+      padding: 0.8rem;
       border: 1px solid var(--border-light);
       border-radius: 4px;
       font-size: 0.9rem;
-      font-family: inherit;
     }
 
     .form-textarea {
-      resize: vertical;
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      font-size: 0.9rem;
       min-height: 100px;
+      font-family: inherit;
     }
 
     .form-submit {
       width: 100%;
       padding: 0.8rem;
-      background: var(--secondary-orange);
-      color: #fff;
+      background: var(--primary-blue);
+      color: white;
       border: none;
       border-radius: 4px;
-      font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      font-weight: 600;
+      font-size: 0.9rem;
     }
 
     .form-submit:hover {
-      background: #a94f1f;
+      background: var(--primary-blue-light);
+    }
+
+    .website-link {
+      display: inline-block;
+      padding: 0.8rem 1.5rem;
+      background: var(--secondary-orange);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     /* MODAL */
@@ -921,63 +730,49 @@
       bottom: 0;
       background: rgba(0,0,0,0.5);
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       z-index: 2000;
     }
 
     .modal {
-      background: #fff;
-      border-radius: 6px;
+      background: white;
+      border-radius: 8px;
       padding: 2rem;
-      max-width: 700px;
-      width: 90%;
+      max-width: 800px;
       max-height: 90vh;
       overflow-y: auto;
+      position: relative;
     }
 
     .modal-close {
-      float: right;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--text-light);
-      background: none;
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--bg-light);
       border: none;
-      padding: 0;
-    }
-
-    .modal-close:hover {
-      color: var(--text-dark);
-    }
-
-    .modal h2 {
-      margin-bottom: 1.5rem;
-      color: var(--primary-blue);
-      clear: both;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
     }
 
     .property-type-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
     }
 
     .type-card {
       padding: 1rem;
       border: 1px solid var(--border-light);
-      border-radius: 6px;
-      transition: all 0.2s;
-    }
-
-    .type-card:hover {
-      border-color: var(--primary-blue);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-radius: 4px;
     }
 
     .type-name {
-      font-weight: 600;
-      color: var(--primary-blue);
+      font-weight: 700;
       margin-bottom: 0.5rem;
     }
 
@@ -985,157 +780,52 @@
       font-size: 0.85rem;
       color: var(--text-light);
       margin-bottom: 0.5rem;
-      line-height: 1.4;
     }
 
     .type-tax {
       font-size: 0.85rem;
       color: var(--secondary-orange);
-      font-weight: 500;
-    }
-
-    /* EMAIL PREVIEW MODAL */
-    .email-preview-modal {
-      background: #fff;
-      border: 1px solid var(--border-light);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .email-header {
-      background: var(--bg-light);
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-light);
-    }
-
-    .email-header .label {
-      font-size: 0.85rem;
-      color: var(--text-light);
       font-weight: 600;
-      margin-bottom: 0.3rem;
-    }
-
-    .email-header .value {
-      font-size: 1rem;
-      color: var(--text-dark);
-    }
-
-    .email-body {
-      padding: 1.5rem;
-      line-height: 1.6;
-      color: var(--text-dark);
-    }
-
-    .email-body p {
-      margin-bottom: 1rem;
-    }
-
-    .email-button {
-      display: inline-block;
-      background: var(--primary-blue);
-      color: #fff;
-      padding: 0.8rem 1.5rem;
-      text-decoration: none;
-      border-radius: 4px;
-      margin-top: 1rem;
-      font-weight: 600;
-    }
-
-    /* LOGIN PAGE */
-    .login-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 70vh;
-      padding: 2rem;
-      background: var(--bg-light);
-    }
-
-    .login-form {
-      background: #fff;
-      padding: 2.5rem;
-      border-radius: 6px;
-      border: 1px solid var(--border-light);
-      width: 100%;
-      max-width: 500px;
-    }
-
-    .login-form h2 {
-      color: var(--primary-blue);
-      margin-bottom: 2rem;
-      font-size: 1.5rem;
-    }
-
-    .login-form .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .login-form .form-submit {
-      background: var(--primary-blue);
-    }
-
-    .login-form .form-submit:hover {
-      background: var(--primary-blue-light);
-    }
-
-    .login-toggle {
-      text-align: center;
-      margin-top: 1.5rem;
-      font-size: 0.9rem;
-    }
-
-    .login-toggle button {
-      background: none;
-      border: none;
-      color: var(--primary-blue);
-      cursor: pointer;
-      font-weight: 600;
-      text-decoration: underline;
     }
 
     /* DASHBOARD */
     .dashboard-container {
       max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 2rem;
+      margin: 0 auto;
+      padding: 2rem;
     }
 
     .dashboard-header {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 6px;
-      border: 1px solid var(--border-light);
       margin-bottom: 2rem;
     }
 
     .dashboard-header h1 {
-      font-size: 1.8rem;
-      color: var(--primary-blue);
+      font-size: 2rem;
       margin-bottom: 0.5rem;
-    }
-
-    .dashboard-header p {
-      font-size: 0.95rem;
-      color: var(--text-light);
     }
 
     .dashboard-tabs {
       display: flex;
-      gap: 2rem;
-      border-bottom: 2px solid var(--border-light);
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-light);
       margin-bottom: 2rem;
-      padding-bottom: 0;
     }
 
     .dashboard-tab {
-      padding: 1rem 0;
-      font-size: 1rem;
+      padding: 1rem 1.5rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 0.95rem;
       font-weight: 600;
       color: var(--text-light);
-      border-bottom: 3px solid transparent;
       transition: all 0.2s;
       position: relative;
-      cursor: pointer;
+    }
+
+    .dashboard-tab:hover {
+      color: var(--text-dark);
     }
 
     .dashboard-tab.active {
@@ -1148,72 +838,68 @@
       align-items: center;
       justify-content: center;
       background: var(--error);
-      color: #fff;
+      color: white;
       border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 0.7rem;
-      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      font-size: 0.65rem;
       margin-left: 0.3rem;
     }
 
     .dashboard-content {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 6px;
-      border: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
     }
 
     .profile-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
       max-width: 600px;
     }
 
-    .profile-form .form-group {
-      margin-bottom: 1.5rem;
+    .privacy-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
     }
 
-    .profile-form .form-submit {
-      background: var(--primary-blue);
-      width: auto;
-      padding: 0.8rem 2rem;
+    .privacy-toggle input {
+      cursor: pointer;
     }
 
-    .profile-form .form-submit:hover {
-      background: var(--primary-blue-light);
-    }
-
-    /* CHAT SYSTEM */
+    /* CHAT */
     .chat-container {
       display: grid;
-      grid-template-columns: 350px 1fr;
-      gap: 0;
-      height: 70vh;
-      background: #fff;
-      border-radius: 6px;
+      grid-template-columns: 250px 1fr;
+      gap: 1rem;
+      height: 600px;
       border: 1px solid var(--border-light);
+      border-radius: 8px;
       overflow: hidden;
     }
 
     .chat-sidebar {
       border-right: 1px solid var(--border-light);
       overflow-y: auto;
-      background: var(--bg-light);
     }
 
     .conversation-item {
       padding: 1rem;
       border-bottom: 1px solid var(--border-light);
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s;
     }
 
     .conversation-item:hover {
-      background: #e8e8e8;
+      background: var(--bg-light);
     }
 
     .conversation-item.active {
-      background: #fff;
-      border-left: 4px solid var(--primary-blue);
+      background: var(--primary-blue);
+      color: white;
     }
 
     .conversation-item.unread {
@@ -1221,19 +907,21 @@
     }
 
     .conversation-property {
-      font-size: 0.9rem;
       font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 0.3rem;
+      font-size: 0.9rem;
     }
 
     .conversation-preview {
       font-size: 0.85rem;
       color: var(--text-light);
+      margin-top: 0.3rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-bottom: 0.3rem;
+    }
+
+    .conversation-item.active .conversation-preview {
+      color: rgba(255,255,255,0.8);
     }
 
     .conversation-meta {
@@ -1242,98 +930,53 @@
       align-items: center;
       font-size: 0.75rem;
       color: var(--text-light);
+      margin-top: 0.3rem;
+    }
+
+    .conversation-item.active .conversation-meta {
+      color: rgba(255,255,255,0.7);
     }
 
     .conversation-badge {
       background: var(--error);
-      color: #fff;
+      color: white;
       border-radius: 50%;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 700;
     }
 
     .chat-main {
       display: flex;
       flex-direction: column;
+      background: white;
     }
 
     .chat-header {
-      padding: 1.5rem;
+      padding: 1rem;
       border-bottom: 1px solid var(--border-light);
-      background: var(--bg-light);
+    }
+
+    .chat-header h3 {
+      margin-bottom: 0.3rem;
+    }
+
+    .chat-header p {
+      font-size: 0.85rem;
+      color: var(--text-light);
     }
 
     .chat-messages {
       flex: 1;
       overflow-y: auto;
-      padding: 1.5rem;
+      padding: 1rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-    }
-
-    .message-bubble {
-      max-width: 70%;
-      padding: 0.75rem 1rem;
-      border-radius: 12px;
-      word-wrap: break-word;
-    }
-
-    .message-bubble.sent {
-      align-self: flex-end;
-      background: var(--primary-blue);
-      color: #fff;
-    }
-
-    .message-bubble.received {
-      align-self: flex-start;
-      background: var(--bg-light);
-      color: var(--text-dark);
-    }
-
-    .message-bubble.system {
-      align-self: center;
-      background: var(--secondary-orange);
-      color: #fff;
-      font-size: 0.85rem;
-      text-align: center;
-      max-width: 80%;
-    }
-
-    .message-meta {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      margin-top: 0.3rem;
-    }
-
-    .chat-input-area {
-      padding: 1rem;
-      border-top: 1px solid var(--border-light);
-      display: flex;
       gap: 0.5rem;
-    }
-
-    .chat-input-area input {
-      flex: 1;
-      padding: 0.75rem;
-      border: 1px solid var(--border-light);
-      border-radius: 4px;
-      font-size: 0.9rem;
-    }
-
-    .chat-input-area button {
-      background: var(--secondary-orange);
-      color: #fff;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
     }
 
     .chat-empty {
@@ -1342,59 +985,334 @@
       justify-content: center;
       height: 100%;
       color: var(--text-light);
-      padding: 2rem;
-      text-align: center;
     }
 
-    /* PRIVACY TOGGLES */
-    .privacy-toggle {
+    .message-bubble {
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+
+    .message-bubble.sent {
+      background: var(--primary-blue);
+      color: white;
+      align-self: flex-end;
+    }
+
+    .message-bubble.received {
+      background: var(--bg-light);
+      color: var(--text-dark);
+      align-self: flex-start;
+    }
+
+    .message-meta {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 0.2rem;
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem;
+      border-top: 1px solid var(--border-light);
+      background: var(--bg-light);
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      padding: 0.7rem;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .chat-input-area button {
+      padding: 0.7rem 1.2rem;
+      background: var(--primary-blue);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* LOGIN */
+    .login-container {
       display: flex;
       align-items: center;
+      justify-content: center;
+      min-height: 70vh;
+      padding: 2rem;
+    }
+
+    .login-form {
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .login-form h2 {
+      margin-bottom: 1.5rem;
+    }
+
+    .login-toggle {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .login-toggle button {
+      background: none;
+      border: none;
+      color: var(--primary-blue);
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0;
+    }
+
+    /* SIGNUP CARDS */
+    .signup-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
       margin-bottom: 1.5rem;
-      padding: 1rem;
-      background: var(--bg-light);
-      border-radius: 4px;
     }
 
-    .privacy-toggle input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
+    .signup-card {
+      padding: 1.5rem;
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      text-align: center;
       cursor: pointer;
+      transition: all 0.2s;
     }
 
-    .privacy-toggle label {
+    .signup-card:hover {
+      border-color: var(--primary-blue);
+      box-shadow: 0 4px 12px rgba(0,53,128,0.1);
+    }
+
+    .signup-card.selected {
+      border-color: var(--primary-blue);
+      background: rgba(0,53,128,0.05);
+    }
+
+    .signup-card-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .signup-card-title {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    /* PROPERTY LIST */
+    .property-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .property-item {
+      padding: 1.5rem;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .property-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
       flex: 1;
+    }
+
+    .property-name {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .property-meta {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .property-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-small {
+      padding: 0.5rem 1rem;
+      background: var(--primary-blue);
+      color: white;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
-      font-weight: 500;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .btn-small:hover {
+      background: var(--primary-blue-light);
+    }
+
+    .btn-small.danger {
+      background: var(--error);
+    }
+
+    .btn-small.danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-small.outline {
+      background: white;
+      border: 1px solid var(--primary-blue);
+      color: var(--primary-blue);
+    }
+
+    .btn-small.outline:hover {
+      background: var(--bg-light);
+    }
+
+    /* PROPERTY CREATION */
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-section-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-row.full {
+      grid-template-columns: 1fr;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checkbox-item input {
+      cursor: pointer;
+    }
+
+    .checkbox-item label {
+      cursor: pointer;
+      margin: 0;
+    }
+
+    /* SEARCH MODAL */
+    .search-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .search-modal-content {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .search-modal-close {
+      float: right;
+      background: var(--bg-light);
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .search-results {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .search-result-item {
+      padding: 1rem;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .search-result-item:hover {
+      border-color: var(--primary-blue);
+      box-shadow: 0 2px 8px rgba(0,53,128,0.1);
+    }
+
+    .search-result-name {
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .search-result-meta {
+      font-size: 0.85rem;
+      color: var(--text-light);
     }
 
     /* FOOTER */
     .footer {
-      background: var(--text-dark);
-      color: #fff;
+      background: var(--bg-light);
       padding: 2rem;
       text-align: center;
-      margin-top: 4rem;
-    }
-
-    .footer p {
-      font-size: 0.9rem;
-      opacity: 0.8;
+      border-top: 1px solid var(--border-light);
+      margin-top: 3rem;
     }
 
     .footer-links {
       display: flex;
       justify-content: center;
-      gap: 2rem;
+      gap: 1.5rem;
       margin-top: 1rem;
-      font-size: 0.85rem;
     }
 
     .footer-links a {
-      color: #fff;
+      color: var(--text-light);
       text-decoration: none;
-      transition: opacity 0.2s;
+      transition: all 0.2s;
     }
 
     .footer-links a:hover {
@@ -1557,7 +1475,8 @@
             shuttle: !!(amenBits & 2097152)
           },
           claimed: CLAIMED_IDS.has(propId),
-          verified: CLAIMED_IDS.has(propId)
+          verified: CLAIMED_IDS.has(propId),
+          claimedBy: null
         };
       });
       return listings.map(function(p) {
@@ -1698,13 +1617,13 @@
         e('div', { className: 'h-card-content' },
           e('div', { className: 'h-card-header' },
             e('div', { className: 'h-card-name' }, prop.name),
-            e('div', { className: 'h-card-meta' }, prop.type + ' • ' + prop.region),
-            e('div', { className: 'h-card-price' }, '€' + price + '/night'),
-            e('div', { className: 'h-card-stats' },
-              e('span', null, prop.beds + ' beds'),
-              e('span', null, prop.baths + ' baths'),
-              e('span', null, renderStars(prop.stars))
-            )
+            e('div', { className: 'h-card-price' }, '€' + price + '/night')
+          ),
+          e('div', { className: 'h-card-meta' }, prop.type + ' • ' + prop.region),
+          e('div', { className: 'h-card-stats' },
+            e('span', null, prop.beds + ' beds'),
+            e('span', null, prop.baths + ' baths'),
+            e('span', null, renderStars(prop.stars))
           ),
           e('div', { className: 'h-card-amenities' },
             amenities.map(function(amenity) {
@@ -1985,15 +1904,33 @@
     function PropertyDetail(props) {
       var prop = props.currentProperty;
       var handleBack = props.handleBack;
+      var user = props.user;
+      var onPropertySaved = props.onPropertySaved;
       var stateInquiry = useState({});
       var inquiry = stateInquiry[0];
       var setInquiry = stateInquiry[1];
+      var stateSaved = useState(false);
+      var isSaved = stateSaved[0];
+      var setIsSaved = stateSaved[1];
+
+      useEffect(function() {
+        if (user && prop) {
+          var saved = JSON.parse(localStorage.getItem('ad_saved_' + user.id) || '[]');
+          setIsSaved(saved.includes(prop.id));
+        }
+      }, [user, prop]);
+
       if (!prop) return e('div', null, e('p', { style: { padding: '2rem', textAlign: 'center' } }, 'Property not found'), e('button', { className: 'back-btn', onClick: handleBack }, '← Back'));
       var amenities = getTopAmenities(prop);
       var price = estimatePrice(prop);
+
       var handleSubmitInquiry = function() {
-        if (!inquiry.name || !inquiry.email || !inquiry.message) {
-          alert('Please fill in all fields');
+        if (!user) {
+          alert('Please sign in to send an inquiry');
+          return;
+        }
+        if (!inquiry.message) {
+          alert('Please enter a message');
           return;
         }
         var convId = 'conv_' + Date.now();
@@ -2002,26 +1939,45 @@
           id: convId,
           propertyId: prop.id,
           propertyName: prop.name,
-          guestName: inquiry.name,
-          guestEmail: inquiry.email,
-          hostId: null,
+          guestId: user.id,
+          guestName: user.name,
+          hostId: prop.claimedBy || null,
+          hostName: prop.claimedBy ? 'Host' : null,
           createdAt: new Date().toISOString(),
           lastMessageAt: new Date().toISOString(),
-          unread: true
+          lastMessage: inquiry.message,
+          unreadGuest: 0,
+          unreadHost: 1
         });
         localStorage.setItem('ad_conversations', JSON.stringify(conversations));
         var messages = [{
-          id: Date.now(),
-          sender: 'guest',
-          senderName: inquiry.name,
+          id: 'msg_' + Date.now(),
+          senderId: user.id,
+          senderName: user.name,
           text: inquiry.message,
           timestamp: new Date().toISOString(),
-          read: false
+          type: 'inquiry'
         }];
         localStorage.setItem('ad_messages_' + convId, JSON.stringify(messages));
-        alert('Inquiry sent to ' + prop.name + '! Check your messages for replies.');
-        setInquiry({});
+        alert('Inquiry sent! Check your messages for replies.');
+        setInquiry({ message: '' });
       };
+
+      var handleSaveProperty = function() {
+        if (!user) {
+          alert('Please sign in to save properties');
+          return;
+        }
+        var saved = JSON.parse(localStorage.getItem('ad_saved_' + user.id) || '[]');
+        if (isSaved) {
+          saved = saved.filter(function(id) { return id !== prop.id; });
+        } else {
+          saved.push(prop.id);
+        }
+        localStorage.setItem('ad_saved_' + user.id, JSON.stringify(saved));
+        setIsSaved(!isSaved);
+      };
+
       return e('div', null,
         e('button', { className: 'back-btn', onClick: handleBack }, '← Back'),
         e('div', { className: 'detail-page' },
@@ -2074,26 +2030,35 @@
               } }) : null
             ),
             e('div', { className: 'detail-right' },
-              prop.verified ? e('div', { className: 'notification-banner' },
+              user && user.role === 'host' && prop.claimedBy === user.id ? e('div', { className: 'notification-banner' },
+                e('p', null, 'You own this property')
+              ) : null,
+              prop.verified && !user ? e('div', { className: 'notification-banner' },
                 e('p', null, '✓ This property is verified and claimed by the host')
               ) : null,
               e('div', { className: 'contact-section' },
                 e('h3', null, 'Send an Inquiry'),
-                e('div', { className: 'form-group' },
-                  e('label', { className: 'form-label' }, 'Your Name'),
-                  e('input', { className: 'form-input', type: 'text', value: inquiry.name || '', onChange: function(evt) { setInquiry(Object.assign({}, inquiry, { name: evt.target.value })); } })
-                ),
-                e('div', { className: 'form-group' },
-                  e('label', { className: 'form-label' }, 'Email'),
-                  e('input', { className: 'form-input', type: 'email', value: inquiry.email || '', onChange: function(evt) { setInquiry(Object.assign({}, inquiry, { email: evt.target.value })); } })
-                ),
-                e('div', { className: 'form-group' },
-                  e('label', { className: 'form-label' }, 'Message'),
-                  e('textarea', { className: 'form-textarea', value: inquiry.message || '', onChange: function(evt) { setInquiry(Object.assign({}, inquiry, { message: evt.target.value })); } })
-                ),
-                e('button', { className: 'form-submit', onClick: handleSubmitInquiry }, 'Send Inquiry')
+                user ? e('div', null,
+                  e('div', { className: 'form-group' },
+                    e('label', { className: 'form-label' }, 'Your Name'),
+                    e('input', { className: 'form-input', type: 'text', value: user.name, disabled: true })
+                  ),
+                  e('div', { className: 'form-group' },
+                    e('label', { className: 'form-label' }, 'Email'),
+                    e('input', { className: 'form-input', type: 'email', value: user.email, disabled: true })
+                  ),
+                  e('div', { className: 'form-group' },
+                    e('label', { className: 'form-label' }, 'Message'),
+                    e('textarea', { className: 'form-textarea', value: inquiry.message || '', onChange: function(evt) { setInquiry(Object.assign({}, inquiry, { message: evt.target.value })); } })
+                  ),
+                  e('button', { className: 'form-submit', onClick: handleSubmitInquiry }, 'Send Inquiry')
+                ) : e('div', null,
+                  e('p', null, 'Sign in to send an inquiry to the host'),
+                  e('button', { className: 'btn-primary', style: { marginTop: '0.5rem' } }, 'Sign In')
+                )
               ),
-              prop.website ? e('a', { href: ensureUrl(prop.website), target: '_blank', rel: 'noopener noreferrer', className: 'website-link' }, 'Visit Website') : null
+              user ? e('button', { className: 'btn-small' + (isSaved ? '' : ' outline'), onClick: handleSaveProperty, style: { marginTop: '1rem', width: '100%' } }, isSaved ? '❤ Saved' : '🤍 Save Property') : null,
+              prop.website ? e('a', { href: ensureUrl(prop.website), target: '_blank', rel: 'noopener noreferrer', className: 'website-link', style: { display: 'block', marginTop: '1rem', textAlign: 'center' } }, 'Visit Website') : null
             )
           )
         )
@@ -2114,36 +2079,81 @@
       var stateNewMessage = useState('');
       var newMessage = stateNewMessage[0];
       var setNewMessage = stateNewMessage[1];
+
       useEffect(function() {
         var saved = localStorage.getItem('ad_conversations');
         var convs = saved ? JSON.parse(saved) : [];
-        setConversations(convs);
-        if (convs.length > 0) {
-          setSelectedConv(convs[0].id);
-          var msgs = localStorage.getItem('ad_messages_' + convs[0].id);
+        var filtered = convs.filter(function(c) {
+          if (user && user.role === 'guest') {
+            return c.guestId === user.id;
+          } else if (user && user.role === 'host') {
+            return c.hostId === user.id;
+          }
+          return false;
+        });
+        filtered.sort(function(a, b) {
+          return new Date(b.lastMessageAt) - new Date(a.lastMessageAt);
+        });
+        setConversations(filtered);
+        if (filtered.length > 0) {
+          setSelectedConv(filtered[0].id);
+          var msgs = localStorage.getItem('ad_messages_' + filtered[0].id);
           setMessages(msgs ? JSON.parse(msgs) : []);
         }
-      }, []);
+      }, [user]);
+
       var handleSelectConversation = function(convId) {
         setSelectedConv(convId);
         var msgs = localStorage.getItem('ad_messages_' + convId);
         setMessages(msgs ? JSON.parse(msgs) : []);
+        var updatedConvs = conversations.map(function(c) {
+          if (c.id === convId) {
+            if (user && user.role === 'guest') {
+              return Object.assign({}, c, { unreadGuest: 0 });
+            } else if (user && user.role === 'host') {
+              return Object.assign({}, c, { unreadHost: 0 });
+            }
+          }
+          return c;
+        });
+        setConversations(updatedConvs);
+        localStorage.setItem('ad_conversations', JSON.stringify(updatedConvs));
       };
+
       var handleSendMessage = function() {
         if (!newMessage.trim() || !selectedConv) return;
         var updatedMessages = messages.slice();
         updatedMessages.push({
-          id: Date.now(),
-          sender: user ? user.id : 'guest',
+          id: 'msg_' + Date.now(),
+          senderId: user.id,
+          senderName: user.name,
           text: newMessage,
           timestamp: new Date().toISOString(),
-          read: false
+          type: 'message'
         });
         setMessages(updatedMessages);
         localStorage.setItem('ad_messages_' + selectedConv, JSON.stringify(updatedMessages));
+
+        var updatedConvs = conversations.map(function(c) {
+          if (c.id === selectedConv) {
+            var conv = Object.assign({}, c, {
+              lastMessage: newMessage,
+              lastMessageAt: new Date().toISOString()
+            });
+            if (user && user.role === 'guest') {
+              conv.unreadHost = (conv.unreadHost || 0) + 1;
+            } else if (user && user.role === 'host') {
+              conv.unreadGuest = (conv.unreadGuest || 0) + 1;
+            }
+            return conv;
+          }
+          return c;
+        });
+        setConversations(updatedConvs);
+        localStorage.setItem('ad_conversations', JSON.stringify(updatedConvs));
         setNewMessage('');
       };
-      var unreadCount = conversations.filter(function(c) { return c.unread; }).length;
+
       return e('div', null,
         e('div', { className: 'chat-container' },
           e('div', { className: 'chat-sidebar' },
@@ -2151,16 +2161,17 @@
               e('div', { style: { padding: '1rem' } }, 'No conversations yet') :
               conversations.map(function(conv) {
                 var isActive = selectedConv === conv.id;
+                var unreadCount = user && user.role === 'guest' ? conv.unreadGuest : conv.unreadHost;
                 return e('div', {
                   key: conv.id,
-                  className: 'conversation-item' + (isActive ? ' active' : '') + (conv.unread ? ' unread' : ''),
+                  className: 'conversation-item' + (isActive ? ' active' : '') + (unreadCount > 0 ? ' unread' : ''),
                   onClick: function() { handleSelectConversation(conv.id); }
                 },
                   e('div', { className: 'conversation-property' }, conv.propertyName),
                   e('div', { className: 'conversation-preview' }, conv.lastMessage || 'No messages'),
                   e('div', { className: 'conversation-meta' },
-                    e('span', null, new Date(conv.lastUpdated).toLocaleDateString()),
-                    conv.unread ? e('div', { className: 'conversation-badge' }, conv.unreadCount) : null
+                    e('span', null, new Date(conv.lastMessageAt).toLocaleDateString()),
+                    unreadCount > 0 ? e('div', { className: 'conversation-badge' }, unreadCount) : null
                   )
                 );
               })
@@ -2169,14 +2180,15 @@
             selectedConv ? e('div', null,
               e('div', { className: 'chat-header' },
                 e('h3', null, conversations.find(function(c) { return c.id === selectedConv; }).propertyName || 'Conversation'),
-                e('p', null, 'with host')
+                e('p', null, 'with ' + (user && user.role === 'guest' ? 'host' : 'guest'))
               ),
               e('div', { className: 'chat-messages' },
                 messages.length === 0 ?
                   e('div', { className: 'chat-empty' }, e('p', null, 'No messages yet')) :
                   messages.map(function(msg) {
-                    var isSent = msg.sender === (user ? user.id : 'guest');
+                    var isSent = msg.senderId === user.id;
                     return e('div', { key: msg.id },
+                      msg.type === 'inquiry' && e('div', { style: { textAlign: 'center', padding: '0.5rem', fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '0.5rem' } }, '📬 Inquiry received'),
                       e('div', { className: 'message-bubble ' + (isSent ? 'sent' : 'received') }, msg.text),
                       e('div', { className: 'message-meta' }, new Date(msg.timestamp).toLocaleTimeString())
                     );
@@ -2192,6 +2204,44 @@
       );
     }
 
+    function SavedPropertiesTab(props) {
+      var user = props.user;
+      var listings = props.listings;
+      var onSelectProperty = props.onSelectProperty;
+
+      var stateRemoval = useState({});
+      var removalInProgress = stateRemoval[0];
+      var setRemovalInProgress = stateRemoval[1];
+
+      var saved = useMemo(function() {
+        if (!user) return [];
+        var savedIds = JSON.parse(localStorage.getItem('ad_saved_' + user.id) || '[]');
+        return listings.filter(function(p) { return savedIds.includes(p.id); });
+      }, [user, listings]);
+
+      var handleRemove = function(propId) {
+        if (!user) return;
+        var savedIds = JSON.parse(localStorage.getItem('ad_saved_' + user.id) || '[]');
+        savedIds = savedIds.filter(function(id) { return id !== propId; });
+        localStorage.setItem('ad_saved_' + user.id, JSON.stringify(savedIds));
+        setRemovalInProgress(Object.assign({}, removalInProgress, { [propId]: false }));
+      };
+
+      return e('div', null,
+        e('h2', null, 'Saved Properties'),
+        saved.length === 0 ?
+          e('p', null, 'You have no saved properties yet. Browse properties and save your favorites!') :
+          e('div', { className: 'property-grid' },
+            saved.map(function(prop) {
+              return e('div', { key: prop.id },
+                e(PropertyCard, { prop: prop, onSelect: onSelectProperty }),
+                e('button', { className: 'btn-small danger', onClick: function() { handleRemove(prop.id); }, style: { width: '100%', marginTop: '0.5rem' } }, 'Remove')
+              );
+            })
+          )
+      );
+    }
+
     function SettingsTab(props) {
       var user = props.user;
       var onSaveSettings = props.onSaveSettings;
@@ -2204,28 +2254,30 @@
       });
       var settings = stateSettings[0];
       var setSettings = stateSettings[1];
+
       var handleSave = function() {
         onSaveSettings(settings);
         alert('Settings saved!');
       };
+
       return e('div', null,
         e('h2', null, 'Privacy & Contact Settings'),
         e('div', { style: { marginTop: '1.5rem' } },
           e('div', { className: 'privacy-toggle' },
-            e('input', { type: 'checkbox', checked: settings.shareEmail, onChange: function(evt) { setSettings(Object.assign({}, settings, { shareEmail: evt.target.checked })); } }),
-            e('label', null, 'Share my email with guests')
+            e('input', { type: 'checkbox', id: 'shareEmail', checked: settings.shareEmail, onChange: function(evt) { setSettings(Object.assign({}, settings, { shareEmail: evt.target.checked })); } }),
+            e('label', { htmlFor: 'shareEmail' }, 'Share my email with guests')
           ),
           e('div', { className: 'privacy-toggle' },
-            e('input', { type: 'checkbox', checked: settings.sharePhone, onChange: function(evt) { setSettings(Object.assign({}, settings, { sharePhone: evt.target.checked })); } }),
-            e('label', null, 'Share my phone number with guests')
+            e('input', { type: 'checkbox', id: 'sharePhone', checked: settings.sharePhone, onChange: function(evt) { setSettings(Object.assign({}, settings, { sharePhone: evt.target.checked })); } }),
+            e('label', { htmlFor: 'sharePhone' }, 'Share my phone number with guests')
           ),
           e('div', { className: 'form-group' },
             e('label', { className: 'form-label' }, 'Phone Number'),
             e('input', { className: 'form-input', type: 'tel', value: settings.phone, onChange: function(evt) { setSettings(Object.assign({}, settings, { phone: evt.target.value })); } })
           ),
           e('div', { className: 'privacy-toggle' },
-            e('input', { type: 'checkbox', checked: settings.shareWhatsapp, onChange: function(evt) { setSettings(Object.assign({}, settings, { shareWhatsapp: evt.target.checked })); } }),
-            e('label', null, 'Share my WhatsApp with guests')
+            e('input', { type: 'checkbox', id: 'shareWhatsapp', checked: settings.shareWhatsapp, onChange: function(evt) { setSettings(Object.assign({}, settings, { shareWhatsapp: evt.target.checked })); } }),
+            e('label', { htmlFor: 'shareWhatsapp' }, 'Share my WhatsApp with guests')
           ),
           e('div', { className: 'form-group' },
             e('label', { className: 'form-label' }, 'WhatsApp Number'),
@@ -2233,6 +2285,237 @@
           ),
           e('button', { className: 'btn-primary', onClick: handleSave, style: { marginTop: '1.5rem' } }, 'Save Settings')
         )
+      );
+    }
+
+    function MyPropertiesTab(props) {
+      var user = props.user;
+      var listings = props.listings;
+      var stateMode = useState('list');
+      var mode = stateMode[0];
+      var setMode = stateMode[1];
+      var stateSearchTerm = useState('');
+      var searchTerm = stateSearchTerm[0];
+      var setSearchTerm = stateSearchTerm[1];
+      var stateSearchResults = useState([]);
+      var searchResults = stateSearchResults[0];
+      var setSearchResults = stateSearchResults[1];
+      var stateCreatingProperty = useState(false);
+      var creatingProperty = stateCreatingProperty[0];
+      var setCreatingProperty = stateCreatingProperty[1];
+      var stateFormData = useState({
+        name: '',
+        type: 'Hotel',
+        region: '',
+        comune: '',
+        street: '',
+        beds: '1',
+        rooms: '1',
+        baths: '1',
+        stars: '3',
+        amenities: {}
+      });
+      var formData = stateFormData[0];
+      var setFormData = stateFormData[1];
+
+      var myProperties = useMemo(function() {
+        if (!user) return [];
+        return listings.filter(function(p) { return p.claimedBy === user.id; });
+      }, [user, listings]);
+
+      var handleSearchProperties = function() {
+        if (!searchTerm.trim()) return;
+        var filtered = listings.filter(function(p) {
+          return p.name.toLowerCase().includes(searchTerm.toLowerCase()) && !p.claimedBy;
+        }).slice(0, 20);
+        setSearchResults(filtered);
+      };
+
+      var handleClaimProperty = function(property) {
+        if (!user) return;
+        property.claimedBy = user.id;
+        if (!user.claimedProperties) user.claimedProperties = [];
+        user.claimedProperties.push(property.id);
+        localStorage.setItem('ad_user', JSON.stringify(user));
+        setSearchTerm('');
+        setSearchResults([]);
+        setMode('list');
+      };
+
+      var handleCreateProperty = function() {
+        if (!formData.name || !formData.region || !formData.comune) {
+          alert('Please fill in required fields');
+          return;
+        }
+        if (!user) return;
+        var newProperty = {
+          id: 'CUSTOM-' + Date.now(),
+          region: formData.region,
+          regionCode: 0,
+          provincia: formData.region,
+          comune: formData.comune,
+          type: formData.type,
+          typeCode: 0,
+          name: formData.name,
+          street: formData.street,
+          number: '',
+          cap: '',
+          lat: 0,
+          lon: 0,
+          stars: parseInt(formData.stars),
+          beds: parseInt(formData.beds),
+          rooms: parseInt(formData.rooms),
+          baths: parseInt(formData.baths),
+          website: '',
+          amenities: formData.amenities,
+          claimed: true,
+          verified: false,
+          claimedBy: user.id,
+          neighborhood: formData.comune
+        };
+        if (!user.createdProperties) user.createdProperties = [];
+        user.createdProperties.push(newProperty);
+        localStorage.setItem('ad_user', JSON.stringify(user));
+        setFormData({
+          name: '',
+          type: 'Hotel',
+          region: '',
+          comune: '',
+          street: '',
+          beds: '1',
+          rooms: '1',
+          baths: '1',
+          stars: '3',
+          amenities: {}
+        });
+        setCreatingProperty(false);
+        setMode('list');
+      };
+
+      return e('div', null,
+        mode === 'list' ? e('div', null,
+          e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' } },
+            e('h2', null, 'My Properties (' + myProperties.length + ')'),
+            e('div', { style: { display: 'flex', gap: '0.5rem' } },
+              e('button', { className: 'btn-small', onClick: function() { setMode('claim'); } }, 'Claim Property'),
+              e('button', { className: 'btn-small', onClick: function() { setCreatingProperty(true); setMode('create'); } }, 'Create New')
+            )
+          ),
+          myProperties.length === 0 ?
+            e('p', null, 'You have no properties yet. Claim an existing property or create a new one.') :
+            e('div', { className: 'property-list' },
+              myProperties.map(function(prop) {
+                return e('div', { key: prop.id, className: 'property-item' },
+                  e('div', { className: 'property-info' },
+                    e('div', { className: 'property-name' }, prop.name),
+                    e('div', { className: 'property-meta' }, prop.type + ' • ' + prop.comune)
+                  ),
+                  e('div', { className: 'property-actions' },
+                    e('button', { className: 'btn-small' }, 'View Inquiries')
+                  )
+                );
+              })
+            )
+        ) : null,
+        mode === 'claim' ? e('div', null,
+          e('button', { className: 'back-btn', onClick: function() { setMode('list'); } }, '← Back'),
+          e('h2', null, 'Claim Existing Property'),
+          e('div', { style: { marginBottom: '1.5rem' } },
+            e('input', { className: 'form-input', type: 'text', placeholder: 'Search by property name...', value: searchTerm, onChange: function(evt) { setSearchTerm(evt.target.value); } }),
+            e('button', { className: 'btn-primary', onClick: handleSearchProperties, style: { marginTop: '0.5rem' } }, 'Search')
+          ),
+          searchResults.length > 0 ? e('div', { className: 'search-results' },
+            searchResults.map(function(prop) {
+              return e('div', { key: prop.id, className: 'search-result-item' },
+                e('div', { className: 'search-result-name' }, prop.name),
+                e('div', { className: 'search-result-meta' }, prop.type + ' in ' + prop.comune),
+                e('button', { className: 'btn-small', onClick: function() { handleClaimProperty(prop); } }, 'Claim This Property')
+              );
+            })
+          ) : searchTerm ? e('p', null, 'No properties found') : null
+        ) : null,
+        mode === 'create' ? e('div', null,
+          e('button', { className: 'back-btn', onClick: function() { setMode('list'); setCreatingProperty(false); } }, '← Back'),
+          e('h2', null, 'Create New Property'),
+          e('form', { style: { maxWidth: '600px' } },
+            e('div', { className: 'form-section' },
+              e('div', { className: 'form-row full' },
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Property Name*'),
+                  e('input', { className: 'form-input', type: 'text', value: formData.name, onChange: function(evt) { setFormData(Object.assign({}, formData, { name: evt.target.value })); } })
+                )
+              ),
+              e('div', { className: 'form-row' },
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Property Type'),
+                  e('select', { className: 'form-select', value: formData.type, onChange: function(evt) { setFormData(Object.assign({}, formData, { type: evt.target.value })); } },
+                    ['Affittacamere', 'Agriturismo', 'Altro', 'B&B', 'Campeggio', 'Hotel', 'Residence', 'Villaggio Turistico'].map(function(t) { return e('option', { key: t, value: t }, t); })
+                  )
+                ),
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Region*'),
+                  e('select', { className: 'form-select', value: formData.region, onChange: function(evt) { setFormData(Object.assign({}, formData, { region: evt.target.value })); } },
+                    e('option', { value: '' }, 'Select Region'),
+                    ['Lazio', 'Lombardy', 'Campania', 'Veneto', 'Other'].map(function(r) { return e('option', { key: r, value: r }, r); })
+                  )
+                )
+              ),
+              e('div', { className: 'form-row full' },
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'City/Comune*'),
+                  e('input', { className: 'form-input', type: 'text', value: formData.comune, onChange: function(evt) { setFormData(Object.assign({}, formData, { comune: evt.target.value })); } })
+                )
+              ),
+              e('div', { className: 'form-row full' },
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Street'),
+                  e('input', { className: 'form-input', type: 'text', value: formData.street, onChange: function(evt) { setFormData(Object.assign({}, formData, { street: evt.target.value })); } })
+                )
+              ),
+              e('div', { className: 'form-row' },
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Beds'),
+                  e('input', { className: 'form-input', type: 'number', min: '1', value: formData.beds, onChange: function(evt) { setFormData(Object.assign({}, formData, { beds: evt.target.value })); } })
+                ),
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Rooms'),
+                  e('input', { className: 'form-input', type: 'number', min: '1', value: formData.rooms, onChange: function(evt) { setFormData(Object.assign({}, formData, { rooms: evt.target.value })); } })
+                )
+              ),
+              e('div', { className: 'form-row' },
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Bathrooms'),
+                  e('input', { className: 'form-input', type: 'number', min: '1', value: formData.baths, onChange: function(evt) { setFormData(Object.assign({}, formData, { baths: evt.target.value })); } })
+                ),
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Star Rating'),
+                  e('select', { className: 'form-select', value: formData.stars, onChange: function(evt) { setFormData(Object.assign({}, formData, { stars: evt.target.value })); } },
+                    e('option', { value: '1' }, '1 Star'),
+                    e('option', { value: '2' }, '2 Stars'),
+                    e('option', { value: '3' }, '3 Stars'),
+                    e('option', { value: '4' }, '4 Stars'),
+                    e('option', { value: '5' }, '5 Stars')
+                  )
+                )
+              ),
+              e('div', { className: 'form-section' },
+                e('div', { className: 'form-section-title' }, 'Amenities'),
+                e('div', { className: 'checkbox-group' },
+                  ['pool', 'ac', 'pets', 'gym', 'restaurant', 'elevator', 'freeParking', 'shuttle'].map(function(amen) {
+                    return e('div', { key: amen, className: 'checkbox-item' },
+                      e('input', { type: 'checkbox', id: 'amen_' + amen, checked: formData.amenities[amen] || false, onChange: function(evt) { var newAmen = Object.assign({}, formData.amenities); newAmen[amen] = evt.target.checked; setFormData(Object.assign({}, formData, { amenities: newAmen })); } }),
+                      e('label', { htmlFor: 'amen_' + amen }, AMENITY_LABELS[amen])
+                    );
+                  })
+                )
+              )
+            ),
+            e('div', { style: { display: 'flex', gap: '0.5rem', marginTop: '1.5rem' } },
+              e('button', { className: 'btn-primary', type: 'button', onClick: handleCreateProperty }, 'Create Property'),
+              e('button', { className: 'btn-secondary', type: 'button', onClick: function() { setMode('list'); setCreatingProperty(false); } }, 'Cancel')
+            )
+          )
+        ) : null
       );
     }
 
@@ -2244,12 +2527,12 @@
       var tab = stateTab[0];
       var setTab = stateTab[1];
       var isHost = user && user.role === 'host';
-      var myProperties = isHost ? listings.filter(function(p) { return p.claimedBy === user.id; }) : [];
-      var unreadMessages = 0;
+
       var handleSaveSettings = function(settings) {
         var updated = Object.assign({}, user, settings);
         localStorage.setItem('ad_user', JSON.stringify(updated));
       };
+
       return e('div', null,
         e('div', { className: 'dashboard-container' },
           e('div', { className: 'dashboard-header' },
@@ -2258,7 +2541,8 @@
           ),
           e('div', { className: 'dashboard-tabs' },
             e('button', { className: 'dashboard-tab' + (tab === 'profile' ? ' active' : ''), onClick: function() { setTab('profile'); } }, 'Profile'),
-            !isHost ? e('button', { className: 'dashboard-tab' + (tab === 'messages' ? ' active' : ''), onClick: function() { setTab('messages'); } }, 'Messages', unreadMessages > 0 ? e('span', { className: 'dashboard-tab-badge' }, unreadMessages) : null) : null,
+            !isHost ? e('button', { className: 'dashboard-tab' + (tab === 'saved' ? ' active' : ''), onClick: function() { setTab('saved'); } }, 'Saved Properties') : null,
+            e('button', { className: 'dashboard-tab' + (tab === 'messages' ? ' active' : ''), onClick: function() { setTab('messages'); } }, 'Messages'),
             isHost ? e('button', { className: 'dashboard-tab' + (tab === 'properties' ? ' active' : ''), onClick: function() { setTab('properties'); } }, 'My Properties') : null,
             isHost ? e('button', { className: 'dashboard-tab' + (tab === 'settings' ? ' active' : ''), onClick: function() { setTab('settings'); } }, 'Settings') : null,
             e('button', { className: 'dashboard-tab', onClick: onLogout, style: { marginLeft: 'auto' } }, 'Logout')
@@ -2277,22 +2561,17 @@
                 ),
                 e('div', { className: 'form-group' },
                   e('label', { className: 'form-label' }, 'Role'),
-                  e('input', { className: 'form-input', type: 'text', value: user ? user.role : '', disabled: true })
-                )
+                  e('input', { className: 'form-input', type: 'text', value: user ? (user.role === 'host' ? 'Property Owner' : 'Guest') : '', disabled: true })
+                ),
+                user && user.bio ? e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Bio'),
+                  e('textarea', { className: 'form-textarea', value: user.bio, disabled: true })
+                ) : null
               )
             ) : null,
+            tab === 'saved' && !isHost ? e(SavedPropertiesTab, { user: user, listings: listings, onSelectProperty: function() {} }) : null,
             tab === 'messages' ? e(MessagesTab, { user: user }) : null,
-            tab === 'properties' && isHost ? e('div', null,
-              e('h2', null, 'My Properties'),
-              myProperties.length === 0 ?
-                e('p', null, 'You have no claimed properties yet') :
-                myProperties.map(function(prop) {
-                  return e('div', { key: prop.id, style: { marginBottom: '1rem', padding: '1rem', border: '1px solid var(--border-light)', borderRadius: '4px' } },
-                    e('h3', null, prop.name),
-                    e('p', null, prop.type + ' in ' + prop.region)
-                  );
-                })
-            ) : null,
+            tab === 'properties' && isHost ? e(MyPropertiesTab, { user: user, listings: listings }) : null,
             tab === 'settings' && isHost ? e(SettingsTab, { user: user, onSaveSettings: handleSaveSettings }) : null
           )
         )
@@ -2304,6 +2583,9 @@
       var stateMode = useState('login');
       var mode = stateMode[0];
       var setMode = stateMode[1];
+      var stateSignupRole = useState('guest');
+      var signupRole = stateSignupRole[0];
+      var setSignupRole = stateSignupRole[1];
       var stateEmail = useState('');
       var email = stateEmail[0];
       var setEmail = stateEmail[1];
@@ -2313,9 +2595,7 @@
       var stateName = useState('');
       var name = stateName[0];
       var setName = stateName[1];
-      var stateRole = useState('traveler');
-      var role = stateRole[0];
-      var setRole = stateRole[1];
+
       var handleLogin = function() {
         if (!email || !password) {
           alert('Please fill in all fields');
@@ -2327,9 +2607,10 @@
           localStorage.setItem('ad_user', JSON.stringify(found));
           onLogin(found);
         } else {
-          alert('Invalid email or password. Please sign up first.');
+          alert('Invalid email or password');
         }
       };
+
       var handleSignup = function() {
         if (!name || !email || !password) {
           alert('Please fill in all fields');
@@ -2337,53 +2618,76 @@
         }
         var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
         if (users.find(function(u) { return u.email === email; })) {
-          alert('Email already registered. Please login instead.');
+          alert('Email already registered');
           return;
         }
         var user = {
-          id: 'user-' + Date.now(),
+          id: 'user_' + Date.now(),
           email: email,
           password: password,
           name: name,
-          role: role,
+          role: signupRole,
           phone: '',
           whatsapp: '',
+          bio: '',
           shareEmail: false,
           sharePhone: false,
           shareWhatsapp: false,
-          claimedProperties: []
+          claimedProperties: [],
+          createdProperties: []
         };
         users.push(user);
         localStorage.setItem('ad_users', JSON.stringify(users));
         localStorage.setItem('ad_user', JSON.stringify(user));
         onLogin(user);
       };
+
       return e('div', { className: 'login-container' },
         e('div', { className: 'login-form' },
-          e('h2', null, mode === 'login' ? 'Sign In' : 'Create Account'),
-          mode === 'signup' ? e('div', { className: 'form-group' },
-            e('label', { className: 'form-label' }, 'Full Name'),
-            e('input', { className: 'form-input', type: 'text', placeholder: 'Your name', value: name, onChange: function(evt) { setName(evt.target.value); } })
-          ) : null,
-          e('div', { className: 'form-group' },
-            e('label', { className: 'form-label' }, 'Email'),
-            e('input', { className: 'form-input', type: 'email', placeholder: 'your@email.com', value: email, onChange: function(evt) { setEmail(evt.target.value); } })
-          ),
-          e('div', { className: 'form-group' },
-            e('label', { className: 'form-label' }, 'Password'),
-            e('input', { className: 'form-input', type: 'password', placeholder: 'Password', value: password, onChange: function(evt) { setPassword(evt.target.value); } })
-          ),
-          mode === 'signup' ? e('div', { className: 'form-group' },
-            e('label', { className: 'form-label' }, 'I am a...'),
-            e('select', { className: 'form-select', value: role, onChange: function(evt) { setRole(evt.target.value); } },
-              e('option', { value: 'traveler' }, 'Traveler'),
-              e('option', { value: 'host' }, 'Property Owner')
+          mode === 'login' ? e('div', null,
+            e('h2', null, 'Sign In'),
+            e('div', { className: 'form-group' },
+              e('label', { className: 'form-label' }, 'Email'),
+              e('input', { className: 'form-input', type: 'email', placeholder: 'your@email.com', value: email, onChange: function(evt) { setEmail(evt.target.value); } })
+            ),
+            e('div', { className: 'form-group' },
+              e('label', { className: 'form-label' }, 'Password'),
+              e('input', { className: 'form-input', type: 'password', placeholder: 'Password', value: password, onChange: function(evt) { setPassword(evt.target.value); } })
+            ),
+            e('button', { className: 'form-submit', onClick: handleLogin }, 'Sign In'),
+            e('div', { className: 'login-toggle' },
+              e('span', null, "Don't have an account? "),
+              e('button', { onClick: function() { setMode('signup'); } }, 'Sign Up')
             )
-          ) : null,
-          e('button', { className: 'form-submit', onClick: mode === 'login' ? handleLogin : handleSignup }, mode === 'login' ? 'Sign In' : 'Create Account'),
-          e('div', { className: 'login-toggle' },
-            e('span', null, mode === 'login' ? "Don't have an account? " : 'Already have an account? '),
-            e('button', { onClick: function() { setMode(mode === 'login' ? 'signup' : 'login'); } }, mode === 'login' ? 'Sign Up' : 'Sign In')
+          ) : e('div', null,
+            e('h2', null, 'Create Account'),
+            e('div', { className: 'signup-cards' },
+              e('div', { className: 'signup-card' + (signupRole === 'guest' ? ' selected' : ''), onClick: function() { setSignupRole('guest'); } },
+                e('div', { className: 'signup-card-icon' }, '🏖️'),
+                e('div', { className: 'signup-card-title' }, 'I\'m a Guest')
+              ),
+              e('div', { className: 'signup-card' + (signupRole === 'host' ? ' selected' : ''), onClick: function() { setSignupRole('host'); } },
+                e('div', { className: 'signup-card-icon' }, '🏠'),
+                e('div', { className: 'signup-card-title' }, 'I\'m a Host')
+              )
+            ),
+            e('div', { className: 'form-group' },
+              e('label', { className: 'form-label' }, 'Full Name'),
+              e('input', { className: 'form-input', type: 'text', placeholder: 'Your name', value: name, onChange: function(evt) { setName(evt.target.value); } })
+            ),
+            e('div', { className: 'form-group' },
+              e('label', { className: 'form-label' }, 'Email'),
+              e('input', { className: 'form-input', type: 'email', placeholder: 'your@email.com', value: email, onChange: function(evt) { setEmail(evt.target.value); } })
+            ),
+            e('div', { className: 'form-group' },
+              e('label', { className: 'form-label' }, 'Password'),
+              e('input', { className: 'form-input', type: 'password', placeholder: 'Password', value: password, onChange: function(evt) { setPassword(evt.target.value); } })
+            ),
+            e('button', { className: 'form-submit', onClick: handleSignup }, 'Create Account'),
+            e('div', { className: 'login-toggle' },
+              e('span', null, 'Already have an account? '),
+              e('button', { onClick: function() { setMode('login'); } }, 'Sign In')
+            )
           )
         )
       );
@@ -2394,7 +2698,17 @@
       var onNavigate = props.onNavigate;
       var user = props.user;
       var onLogout = props.onLogout;
+      var conversations = props.conversations;
+
       var unreadCount = 0;
+      if (user && conversations) {
+        if (user.role === 'guest') {
+          unreadCount = conversations.filter(function(c) { return c.guestId === user.id && c.unreadGuest > 0; }).reduce(function(sum, c) { return sum + c.unreadGuest; }, 0);
+        } else if (user.role === 'host') {
+          unreadCount = conversations.filter(function(c) { return c.hostId === user.id && c.unreadHost > 0; }).reduce(function(sum, c) { return sum + c.unreadHost; }, 0);
+        }
+      }
+
       return e('nav', { className: 'navbar' },
         e('div', { className: 'navbar-container' },
           e('a', { className: 'navbar-logo', onClick: function() { onNavigate('home'); } }, 'AffittoDiretto'),
@@ -2436,6 +2750,10 @@
       var stateNavHistory = useState([]);
       var navHistory = stateNavHistory[0];
       var setNavHistory = stateNavHistory[1];
+      var stateConversations = useState([]);
+      var conversations = stateConversations[0];
+      var setConversations = stateConversations[1];
+
       useEffect(function() {
         var parsed = parseListings();
         setListings(parsed);
@@ -2443,11 +2761,17 @@
         if (savedUser) {
           setUser(JSON.parse(savedUser));
         }
+        var savedConvs = localStorage.getItem('ad_conversations');
+        if (savedConvs) {
+          setConversations(JSON.parse(savedConvs));
+        }
       }, []);
+
       var currentProperty = useMemo(function() {
         if (currentPage !== 'detail' || !pageState.propertyId) return null;
         return listings.find(function(p) { return p.id === pageState.propertyId; });
       }, [listings, currentPage, pageState]);
+
       var handleNavigate = function(page, state) {
         var newHistory = navHistory.slice();
         newHistory.push({ page: currentPage, state: pageState });
@@ -2456,6 +2780,7 @@
         if (state) setPageState(state);
         window.scrollTo(0, 0);
       };
+
       var handleBack = function() {
         if (navHistory.length > 0) {
           var prev = navHistory[navHistory.length - 1];
@@ -2466,6 +2791,7 @@
           setCurrentPage('home');
         }
       };
+
       var handleSelectProperty = function(prop) {
         var newHistory = navHistory.slice();
         newHistory.push({ page: currentPage, state: pageState });
@@ -2474,17 +2800,23 @@
         setPageState({ propertyId: prop.id });
         window.scrollTo(0, 0);
       };
+
       var handleLogout = function() {
         localStorage.removeItem('ad_user');
         setUser(null);
         setCurrentPage('home');
       };
+
+      var handlePropertySaved = function() {
+        // Trigger any necessary updates
+      };
+
       return e('div', null,
-        e(Navbar, { currentPage: currentPage, onNavigate: handleNavigate, user: user, onLogout: handleLogout }),
+        e(Navbar, { currentPage: currentPage, onNavigate: handleNavigate, user: user, onLogout: handleLogout, conversations: conversations }),
         currentPage === 'home' ? e(HomePage, { listings: listings, onSelectProperty: handleSelectProperty }) :
         currentPage === 'search' ? e(SearchPage, { listings: listings, onSelectProperty: handleSelectProperty, onNavigate: function() { handleNavigate('home'); } }) :
         currentPage === 'map' ? e(MapPage, { listings: listings, onSelectProperty: handleSelectProperty, onNavigate: function() { handleNavigate('home'); } }) :
-        currentPage === 'detail' ? e(PropertyDetail, { currentProperty: currentProperty, onNavigate: handleNavigate, handleBack: handleBack, user: user }) :
+        currentPage === 'detail' ? e(PropertyDetail, { currentProperty: currentProperty, onNavigate: handleNavigate, handleBack: handleBack, user: user, onPropertySaved: handlePropertySaved }) :
         currentPage === 'login' ? e(LoginPage, { onLogin: function(u) { setUser(u); setCurrentPage('dashboard'); } }) :
         currentPage === 'dashboard' ? e(Dashboard, { user: user, onLogout: handleLogout, listings: listings }) :
         e('div', null),
