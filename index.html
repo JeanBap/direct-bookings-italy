@@ -1906,12 +1906,15 @@
       var handleBack = props.handleBack;
       var user = props.user;
       var onPropertySaved = props.onPropertySaved;
-      var stateInquiry = useState({});
+      var stateInquiry = useState({ checkIn: '', checkOut: '', guests: '2', rooms: '1', message: '' });
       var inquiry = stateInquiry[0];
       var setInquiry = stateInquiry[1];
       var stateSaved = useState(false);
       var isSaved = stateSaved[0];
       var setIsSaved = stateSaved[1];
+      var stateNotice = useState(null);
+      var notice = stateNotice[0];
+      var setNotice = stateNotice[1];
 
       useEffect(function() {
         if (user && prop) {
@@ -1920,17 +1923,39 @@
         }
       }, [user, prop]);
 
+      var buildAutoMessage = function(inq) {
+        if (!inq.checkIn || !inq.checkOut) return '';
+        var ciDate = new Date(inq.checkIn);
+        var coDate = new Date(inq.checkOut);
+        var nights = Math.max(1, Math.round((coDate - ciDate) / 86400000));
+        var opts = { month: 'long', day: 'numeric', year: 'numeric' };
+        return 'Hi, I would like to book your property from ' + ciDate.toLocaleDateString('en-US', opts) + ' to ' + coDate.toLocaleDateString('en-US', opts) + ' (' + nights + ' night' + (nights > 1 ? 's' : '') + '). We are ' + (inq.guests || '2') + ' guest' + (parseInt(inq.guests) !== 1 ? 's' : '') + ' and need ' + (inq.rooms || '1') + ' room' + (parseInt(inq.rooms) !== 1 ? 's' : '') + '. Is this available and what would the total cost be?';
+      };
+
+      var handleInquiryFieldChange = function(field, value) {
+        var updated = Object.assign({}, inquiry);
+        updated[field] = value;
+        if (field === 'checkIn' || field === 'checkOut' || field === 'guests' || field === 'rooms') {
+          updated.message = buildAutoMessage(updated);
+        }
+        setInquiry(updated);
+      };
+
       if (!prop) return e('div', null, e('p', { style: { padding: '2rem', textAlign: 'center' } }, 'Property not found'), e('button', { className: 'back-btn', onClick: handleBack }, '← Back'));
       var amenities = getTopAmenities(prop);
       var price = estimatePrice(prop);
 
       var handleSubmitInquiry = function() {
         if (!user) {
-          alert('Please sign in to send an inquiry');
+          setNotice({ type: 'error', text: 'Please sign in to send an inquiry' });
+          return;
+        }
+        if (!inquiry.checkIn || !inquiry.checkOut) {
+          setNotice({ type: 'error', text: 'Please select check-in and check-out dates' });
           return;
         }
         if (!inquiry.message) {
-          alert('Please enter a message');
+          setNotice({ type: 'error', text: 'Please enter a message' });
           return;
         }
         var convId = 'conv_' + Date.now();
@@ -1943,6 +1968,11 @@
           guestName: user.name,
           hostId: prop.claimedBy || null,
           hostName: prop.claimedBy ? 'Host' : null,
+          checkIn: inquiry.checkIn,
+          checkOut: inquiry.checkOut,
+          guests: parseInt(inquiry.guests) || 2,
+          rooms: parseInt(inquiry.rooms) || 1,
+          status: 'open',
           createdAt: new Date().toISOString(),
           lastMessageAt: new Date().toISOString(),
           lastMessage: inquiry.message,
@@ -1959,13 +1989,13 @@
           type: 'inquiry'
         }];
         localStorage.setItem('ad_messages_' + convId, JSON.stringify(messages));
-        alert('Inquiry sent! Check your messages for replies.');
-        setInquiry({ message: '' });
+        setNotice({ type: 'success', text: 'Inquiry sent! Check your messages for replies.' });
+        setInquiry({ checkIn: '', checkOut: '', guests: '2', rooms: '1', message: '' });
       };
 
       var handleSaveProperty = function() {
         if (!user) {
-          alert('Please sign in to save properties');
+          setNotice({ type: 'error', text: 'Please sign in to save properties' });
           return;
         }
         var saved = JSON.parse(localStorage.getItem('ad_saved_' + user.id) || '[]');
@@ -2036,6 +2066,7 @@
               prop.verified && !user ? e('div', { className: 'notification-banner' },
                 e('p', null, '✓ This property is verified and claimed by the host')
               ) : null,
+              notice ? e('div', { className: 'inline-notice ' + notice.type, style: { padding: '0.75rem 1rem', marginBottom: '1rem', borderRadius: '8px', background: notice.type === 'success' ? '#e8f5e9' : '#fce4ec', color: notice.type === 'success' ? '#2e7d32' : '#c62828', fontWeight: 500, fontSize: '0.95rem' } }, notice.text) : null,
               e('div', { className: 'contact-section' },
                 e('h3', null, 'Send an Inquiry'),
                 user ? e('div', null,
@@ -2043,13 +2074,29 @@
                     e('label', { className: 'form-label' }, 'Your Name'),
                     e('input', { className: 'form-input', type: 'text', value: user.name, disabled: true })
                   ),
-                  e('div', { className: 'form-group' },
-                    e('label', { className: 'form-label' }, 'Email'),
-                    e('input', { className: 'form-input', type: 'email', value: user.email, disabled: true })
+                  e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' } },
+                    e('div', { className: 'form-group' },
+                      e('label', { className: 'form-label' }, 'Check-in'),
+                      e('input', { className: 'form-input', type: 'date', value: inquiry.checkIn || '', onChange: function(evt) { handleInquiryFieldChange('checkIn', evt.target.value); } })
+                    ),
+                    e('div', { className: 'form-group' },
+                      e('label', { className: 'form-label' }, 'Check-out'),
+                      e('input', { className: 'form-input', type: 'date', value: inquiry.checkOut || '', min: inquiry.checkIn || '', onChange: function(evt) { handleInquiryFieldChange('checkOut', evt.target.value); } })
+                    )
+                  ),
+                  e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' } },
+                    e('div', { className: 'form-group' },
+                      e('label', { className: 'form-label' }, 'Guests'),
+                      e('input', { className: 'form-input', type: 'number', min: '1', max: '20', value: inquiry.guests || '2', onChange: function(evt) { handleInquiryFieldChange('guests', evt.target.value); } })
+                    ),
+                    e('div', { className: 'form-group' },
+                      e('label', { className: 'form-label' }, 'Rooms'),
+                      e('input', { className: 'form-input', type: 'number', min: '1', max: '10', value: inquiry.rooms || '1', onChange: function(evt) { handleInquiryFieldChange('rooms', evt.target.value); } })
+                    )
                   ),
                   e('div', { className: 'form-group' },
                     e('label', { className: 'form-label' }, 'Message'),
-                    e('textarea', { className: 'form-textarea', value: inquiry.message || '', onChange: function(evt) { setInquiry(Object.assign({}, inquiry, { message: evt.target.value })); } })
+                    e('textarea', { className: 'form-textarea', value: inquiry.message || '', placeholder: 'Select dates above to auto-generate your inquiry...', onChange: function(evt) { handleInquiryFieldChange('message', evt.target.value); } })
                   ),
                   e('button', { className: 'form-submit', onClick: handleSubmitInquiry }, 'Send Inquiry')
                 ) : e('div', null,
@@ -2080,20 +2127,26 @@
       var newMessage = stateNewMessage[0];
       var setNewMessage = stateNewMessage[1];
 
-      useEffect(function() {
+      var loadConversations = function() {
         var saved = localStorage.getItem('ad_conversations');
         var convs = saved ? JSON.parse(saved) : [];
         var filtered = convs.filter(function(c) {
           if (user && user.role === 'guest') {
             return c.guestId === user.id;
           } else if (user && user.role === 'host') {
-            return c.hostId === user.id;
+            var claimedProps = user.claimedProperties || [];
+            return c.hostId === user.id || (claimedProps.indexOf(c.propertyId) !== -1);
           }
           return false;
         });
         filtered.sort(function(a, b) {
           return new Date(b.lastMessageAt) - new Date(a.lastMessageAt);
         });
+        return filtered;
+      };
+
+      useEffect(function() {
+        var filtered = loadConversations();
         setConversations(filtered);
         if (filtered.length > 0) {
           setSelectedConv(filtered[0].id);
@@ -2106,18 +2159,16 @@
         setSelectedConv(convId);
         var msgs = localStorage.getItem('ad_messages_' + convId);
         setMessages(msgs ? JSON.parse(msgs) : []);
-        var updatedConvs = conversations.map(function(c) {
+        var allConvs = JSON.parse(localStorage.getItem('ad_conversations') || '[]');
+        allConvs = allConvs.map(function(c) {
           if (c.id === convId) {
-            if (user && user.role === 'guest') {
-              return Object.assign({}, c, { unreadGuest: 0 });
-            } else if (user && user.role === 'host') {
-              return Object.assign({}, c, { unreadHost: 0 });
-            }
+            if (user && user.role === 'guest') c.unreadGuest = 0;
+            else if (user && user.role === 'host') c.unreadHost = 0;
           }
           return c;
         });
-        setConversations(updatedConvs);
-        localStorage.setItem('ad_conversations', JSON.stringify(updatedConvs));
+        localStorage.setItem('ad_conversations', JSON.stringify(allConvs));
+        setConversations(loadConversations());
       };
 
       var handleSendMessage = function() {
@@ -2134,24 +2185,77 @@
         setMessages(updatedMessages);
         localStorage.setItem('ad_messages_' + selectedConv, JSON.stringify(updatedMessages));
 
-        var updatedConvs = conversations.map(function(c) {
+        var allConvs = JSON.parse(localStorage.getItem('ad_conversations') || '[]');
+        allConvs = allConvs.map(function(c) {
           if (c.id === selectedConv) {
-            var conv = Object.assign({}, c, {
-              lastMessage: newMessage,
-              lastMessageAt: new Date().toISOString()
-            });
-            if (user && user.role === 'guest') {
-              conv.unreadHost = (conv.unreadHost || 0) + 1;
-            } else if (user && user.role === 'host') {
-              conv.unreadGuest = (conv.unreadGuest || 0) + 1;
-            }
-            return conv;
+            c.lastMessage = newMessage;
+            c.lastMessageAt = new Date().toISOString();
+            if (user && user.role === 'guest') c.unreadHost = (c.unreadHost || 0) + 1;
+            else if (user && user.role === 'host') c.unreadGuest = (c.unreadGuest || 0) + 1;
           }
           return c;
         });
-        setConversations(updatedConvs);
-        localStorage.setItem('ad_conversations', JSON.stringify(updatedConvs));
+        localStorage.setItem('ad_conversations', JSON.stringify(allConvs));
+        setConversations(loadConversations());
         setNewMessage('');
+      };
+
+      var handleAgreeToStay = function() {
+        if (!selectedConv || !user) return;
+        var allConvs = JSON.parse(localStorage.getItem('ad_conversations') || '[]');
+        var agreedConv = allConvs.find(function(c) { return c.id === selectedConv; });
+        if (!agreedConv) return;
+        var now = new Date().toISOString();
+
+        allConvs = allConvs.map(function(c) {
+          if (c.id === selectedConv) {
+            c.status = 'agreed';
+            c.lastMessage = 'I have agreed to stay at this property.';
+            c.lastMessageAt = now;
+            c.unreadHost = (c.unreadHost || 0) + 1;
+            return c;
+          }
+          if (c.guestId === user.id && c.id !== selectedConv && c.status !== 'agreed' && c.status !== 'withdrawn') {
+            c.status = 'withdrawn';
+            c.lastMessage = 'Guest has chosen another property and withdrawn this inquiry.';
+            c.lastMessageAt = now;
+            c.unreadHost = (c.unreadHost || 0) + 1;
+            var otherMsgs = JSON.parse(localStorage.getItem('ad_messages_' + c.id) || '[]');
+            otherMsgs.push({
+              id: 'msg_' + Date.now() + '_' + c.id,
+              senderId: 'system',
+              senderName: 'System',
+              text: 'This inquiry has been withdrawn. ' + user.name + ' has agreed to stay at ' + agreedConv.propertyName + '.',
+              timestamp: now,
+              type: 'system'
+            });
+            localStorage.setItem('ad_messages_' + c.id, JSON.stringify(otherMsgs));
+            return c;
+          }
+          return c;
+        });
+        localStorage.setItem('ad_conversations', JSON.stringify(allConvs));
+
+        var agreedMsgs = messages.slice();
+        agreedMsgs.push({
+          id: 'msg_' + Date.now(),
+          senderId: 'system',
+          senderName: 'System',
+          text: user.name + ' has agreed to stay at this property. Booking confirmed!',
+          timestamp: now,
+          type: 'system'
+        });
+        setMessages(agreedMsgs);
+        localStorage.setItem('ad_messages_' + selectedConv, JSON.stringify(agreedMsgs));
+        setConversations(loadConversations());
+      };
+
+      var activeConv = conversations.find(function(c) { return c.id === selectedConv; });
+      var statusLabel = function(s) {
+        if (s === 'agreed') return { text: 'Confirmed', color: '#2e7d32', bg: '#e8f5e9' };
+        if (s === 'withdrawn') return { text: 'Withdrawn', color: '#e65100', bg: '#fff3e0' };
+        if (s === 'declined') return { text: 'Declined', color: '#c62828', bg: '#fce4ec' };
+        return { text: 'Open', color: '#1565c0', bg: '#e3f2fd' };
       };
 
       return e('div', null,
@@ -2162,12 +2266,17 @@
               conversations.map(function(conv) {
                 var isActive = selectedConv === conv.id;
                 var unreadCount = user && user.role === 'guest' ? conv.unreadGuest : conv.unreadHost;
+                var sl = statusLabel(conv.status);
                 return e('div', {
                   key: conv.id,
                   className: 'conversation-item' + (isActive ? ' active' : '') + (unreadCount > 0 ? ' unread' : ''),
                   onClick: function() { handleSelectConversation(conv.id); }
                 },
-                  e('div', { className: 'conversation-property' }, conv.propertyName),
+                  e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+                    e('div', { className: 'conversation-property' }, conv.propertyName),
+                    e('span', { style: { fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: sl.bg, color: sl.color, fontWeight: 600 } }, sl.text)
+                  ),
+                  conv.checkIn ? e('div', { style: { fontSize: '0.75rem', color: 'var(--text-light)', marginTop: '2px' } }, conv.checkIn + ' to ' + conv.checkOut + ' | ' + conv.guests + ' guests') : null,
                   e('div', { className: 'conversation-preview' }, conv.lastMessage || 'No messages'),
                   e('div', { className: 'conversation-meta' },
                     e('span', null, new Date(conv.lastMessageAt).toLocaleDateString()),
@@ -2177,26 +2286,49 @@
               })
           ),
           e('div', { className: 'chat-main' },
-            selectedConv ? e('div', null,
+            selectedConv && activeConv ? e('div', null,
               e('div', { className: 'chat-header' },
-                e('h3', null, conversations.find(function(c) { return c.id === selectedConv; }).propertyName || 'Conversation'),
-                e('p', null, 'with ' + (user && user.role === 'guest' ? 'host' : 'guest'))
+                e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+                  e('div', null,
+                    e('h3', { style: { margin: 0 } }, activeConv.propertyName || 'Conversation'),
+                    e('p', { style: { margin: '2px 0 0', fontSize: '0.85rem', color: 'var(--text-light)' } }, 'with ' + (user && user.role === 'guest' ? (activeConv.hostName || 'host') : activeConv.guestName))
+                  ),
+                  (function() {
+                    var sl = statusLabel(activeConv.status);
+                    return e('span', { style: { padding: '4px 10px', borderRadius: '6px', background: sl.bg, color: sl.color, fontWeight: 600, fontSize: '0.85rem' } }, sl.text);
+                  })()
+                ),
+                activeConv.checkIn ? e('div', { style: { marginTop: '0.4rem', padding: '0.4rem 0.6rem', background: '#f5f5f5', borderRadius: '6px', fontSize: '0.85rem' } },
+                  'Dates: ' + activeConv.checkIn + ' to ' + activeConv.checkOut + ' | Guests: ' + (activeConv.guests || '-') + ' | Rooms: ' + (activeConv.rooms || '-')
+                ) : null
               ),
               e('div', { className: 'chat-messages' },
                 messages.length === 0 ?
                   e('div', { className: 'chat-empty' }, e('p', null, 'No messages yet')) :
                   messages.map(function(msg) {
                     var isSent = msg.senderId === user.id;
+                    var isSystem = msg.type === 'system';
                     return e('div', { key: msg.id },
-                      msg.type === 'inquiry' && e('div', { style: { textAlign: 'center', padding: '0.5rem', fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '0.5rem' } }, '📬 Inquiry received'),
-                      e('div', { className: 'message-bubble ' + (isSent ? 'sent' : 'received') }, msg.text),
-                      e('div', { className: 'message-meta' }, new Date(msg.timestamp).toLocaleTimeString())
+                      msg.type === 'inquiry' ? e('div', { style: { textAlign: 'center', padding: '0.5rem', fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '0.5rem' } }, '📬 Inquiry received') : null,
+                      isSystem ? e('div', { style: { textAlign: 'center', padding: '0.75rem 1rem', margin: '0.5rem auto', maxWidth: '80%', fontSize: '0.85rem', color: '#555', background: '#f0f4f8', borderRadius: '8px', fontStyle: 'italic' } }, msg.text) :
+                      e('div', null,
+                        e('div', { className: 'message-bubble ' + (isSent ? 'sent' : 'received') }, msg.text),
+                        e('div', { className: 'message-meta' }, new Date(msg.timestamp).toLocaleTimeString())
+                      )
                     );
                   })
               ),
-              e('div', { className: 'chat-input-area' },
-                e('input', { type: 'text', placeholder: 'Type a message...', value: newMessage, onChange: function(evt) { setNewMessage(evt.target.value); }, onKeyPress: function(evt) { if (evt.key === 'Enter') handleSendMessage(); } }),
-                e('button', { onClick: handleSendMessage }, 'Send')
+              activeConv.status !== 'agreed' && activeConv.status !== 'withdrawn' && activeConv.status !== 'declined' ? e('div', null,
+                e('div', { className: 'chat-input-area' },
+                  e('input', { type: 'text', placeholder: 'Type a message...', value: newMessage, onChange: function(evt) { setNewMessage(evt.target.value); }, onKeyPress: function(evt) { if (evt.key === 'Enter') handleSendMessage(); } }),
+                  e('button', { onClick: handleSendMessage }, 'Send')
+                ),
+                user && user.role === 'guest' ? e('button', {
+                  onClick: handleAgreeToStay,
+                  style: { display: 'block', width: '100%', marginTop: '0.5rem', padding: '0.75rem', background: '#2e7d32', color: 'white', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer' }
+                }, 'Agree to Stay at This Property') : null
+              ) : e('div', { style: { padding: '1rem', textAlign: 'center', background: '#f5f5f5', borderRadius: '8px', margin: '0.5rem', color: '#666' } },
+                activeConv.status === 'agreed' ? 'Booking confirmed. You can still message the host.' : 'This inquiry has been withdrawn.'
               )
             ) : e('div', { className: 'chat-empty' }, e('p', null, 'Select a conversation'))
           )
@@ -2254,10 +2386,14 @@
       });
       var settings = stateSettings[0];
       var setSettings = stateSettings[1];
+      var stateSettingsNotice = useState(null);
+      var settingsNotice = stateSettingsNotice[0];
+      var setSettingsNotice = stateSettingsNotice[1];
 
       var handleSave = function() {
         onSaveSettings(settings);
-        alert('Settings saved!');
+        setSettingsNotice('Settings saved!');
+        setTimeout(function() { setSettingsNotice(null); }, 3000);
       };
 
       return e('div', null,
@@ -2283,7 +2419,8 @@
             e('label', { className: 'form-label' }, 'WhatsApp Number'),
             e('input', { className: 'form-input', type: 'tel', value: settings.whatsapp, onChange: function(evt) { setSettings(Object.assign({}, settings, { whatsapp: evt.target.value })); } })
           ),
-          e('button', { className: 'btn-primary', onClick: handleSave, style: { marginTop: '1.5rem' } }, 'Save Settings')
+          e('button', { className: 'btn-primary', onClick: handleSave, style: { marginTop: '1.5rem' } }, 'Save Settings'),
+          settingsNotice ? e('div', { style: { marginTop: '0.75rem', padding: '0.75rem 1rem', borderRadius: '8px', background: '#e8f5e9', color: '#2e7d32', fontWeight: 500 } }, settingsNotice) : null
         )
       );
     }
@@ -2320,7 +2457,11 @@
 
       var myProperties = useMemo(function() {
         if (!user) return [];
-        return listings.filter(function(p) { return p.claimedBy === user.id; });
+        var claimed = (user.claimedProperties || []).map(function(pid) {
+          return listings.find(function(p) { return p.id === pid; });
+        }).filter(Boolean);
+        var created = (user.createdProperties || []);
+        return claimed.concat(created);
       }, [user, listings]);
 
       var handleSearchProperties = function() {
@@ -2335,8 +2476,23 @@
         if (!user) return;
         property.claimedBy = user.id;
         if (!user.claimedProperties) user.claimedProperties = [];
-        user.claimedProperties.push(property.id);
+        if (user.claimedProperties.indexOf(property.id) === -1) {
+          user.claimedProperties.push(property.id);
+        }
         localStorage.setItem('ad_user', JSON.stringify(user));
+        var allUsers = JSON.parse(localStorage.getItem('ad_users') || '[]');
+        allUsers = allUsers.map(function(u) { return u.id === user.id ? user : u; });
+        localStorage.setItem('ad_users', JSON.stringify(allUsers));
+        var convs = JSON.parse(localStorage.getItem('ad_conversations') || '[]');
+        var updated = false;
+        convs = convs.map(function(c) {
+          if (c.propertyId === property.id && !c.hostId) {
+            updated = true;
+            return Object.assign({}, c, { hostId: user.id, hostName: user.name });
+          }
+          return c;
+        });
+        if (updated) localStorage.setItem('ad_conversations', JSON.stringify(convs));
         setSearchTerm('');
         setSearchResults([]);
         setMode('list');
@@ -2344,7 +2500,6 @@
 
       var handleCreateProperty = function() {
         if (!formData.name || !formData.region || !formData.comune) {
-          alert('Please fill in required fields');
           return;
         }
         if (!user) return;
@@ -2567,7 +2722,36 @@
                   e('label', { className: 'form-label' }, 'Bio'),
                   e('textarea', { className: 'form-textarea', value: user.bio, disabled: true })
                 ) : null
-              )
+              ),
+              !isHost && user ? (function() {
+                var allConvs = JSON.parse(localStorage.getItem('ad_conversations') || '[]');
+                var myInquiries = allConvs.filter(function(c) { return c.guestId === user.id; });
+                if (myInquiries.length === 0) return null;
+                var statusStyle = function(s) {
+                  if (s === 'agreed') return { bg: '#e8f5e9', color: '#2e7d32', label: 'Confirmed' };
+                  if (s === 'withdrawn') return { bg: '#fff3e0', color: '#e65100', label: 'Withdrawn' };
+                  if (s === 'declined') return { bg: '#fce4ec', color: '#c62828', label: 'Declined' };
+                  return { bg: '#e3f2fd', color: '#1565c0', label: 'Open' };
+                };
+                return e('div', { style: { marginTop: '2rem' } },
+                  e('h2', null, 'My Inquiries (' + myInquiries.length + ')'),
+                  e('div', { style: { display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' } },
+                    myInquiries.map(function(inq) {
+                      var ss = statusStyle(inq.status);
+                      return e('div', { key: inq.id, style: { padding: '1rem', background: '#fff', border: '1px solid #e0e0e0', borderRadius: '10px' } },
+                        e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+                          e('div', { style: { fontWeight: 600 } }, inq.propertyName),
+                          e('span', { style: { padding: '3px 8px', borderRadius: '4px', background: ss.bg, color: ss.color, fontWeight: 600, fontSize: '0.8rem' } }, ss.label)
+                        ),
+                        inq.checkIn ? e('div', { style: { fontSize: '0.85rem', color: '#666', marginTop: '0.3rem' } },
+                          inq.checkIn + ' to ' + inq.checkOut + ' | ' + (inq.guests || '-') + ' guests, ' + (inq.rooms || '-') + ' rooms'
+                        ) : null,
+                        e('div', { style: { fontSize: '0.8rem', color: '#999', marginTop: '0.3rem' } }, 'Sent ' + new Date(inq.createdAt).toLocaleDateString())
+                      );
+                    })
+                  )
+                );
+              })() : null
             ) : null,
             tab === 'saved' && !isHost ? e(SavedPropertiesTab, { user: user, listings: listings, onSelectProperty: function() {} }) : null,
             tab === 'messages' ? e(MessagesTab, { user: user }) : null,
@@ -2595,10 +2779,13 @@
       var stateName = useState('');
       var name = stateName[0];
       var setName = stateName[1];
+      var stateLoginNotice = useState(null);
+      var loginNotice = stateLoginNotice[0];
+      var setLoginNotice = stateLoginNotice[1];
 
       var handleLogin = function() {
         if (!email || !password) {
-          alert('Please fill in all fields');
+          setLoginNotice({ type: 'error', text: 'Please fill in all fields' });
           return;
         }
         var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
@@ -2607,18 +2794,18 @@
           localStorage.setItem('ad_user', JSON.stringify(found));
           onLogin(found);
         } else {
-          alert('Invalid email or password');
+          setLoginNotice({ type: 'error', text: 'Invalid email or password' });
         }
       };
 
       var handleSignup = function() {
         if (!name || !email || !password) {
-          alert('Please fill in all fields');
+          setLoginNotice({ type: 'error', text: 'Please fill in all fields' });
           return;
         }
         var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
         if (users.find(function(u) { return u.email === email; })) {
-          alert('Email already registered');
+          setLoginNotice({ type: 'error', text: 'Email already registered' });
           return;
         }
         var user = {
@@ -2644,6 +2831,7 @@
 
       return e('div', { className: 'login-container' },
         e('div', { className: 'login-form' },
+          loginNotice ? e('div', { style: { padding: '0.75rem 1rem', marginBottom: '1rem', borderRadius: '8px', background: loginNotice.type === 'success' ? '#e8f5e9' : '#fce4ec', color: loginNotice.type === 'success' ? '#2e7d32' : '#c62828', fontWeight: 500, fontSize: '0.95rem' } }, loginNotice.text) : null,
           mode === 'login' ? e('div', null,
             e('h2', null, 'Sign In'),
             e('div', { className: 'form-group' },
@@ -2759,7 +2947,12 @@
         setListings(parsed);
         var savedUser = localStorage.getItem('ad_user');
         if (savedUser) {
-          setUser(JSON.parse(savedUser));
+          var u = JSON.parse(savedUser);
+          setUser(u);
+          var hash = window.location.hash.replace('#/', '');
+          if (hash === 'dashboard' || hash === 'search' || hash === 'map') {
+            setCurrentPage(hash);
+          }
         }
         var savedConvs = localStorage.getItem('ad_conversations');
         if (savedConvs) {
@@ -2778,6 +2971,7 @@
         setNavHistory(newHistory);
         setCurrentPage(page);
         if (state) setPageState(state);
+        window.location.hash = '#/' + page;
         window.scrollTo(0, 0);
       };
 
