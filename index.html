@@ -1887,7 +1887,7 @@
           ),
           e('div', { className: 'h-card-meta' }, prop.type + ' • ' + prop.region),
           e('div', { className: 'h-card-stats' },
-            e('span', null, prop.beds + ' beds'),
+            prop.beds > 0 ? e('span', null, prop.beds + ' beds') : null,
             prop.googleRating ? e('span', { style: { color: '#f59e0b', fontWeight: 600 } }, prop.googleRating.toFixed(1) + '/5 (' + prop.googleReviews.toLocaleString() + ')') : e('span', null, renderStars(prop.stars))
           ),
           prop.googleDesc ? e('div', { style: { fontSize: '0.8rem', color: '#666', marginTop: '0.25rem', lineHeight: 1.3 } }, prop.googleDesc) : null,
@@ -2096,6 +2096,12 @@
       var bookingFilter = stateBookingFilter[0];
       var setBookingFilter = stateBookingFilter[1];
 
+      var stateExpandedId = useState(null);
+      var expandedId = stateExpandedId[0];
+      var setExpandedId = stateExpandedId[1];
+
+      var highlightRef = useRef(null);
+
       var allCommunes = useMemo(function() { return buildCommunesByAllRegions(listings); }, [listings]);
       var neighborhoodsByComune = useMemo(function() { return buildNeighborhoodsByComune(listings); }, [listings]);
 
@@ -2229,6 +2235,32 @@
         };
       }, []);
 
+      // Highlight expanded property on map
+      useEffect(function() {
+        if (!mapInstanceRef.current) return;
+        var L = window.L;
+        if (!L) return;
+        var map = mapInstanceRef.current;
+        // Remove old highlight
+        if (highlightRef.current) { map.removeLayer(highlightRef.current); highlightRef.current = null; }
+        if (!expandedId) return;
+        var prop = filteredListings.find(function(l) { return l.id === expandedId; });
+        if (!prop || !prop.lat || !prop.lon) return;
+        // Add highlight marker with name label
+        var highlight = L.marker([prop.lat, prop.lon], {
+          icon: L.divIcon({
+            className: 'map-highlight-label',
+            html: '<div style="background:#003580;color:#fff;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.3);transform:translateX(-50%)">' + (prop.name || 'Property') + '</div>',
+            iconSize: [0, 0],
+            iconAnchor: [0, 30]
+          })
+        });
+        highlight.addTo(map);
+        highlightRef.current = highlight;
+        // Pan map to property
+        map.setView([prop.lat, prop.lon], Math.max(map.getZoom(), 13), { animate: true });
+      }, [expandedId, filteredListings]);
+
       return e('div', null,
         showModal && e(PropertyTypeInfoModal, { onClose: function() { setShowModal(false); } }),
         e('div', { className: 'search-container', style: showMap ? {} : { gridTemplateColumns: '20% 80%' } },
@@ -2317,7 +2349,50 @@
               )
             ),
             paginatedListings.map(function(prop) {
-              return e(HorizontalPropertyCard, { key: prop.id, prop: prop, onSelect: onSelectProperty });
+              var amenities = getTopAmenities(prop);
+              var price = prop.googlePrice || estimatePrice(prop);
+              return e('div', { key: prop.id },
+                e(HorizontalPropertyCard, {
+                  prop: prop,
+                  onSelect: function() { setExpandedId(expandedId === prop.id ? null : prop.id); }
+                }),
+                expandedId === prop.id ? e('div', { style: { padding: '1.5rem', background: '#f9f9f9', borderRadius: '0 0 12px 12px', borderLeft: '1px solid #ddd', borderRight: '1px solid #ddd', borderBottom: '1px solid #ddd', marginBottom: '1rem' } },
+                  e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' } },
+                    e('div', null,
+                      e('h4', { style: { fontSize: '0.95rem', fontWeight: 600, color: '#444', marginBottom: '0.75rem' } }, 'Property Details'),
+                      e('div', { style: { fontSize: '0.9rem', color: '#666', lineHeight: 1.8 } },
+                        e('div', null, 'Name: ' + prop.name),
+                        e('div', null, 'Type: ' + prop.type),
+                        e('div', null, 'Region: ' + prop.region),
+                        e('div', null, 'Price: €' + price + '/night'),
+                        prop.beds > 0 ? e('div', null, 'Beds: ' + prop.beds) : null,
+                        e('div', null, 'Rooms: ' + prop.rooms)
+                      )
+                    ),
+                    e('div', null,
+                      e('h4', { style: { fontSize: '0.95rem', fontWeight: 600, color: '#444', marginBottom: '0.75rem' } }, 'Amenities'),
+                      e('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '0.5rem' } },
+                        amenities.map(function(amenity) {
+                          return e('span', { className: 'amenity-chip', key: amenity, style: { fontSize: '0.85rem', padding: '0.3rem 0.6rem' } }, amenity);
+                        })
+                      )
+                    )
+                  ),
+                  prop.googleRating ? e('div', { style: { marginBottom: '1.5rem', padding: '0.75rem', background: '#fff', borderRadius: '6px', borderLeft: '4px solid #f59e0b' } },
+                    e('div', { style: { fontSize: '0.9rem', fontWeight: 600, color: '#333' } }, prop.googleRating.toFixed(1) + '/5 (Google)'),
+                    e('div', { style: { fontSize: '0.85rem', color: '#666' } }, prop.googleReviews.toLocaleString() + ' reviews')
+                  ) : null,
+                  prop.googleDesc ? e('div', { style: { marginBottom: '1.5rem', padding: '0.75rem', background: '#fff', borderRadius: '6px', fontSize: '0.9rem', color: '#555', lineHeight: 1.5, borderLeft: '4px solid #0066d4' } },
+                    e('strong', null, 'Description:'),
+                    e('div', { style: { marginTop: '0.5rem' } }, prop.googleDesc)
+                  ) : null,
+                  e(BookingChannels, { prop: prop, compact: false }),
+                  e('div', { style: { marginTop: '1.5rem', display: 'flex', gap: '0.75rem' } },
+                    e('button', { className: 'btn-primary', onClick: function() { onSelectProperty(prop); } }, 'View Full Details →'),
+                    e('button', { className: 'btn-secondary', onClick: function() { setExpandedId(null); }, style: { flex: 1, padding: '0.8rem', border: '1px solid #ddd', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontWeight: 500 } }, 'Close')
+                  )
+                ) : null
+              );
             }),
             filteredListings.length === 0 && e('div', { className: 'empty-state' }, e('h3', null, 'No properties found'), e('p', null, 'Try adjusting your filters.')),
             totalPages > 1 && e('div', { className: 'pagination' },
@@ -2546,6 +2621,7 @@
       var prop = props.currentProperty;
       var handleBack = props.handleBack;
       var user = props.user;
+      var onNavigate = props.onNavigate;
       var onPropertySaved = props.onPropertySaved;
       var stateInquiry = useState({ checkIn: '', checkOut: '', guests: '2', rooms: '1', message: '' });
       var inquiry = stateInquiry[0];
@@ -2661,10 +2737,10 @@
               e('div', { className: 'property-type' }, prop.type + ' • ' + prop.region),
               e('div', { className: 'price-tag' }, '€' + price + '/night'),
               e('div', { className: 'info-grid' },
-                e('div', { className: 'info-item' },
+                prop.beds > 0 ? e('div', { className: 'info-item' },
                   e('div', { className: 'info-value' }, prop.beds),
                   e('div', { className: 'info-label' }, 'Bedrooms')
-                ),
+                ) : null,
                 e('div', { className: 'info-item' },
                   e('div', { className: 'info-value' }, prop.rooms),
                   e('div', { className: 'info-label' }, 'Rooms')
@@ -2701,14 +2777,25 @@
                   e('iframe', { src: calSrc, style: { width: '100%', height: '400px', border: '1px solid #ddd', borderRadius: '8px' }, frameBorder: '0', scrolling: 'no' })
                 );
               })(),
-              prop.lat && prop.lon ? e('div', { className: 'map-embed', id: 'detail-map-' + prop.id, ref: function(el) {
-                if (el && !el.dataset.init) {
-                  el.dataset.init = 'true';
-                  var m = window.L.map(el).setView([prop.lat, prop.lon], 14);
-                  window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(m);
-                  window.L.circleMarker([prop.lat, prop.lon], { radius: 8, fillColor: '#0066d4', color: '#333', weight: 2, opacity: 1, fillOpacity: 0.8 }).addTo(m);
-                }
-              } }) : null
+              prop.lat && prop.lon ? e('div', { style: { marginTop: '1.5rem' } },
+                e('h3', { style: { marginBottom: '0.75rem' } }, 'Location'),
+                e('div', { className: 'map-embed', id: 'detail-map-' + prop.id, style: { height: '300px' }, ref: function(el) {
+                  if (el && !el.dataset.init) {
+                    el.dataset.init = 'true';
+                    var m = window.L.map(el).setView([prop.lat, prop.lon], 14);
+                    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(m);
+                    window.L.marker([prop.lat, prop.lon], {
+                      icon: window.L.divIcon({
+                        className: 'map-highlight-label',
+                        html: '<div style="background:#003580;color:#fff;padding:4px 10px;border-radius:6px;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.25);transform:translateX(-50%)">' + (prop.name || 'Property') + '</div>',
+                        iconSize: [0, 0],
+                        iconAnchor: [0, 20]
+                      })
+                    }).addTo(m);
+                    window.L.circleMarker([prop.lat, prop.lon], { radius: 8, fillColor: '#0066d4', color: '#fff', weight: 2, opacity: 1, fillOpacity: 0.9 }).addTo(m);
+                  }
+                } })
+              ) : null
             ),
             e('div', { className: 'detail-right' },
               user && user.role === 'host' && prop.claimedBy === user.id ? e('div', { className: 'notification-banner' },
@@ -2752,7 +2839,7 @@
                   e('button', { className: 'form-submit', onClick: handleSubmitInquiry }, 'Send Inquiry')
                 ) : e('div', null,
                   e('p', null, 'Sign in to send an inquiry to the host'),
-                  e('button', { className: 'btn-primary', style: { marginTop: '0.5rem' } }, 'Sign In')
+                  e('button', { className: 'btn-primary', style: { marginTop: '0.5rem' }, onClick: function() { props.onNavigate('login'); } }, 'Sign In')
                 )
               ),
               user ? e('button', { className: 'btn-small' + (isSaved ? '' : ' outline'), onClick: handleSaveProperty, style: { marginTop: '1rem', width: '100%' } }, isSaved ? '❤ Saved' : '🤍 Save Property') : null,
@@ -4234,9 +4321,18 @@
       var stateName = useState('');
       var name = stateName[0];
       var setName = stateName[1];
+      var stateRole = useState('guest');
+      var role = stateRole[0];
+      var setRole = stateRole[1];
       var stateLoginNotice = useState(null);
       var loginNotice = stateLoginNotice[0];
       var setLoginNotice = stateLoginNotice[1];
+      var statePendingCode = useState(null);
+      var pendingCode = statePendingCode[0];
+      var setPendingCode = statePendingCode[1];
+      var stateConfirmCode = useState('');
+      var confirmCode = stateConfirmCode[0];
+      var setConfirmCode = stateConfirmCode[1];
 
       var handleLogin = function() {
         if (!email || !password) {
@@ -4244,12 +4340,35 @@
           return;
         }
         var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
-        var found = users.find(function(u) { return u.email === email && u.password === password; });
+        var found = users.find(function(u) { return u.email === email && u.password === password && u.role === role; });
         if (found) {
+          if (!found.emailConfirmed) {
+            var code = Math.floor(100000 + Math.random() * 900000).toString();
+            setPendingCode(code);
+            setMode('confirm');
+            setLoginNotice(null);
+          } else {
+            localStorage.setItem('ad_user', JSON.stringify(found));
+            onLogin(found);
+          }
+        } else {
+          setLoginNotice({ type: 'error', text: 'No account found with this email and role' });
+        }
+      };
+
+      var handleVerifyCode = function() {
+        if (confirmCode !== pendingCode) {
+          setLoginNotice({ type: 'error', text: 'Incorrect code' });
+          return;
+        }
+        var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
+        var found = users.find(function(u) { return u.email === email && u.password === password && u.role === role; });
+        if (found) {
+          found.emailConfirmed = true;
+          users = users.map(function(u) { return u.id === found.id ? found : u; });
+          localStorage.setItem('ad_users', JSON.stringify(users));
           localStorage.setItem('ad_user', JSON.stringify(found));
           onLogin(found);
-        } else {
-          setLoginNotice({ type: 'error', text: 'Invalid email or password' });
         }
       };
 
@@ -4259,15 +4378,17 @@
           return;
         }
         var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
-        if (users.find(function(u) { return u.email === email; })) {
-          setLoginNotice({ type: 'error', text: 'Email already registered' });
+        if (users.find(function(u) { return u.email === email && u.role === role; })) {
+          setLoginNotice({ type: 'error', text: 'Email already registered for this role' });
           return;
         }
+        var code = Math.floor(100000 + Math.random() * 900000).toString();
         var user = {
           id: 'user_' + Date.now(),
           email: email,
           password: password,
           name: name,
+          role: role,
           phone: '',
           whatsapp: '',
           bio: '',
@@ -4275,19 +4396,48 @@
           sharePhone: false,
           shareWhatsapp: false,
           claimedProperties: [],
-          createdProperties: []
+          createdProperties: [],
+          emailConfirmed: false,
+          confirmationCode: code
         };
         users.push(user);
         localStorage.setItem('ad_users', JSON.stringify(users));
-        localStorage.setItem('ad_user', JSON.stringify(user));
-        onLogin(user);
+        setPendingCode(code);
+        setMode('confirm');
+        setConfirmCode('');
+        setLoginNotice(null);
       };
 
       return e('div', { className: 'login-container' },
         e('div', { className: 'login-form' },
           loginNotice ? e('div', { style: { padding: '0.75rem 1rem', marginBottom: '1rem', borderRadius: '8px', background: loginNotice.type === 'success' ? '#e8f5e9' : '#fce4ec', color: loginNotice.type === 'success' ? '#2e7d32' : '#c62828', fontWeight: 500, fontSize: '0.95rem' } }, loginNotice.text) : null,
-          mode === 'login' ? e('div', null,
+          mode === 'confirm' ? e('div', null,
+            e('h2', null, 'Confirm Your Email'),
+            e('p', { style: { color: '#666', marginBottom: '1rem' } }, 'Enter the 6-digit code sent to ' + email),
+            e('p', { style: { background: '#fff3cd', padding: '0.75rem', borderRadius: '8px', fontSize: '0.85rem', color: '#856404', marginBottom: '1rem' } }, 'Demo mode: Your code is ' + pendingCode),
+            e('div', { className: 'form-group' },
+              e('label', { className: 'form-label' }, 'Confirmation Code'),
+              e('input', { className: 'form-input', type: 'text', placeholder: '000000', value: confirmCode, maxLength: 6, onChange: function(evt) { setConfirmCode(evt.target.value); } })
+            ),
+            e('button', { className: 'form-submit', onClick: handleVerifyCode }, 'Verify Code'),
+            e('div', { className: 'login-toggle' },
+              e('button', { onClick: function() { setMode(mode === 'confirm' && pendingCode ? 'login' : 'signup'); setConfirmCode(''); setPendingCode(null); } }, 'Back')
+            )
+          ) : mode === 'login' ? e('div', null,
             e('h2', null, 'Sign In'),
+            e('div', { className: 'form-group' },
+              e('label', { className: 'form-label' }, 'I am a:'),
+              e('div', { style: { display: 'flex', gap: '0', marginBottom: '1rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--primary-blue)' } },
+                e('button', {
+                  onClick: function() { setRole('guest'); },
+                  style: { flex: 1, padding: '0.75rem', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem', background: role === 'guest' ? 'var(--primary-blue)' : '#fff', color: role === 'guest' ? '#fff' : 'var(--primary-blue)' }
+                }, 'Guest'),
+                e('button', {
+                  onClick: function() { setRole('host'); },
+                  style: { flex: 1, padding: '0.75rem', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem', background: role === 'host' ? 'var(--primary-blue)' : '#fff', color: role === 'host' ? '#fff' : 'var(--primary-blue)' }
+                }, 'Host')
+              )
+            ),
             e('div', { className: 'form-group' },
               e('label', { className: 'form-label' }, 'Email'),
               e('input', { className: 'form-input', type: 'email', placeholder: 'your@email.com', value: email, onChange: function(evt) { setEmail(evt.target.value); } })
@@ -4297,12 +4447,26 @@
               e('input', { className: 'form-input', type: 'password', placeholder: 'Password', value: password, onChange: function(evt) { setPassword(evt.target.value); } })
             ),
             e('button', { className: 'form-submit', onClick: handleLogin }, 'Sign In'),
+            e('button', { className: 'btn-secondary', style: { width: '100%', marginTop: '0.75rem', padding: '0.8rem', border: '1px solid #ddd', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontWeight: 500 }, onClick: function() { setLoginNotice({ type: 'info', text: 'Google Sign-In will be available soon. For now, please create an account to get started.' }); } }, '🔵 Sign in with Google (Coming Soon)'),
             e('div', { className: 'login-toggle' },
               e('span', null, "Don't have an account? "),
-              e('button', { onClick: function() { setMode('signup'); } }, 'Sign Up')
+              e('button', { onClick: function() { setMode('signup'); setLoginNotice(null); } }, 'Sign Up')
             )
           ) : e('div', null,
             e('h2', null, 'Create Account'),
+            e('div', { className: 'form-group' },
+              e('label', { className: 'form-label' }, 'I am a:'),
+              e('div', { style: { display: 'flex', gap: '0', marginBottom: '1rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--primary-blue)' } },
+                e('button', {
+                  onClick: function() { setRole('guest'); },
+                  style: { flex: 1, padding: '0.75rem', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem', background: role === 'guest' ? 'var(--primary-blue)' : '#fff', color: role === 'guest' ? '#fff' : 'var(--primary-blue)' }
+                }, 'Guest'),
+                e('button', {
+                  onClick: function() { setRole('host'); },
+                  style: { flex: 1, padding: '0.75rem', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem', background: role === 'host' ? 'var(--primary-blue)' : '#fff', color: role === 'host' ? '#fff' : 'var(--primary-blue)' }
+                }, 'Host')
+              )
+            ),
             e('div', { className: 'form-group' },
               e('label', { className: 'form-label' }, 'Full Name'),
               e('input', { className: 'form-input', type: 'text', placeholder: 'Your name', value: name, onChange: function(evt) { setName(evt.target.value); } })
@@ -4318,7 +4482,7 @@
             e('button', { className: 'form-submit', onClick: handleSignup }, 'Create Account'),
             e('div', { className: 'login-toggle' },
               e('span', null, 'Already have an account? '),
-              e('button', { onClick: function() { setMode('login'); } }, 'Sign In')
+              e('button', { onClick: function() { setMode('login'); setLoginNotice(null); } }, 'Sign In')
             )
           )
         )
