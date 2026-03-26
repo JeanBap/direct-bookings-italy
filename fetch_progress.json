@@ -1,0 +1,45 @@
+{
+  "completed": {
+    "Rome|Hotels": {
+      "count": 995,
+      "newCount": 695,
+      "at": "2026-03-26T18:18:32.643Z"
+    },
+    "Rome|B&Bs": {
+      "count": 200,
+      "newCount": 109,
+      "at": "2026-03-26T18:19:40.957Z"
+    },
+    "Rome|Rentals": {
+      "count": 180,
+      "newCount": 72,
+      "at": "2026-03-26T18:20:25.716Z"
+    },
+    "Rome|Agriturismos": {
+      "count": 17,
+      "newCount": 9,
+      "at": "2026-03-26T18:20:31.135Z"
+    },
+    "Milan|Hotels": {
+      "count": 936,
+      "newCount": 664,
+      "at": "2026-03-26T18:25:03.045Z"
+    },
+    "Milan|B&Bs": {
+      "count": 200,
+      "newCount": 101,
+      "at": "2026-03-26T18:26:05.166Z"
+    },
+    "Milan|Rentals": {
+      "count": 180,
+      "newCount": 87,
+      "at": "2026-03-26T18:26:53.682Z"
+    },
+    "Milan|Agriturismos": {
+      "count": 175,
+      "newCount": 73,
+      "at": "2026-03-26T18:27:53.619Z"
+    }
+  },
+  "totalProps": 1810
+}

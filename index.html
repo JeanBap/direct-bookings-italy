@@ -1412,6 +1412,26 @@
     .map-filters { background: #fff; padding: 12px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; gap: 12px; flex-wrap: wrap; align-items: center; position: absolute; top: 10px; left: 10px; z-index: 1000; max-width: calc(100% - 20px); }
     .map-filters select, .map-filters input { padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.8rem; }
     .map-filter-count { font-size: 0.8rem; color: #666; font-weight: 500; }
+    .about-container { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+    .about-container h1 { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; color: var(--primary-blue); }
+    .about-container h2 { font-size: 1.3rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--text-dark); }
+    .about-container p { line-height: 1.7; color: #444; margin-bottom: 1rem; }
+    .about-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 2rem 0; }
+    .about-stat { text-align: center; padding: 1.5rem; background: var(--bg-light); border-radius: 12px; }
+    .about-stat-value { font-size: 2rem; font-weight: 800; color: var(--primary-blue); }
+    .about-stat-label { font-size: 0.9rem; color: var(--text-light); margin-top: 0.3rem; }
+    .why-section { background: linear-gradient(135deg, #f0f4ff, #e8f5e9); padding: 3rem 2rem; margin-top: 2rem; }
+    .why-content { max-width: 1000px; margin: 0 auto; text-align: center; }
+    .why-content h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; color: var(--primary-blue); }
+    .why-content p { font-size: 1.05rem; line-height: 1.7; color: #444; max-width: 700px; margin: 0 auto 1.5rem; }
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1.5rem; text-align: left; }
+    .why-card { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .why-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-dark); }
+    .why-card p { font-size: 0.9rem; color: #666; line-height: 1.5; margin: 0; }
+    .promoted-badge { position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 0.3rem 0.7rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; }
+    .promote-section { background: linear-gradient(135deg, #fff7ed, #fffbeb); border: 2px solid #f59e0b; border-radius: 12px; padding: 1.5rem; margin-top: 1rem; }
+    .promote-section h3 { color: #d97706; margin-bottom: 0.5rem; }
+    @media (max-width: 768px) { .about-stats, .why-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -1710,62 +1730,68 @@
       );
     }
 
+    function getDirectChannels(prop) {
+      var direct = [];
+      if (prop.website) {
+        var wsUrl = prop.website.indexOf('http') === 0 ? prop.website : 'https://' + prop.website;
+        direct.push({ key: 'website', icon: '🌐', label: 'Website', url: wsUrl });
+      }
+      if (prop.verified) {
+        direct.push({ key: 'email', icon: '✉', label: 'Email' });
+        direct.push({ key: 'phone', icon: '📞', label: 'Phone' });
+        direct.push({ key: 'whatsapp', icon: '💬', label: 'WhatsApp' });
+      }
+      return direct;
+    }
+    function getPlatformChannels(prop) {
+      var platforms = [];
+      if (prop.hasGoogle) {
+        platforms.push({ key: 'google', icon: '🔍', label: 'Google', url: 'https://www.google.com/travel/hotels/s/' + encodeURIComponent(prop.name + ' ' + prop.comune + ' Italy') });
+      }
+      return platforms;
+    }
+    function hasDirectBooking(prop) { return !!(prop.website || prop.verified); }
+
     function BookingChannels(props) {
       var prop = props.prop;
       var compact = props.compact;
-      var channels = [];
-      if (prop.hasGoogle) {
-        channels.push({ key: 'google', icon: '🔍', label: 'Google', active: true, url: 'https://www.google.com/travel/hotels/s/' + encodeURIComponent(prop.name + ' ' + prop.comune + ' Italy') });
-      } else {
-        channels.push({ key: 'google', icon: '🔍', label: 'Google', active: false });
+      var direct = getDirectChannels(prop);
+      var platforms = getPlatformChannels(prop);
+      if (direct.length === 0 && platforms.length === 0) return null;
+
+      function renderChannel(ch) {
+        return e(ch.url ? 'a' : 'span', {
+          key: ch.key,
+          className: 'booking-channel active',
+          href: ch.url || undefined,
+          target: ch.url ? '_blank' : undefined,
+          rel: ch.url ? 'noopener noreferrer' : undefined,
+          onClick: ch.url ? function(evt) { evt.stopPropagation(); } : undefined,
+          title: ch.label
+        }, e('span', { className: 'channel-icon' }, ch.icon), ch.label);
       }
-      channels.push({ key: 'booking', icon: '🏨', label: 'Booking.com', active: false, note: 'Coming soon' });
-      if (prop.website) {
-        var wsUrl = prop.website.indexOf('http') === 0 ? prop.website : 'https://' + prop.website;
-        channels.push({ key: 'website', icon: '🌐', label: 'Website', active: true, url: wsUrl });
-      } else {
-        channels.push({ key: 'website', icon: '🌐', label: 'Website', active: false });
-      }
-      channels.push({ key: 'phone', icon: '📞', label: 'Phone', active: prop.verified, note: prop.verified ? 'Contact host' : 'Claim to add' });
-      channels.push({ key: 'email', icon: '✉', label: 'Email', active: prop.verified, note: prop.verified ? 'Contact host' : 'Claim to add' });
-      channels.push({ key: 'whatsapp', icon: '💬', label: 'WhatsApp', active: prop.verified, note: prop.verified ? 'Message host' : 'Claim to add' });
-      var activeChannels = channels.filter(function(c) { return c.active; });
-      if (activeChannels.length === 0) return null;
+
       if (compact) {
-        return e('div', { className: 'booking-channels' },
-          activeChannels.map(function(ch) {
-            return e(ch.url ? 'a' : 'span', {
-              key: ch.key,
-              className: 'booking-channel active',
-              href: ch.url || undefined,
-              target: ch.url ? '_blank' : undefined,
-              rel: ch.url ? 'noopener noreferrer' : undefined,
-              onClick: ch.url ? function(evt) { evt.stopPropagation(); } : undefined,
-              title: ch.note || ch.label
-            },
-              e('span', { className: 'channel-icon' }, ch.icon),
-              ch.label
-            );
-          })
+        return e('div', { style: { marginTop: '0.5rem' } },
+          direct.length > 0 ? e('div', { className: 'booking-channels', style: { marginBottom: '4px' } },
+            e('span', { style: { fontSize: '0.65rem', fontWeight: 700, color: '#2e7d32', textTransform: 'uppercase', letterSpacing: '0.5px', marginRight: '4px' } }, 'Direct:'),
+            direct.map(renderChannel)
+          ) : null,
+          platforms.length > 0 ? e('div', { className: 'booking-channels' },
+            e('span', { style: { fontSize: '0.65rem', fontWeight: 700, color: '#1565c0', textTransform: 'uppercase', letterSpacing: '0.5px', marginRight: '4px' } }, 'Platforms:'),
+            platforms.map(renderChannel)
+          ) : null
         );
       }
       return e('div', { className: 'booking-channel-section' },
-        e('h4', null, 'Booking Channels'),
-        e('div', { className: 'booking-channels' },
-          activeChannels.map(function(ch) {
-            return e(ch.url ? 'a' : 'span', {
-              key: ch.key,
-              className: 'booking-channel active',
-              href: ch.url || undefined,
-              target: ch.url ? '_blank' : undefined,
-              rel: ch.url ? 'noopener noreferrer' : undefined,
-              title: ch.note || ''
-            },
-              e('span', { className: 'channel-icon' }, ch.icon),
-              ch.label
-            );
-          })
-        )
+        direct.length > 0 ? e('div', { style: { marginBottom: '0.75rem' } },
+          e('h4', { style: { color: '#2e7d32' } }, 'Direct Booking Channels'),
+          e('div', { className: 'booking-channels' }, direct.map(renderChannel))
+        ) : null,
+        platforms.length > 0 ? e('div', null,
+          e('h4', { style: { color: '#1565c0' } }, 'Platform Channels'),
+          e('div', { className: 'booking-channels' }, platforms.map(renderChannel))
+        ) : null
       );
     }
 
@@ -1941,6 +1967,29 @@
               return e(PropertyCard, { key: prop.id, prop: prop, onSelect: onSelectProperty });
             })
           )
+        ),
+        e('div', { className: 'why-section' },
+          e('div', { className: 'why-content' },
+            e('h2', null, 'Why We Do It'),
+            e('p', null, 'Booking platforms charge property owners 15-25% commission on every stay. These costs are passed on to you as a traveler through higher prices. We built AffittoDiretto.it to change that.'),
+            e('div', { className: 'why-grid' },
+              e('div', { className: 'why-card' },
+                e('h3', null, 'Guests Save Money'),
+                e('p', null, 'When you book direct, there are no middleman fees. Property owners can offer you better rates because they keep 100% of the booking value.')
+              ),
+              e('div', { className: 'why-card' },
+                e('h3', null, 'Owners Earn More'),
+                e('p', null, 'A hotel losing 20% to booking platforms loses thousands per month. With AffittoDiretto, listing is free forever. Owners keep every euro they earn.')
+              ),
+              e('div', { className: 'why-card' },
+                e('h3', null, 'Personal Connection'),
+                e('p', null, 'Talk directly to your host. Need a late check-in? Special dietary needs? Direct communication means better service and flexibility.')
+              )
+            ),
+            e('div', { style: { marginTop: '2rem' } },
+              e('button', { className: 'btn-primary', style: { padding: '0.8rem 2rem' }, onClick: function() { onNavigate('about'); } }, 'Learn More About Us')
+            )
+          )
         )
       );
     }
@@ -1990,6 +2039,10 @@
       var showModal = stateShowModal[0];
       var setShowModal = stateShowModal[1];
 
+      var stateBookingFilter = useState('');
+      var bookingFilter = stateBookingFilter[0];
+      var setBookingFilter = stateBookingFilter[1];
+
       var allCommunes = useMemo(function() { return buildCommunesByAllRegions(listings); }, [listings]);
       var neighborhoodsByComune = useMemo(function() { return buildNeighborhoodsByComune(listings); }, [listings]);
 
@@ -2015,6 +2068,9 @@
           if (selectedType && l.type !== selectedType) return false;
           if (l.stars < minStars) return false;
           if (l.beds < minBeds) return false;
+          if (bookingFilter === 'direct' && !hasDirectBooking(l)) return false;
+          if (bookingFilter === 'google' && !l.hasGoogle) return false;
+          if (bookingFilter === 'website' && !l.website) return false;
           var amenArr = Array.from(selectedAmenities);
           for (var i = 0; i < amenArr.length; i++) {
             if (!l.amenities[amenArr[i]]) return false;
@@ -2042,7 +2098,7 @@
           result.sort(function(a, b) { return estimatePrice(b) - estimatePrice(a); });
         }
         return result;
-      }, [listings, resolvedCity, neighborhood, selectedType, minStars, minBeds, selectedAmenities, sortBy]);
+      }, [listings, resolvedCity, neighborhood, selectedType, minStars, minBeds, selectedAmenities, sortBy, bookingFilter]);
 
       var itemsPerPage = 10;
       var totalPages = Math.ceil(filteredListings.length / itemsPerPage);
@@ -2076,7 +2132,7 @@
                   style: { position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#666', padding: '2px 6px' }
                 }, 'x'),
                 e('datalist', { id: 'city-datalist' },
-                  allCommunes.slice(0, 500).map(function(c) { return e('option', { key: c, value: c }); })
+                  allCommunes.map(function(c) { return e('option', { key: c, value: c }); })
                 )
               )
             ),
@@ -2104,6 +2160,15 @@
             e('div', { className: 'filter-group' },
               e('label', { className: 'filter-label' }, 'Min Beds: ' + minBeds),
               e('input', { type: 'range', min: '0', max: '10', value: minBeds, className: 'slider', style: { width: '100%' }, onChange: function(ev) { setMinBeds(parseInt(ev.target.value)); setCurrentPage(1); } })
+            ),
+            e('div', { className: 'filter-group' },
+              e('label', { className: 'filter-label' }, 'Booking Type'),
+              e('select', { className: 'filter-select', value: bookingFilter, onChange: function(ev) { setBookingFilter(ev.target.value); setCurrentPage(1); } },
+                e('option', { value: '' }, 'All properties'),
+                e('option', { value: 'direct' }, 'Direct booking available'),
+                e('option', { value: 'google' }, 'Google verified'),
+                e('option', { value: 'website' }, 'Has website')
+              )
             ),
             e('div', { className: 'filter-group' },
               e('label', { className: 'filter-label' }, 'Amenities'),
@@ -2312,6 +2377,43 @@
       );
     }
 
+    function AboutPage(props) {
+      var onNavigate = props.onNavigate;
+      return e('div', { className: 'about-container' },
+        e('h1', null, 'About AffittoDiretto.it'),
+        e('p', { style: { fontSize: '1.1rem' } }, 'We believe everyone deserves a fair deal when traveling in Italy. AffittoDiretto.it is a free platform that connects travelers directly with property owners across Italy, cutting out the middleman and the hefty commission fees that come with it.'),
+        e('div', { className: 'about-stats' },
+          e('div', { className: 'about-stat' },
+            e('div', { className: 'about-stat-value' }, '63,000+'),
+            e('div', { className: 'about-stat-label' }, 'Properties Listed')
+          ),
+          e('div', { className: 'about-stat' },
+            e('div', { className: 'about-stat-value' }, '2,040'),
+            e('div', { className: 'about-stat-label' }, 'Cities Covered')
+          ),
+          e('div', { className: 'about-stat' },
+            e('div', { className: 'about-stat-value' }, '20'),
+            e('div', { className: 'about-stat-label' }, 'Italian Regions')
+          )
+        ),
+        e('h2', null, 'Our Mission'),
+        e('p', null, 'The big booking platforms charge property owners 15-25% commission on every reservation. These costs get passed on to travelers through inflated prices. We created AffittoDiretto.it to break this cycle.'),
+        e('p', null, 'For guests, this means lower prices and a direct relationship with your host. Need to change your dates? Have a special request? When you book direct, you talk to the person who owns the property, not a call center halfway across the world.'),
+        e('p', null, 'For property owners, this means keeping more of what they earn. A hotel owner paying 20% commission on a platform loses thousands of euros every month. With AffittoDiretto, their listing is free. They keep 100% of the booking revenue.'),
+        e('h2', null, 'How It Works'),
+        e('p', null, 'We aggregate publicly available accommodation data from Italian tourism registries and enrich it with Google Hotels ratings, reviews, and real photos. Property owners can claim their listing for free, verify their identity, and start receiving direct inquiries from travelers.'),
+        e('p', null, 'We will never charge guests to search or book. We will never charge property owners to list. Our revenue comes solely from optional promoted listings, where hosts can pay a small fee to appear in featured positions on the homepage.'),
+        e('h2', null, 'Who We Are'),
+        e('p', null, 'AffittoDiretto.it is built by a small team passionate about Italian hospitality and fair travel. We are based in Italy and understand firsthand how the platform economy has squeezed both travelers and local accommodation providers.'),
+        e('p', null, 'We started this project because we saw an opportunity to do something genuinely useful: give travelers better prices and give hosts their margins back, all through the simple act of connecting them directly.'),
+        e('div', { style: { marginTop: '2rem', padding: '1.5rem', background: '#f0f4ff', borderRadius: '12px', textAlign: 'center' } },
+          e('h3', { style: { marginBottom: '0.5rem' } }, 'Ready to Book Direct?'),
+          e('p', { style: { color: '#666', marginBottom: '1rem' } }, 'Browse 63,000+ accommodations across all of Italy'),
+          e('button', { className: 'btn-primary', onClick: function() { onNavigate('search'); } }, 'Search Properties')
+        )
+      );
+    }
+
     function PropertyDetail(props) {
       var prop = props.currentProperty;
       var handleBack = props.handleBack;
@@ -2354,7 +2456,7 @@
 
       if (!prop) return e('div', null, e('p', { style: { padding: '2rem', textAlign: 'center' } }, 'Property not found'), e('button', { className: 'back-btn', onClick: handleBack }, '← Back'));
       var amenities = getTopAmenities(prop);
-      var price = estimatePrice(prop);
+      var price = prop.googlePrice || estimatePrice(prop);
 
       var handleSubmitInquiry = function() {
         if (!user) {
@@ -2517,7 +2619,19 @@
                 )
               ),
               user ? e('button', { className: 'btn-small' + (isSaved ? '' : ' outline'), onClick: handleSaveProperty, style: { marginTop: '1rem', width: '100%' } }, isSaved ? '❤ Saved' : '🤍 Save Property') : null,
-              prop.website ? e('a', { href: ensureUrl(prop.website), target: '_blank', rel: 'noopener noreferrer', className: 'website-link', style: { display: 'block', marginTop: '1rem', textAlign: 'center' } }, 'Visit Website') : null
+              prop.website ? e('a', { href: ensureUrl(prop.website), target: '_blank', rel: 'noopener noreferrer', className: 'website-link', style: { display: 'block', marginTop: '1rem', textAlign: 'center' } }, 'Visit Website') : null,
+              user && user.role === 'host' && prop.claimedBy === user.id ? e('div', { className: 'promote-section' },
+                e('h3', null, 'Promote This Property'),
+                e('p', { style: { fontSize: '0.9rem', color: '#666', marginBottom: '0.75rem' } }, 'Get your property featured on the homepage and top of search results. Only 10 featured spots available.'),
+                e('div', { style: { display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '0.75rem' } },
+                  e('div', { style: { textAlign: 'center' } },
+                    e('div', { style: { fontSize: '1.5rem', fontWeight: 800, color: '#d97706' } }, '\u20AC10'),
+                    e('div', { style: { fontSize: '0.8rem', color: '#888' } }, 'per day')
+                  ),
+                  e('div', { style: { fontSize: '0.85rem', color: '#666' } }, 'Minimum 10 days (\u20AC100). Your property appears in the Featured Properties section on the homepage and ranks higher in search results.')
+                ),
+                e('button', { className: 'btn-primary', style: { width: '100%', background: '#d97706' }, onClick: function() { setNotice({ type: 'success', text: 'Promotion request received! We will contact you at ' + user.email + ' with payment instructions.' }); } }, 'Request Promotion - From \u20AC100')
+              ) : null
             )
           )
         )
@@ -3253,8 +3367,8 @@
             e('h3', null, 'Featured Properties Strategy'),
             e('div', { style: { background: '#fff3cd', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', lineHeight: 1.6 } },
               e('strong', null, 'Current: '), 'Top 6 by Google rating (free).', e('br'),
-              e('strong', null, 'Planned: '), 'Hosts can pay \u20AC20/month for a featured slot (10 max). Paid featured properties replace the free top-rated ones.', e('br'),
-              e('strong', null, 'Revenue potential: '), '10 slots x \u20AC20/mo = \u20AC200/mo = \u20AC2,400/year'
+              e('strong', null, 'Promoted Listings: '), 'Hosts pay \u20AC10/day for a featured slot (10 max). Minimum booking: 10 days (\u20AC100).', e('br'),
+              e('strong', null, 'Revenue potential: '), '10 slots x \u20AC10/day = \u20AC100/day = \u20AC3,000/month = \u20AC36,000/year'
             ),
             e('h4', null, 'Current Featured (Top 6 Google-Rated)'),
             listings.filter(function(l) { return l.hasGoogle && l.googleRating; }).sort(function(a, b) { return (b.googleRating * 1000 + b.googleReviews) - (a.googleRating * 1000 + a.googleReviews); }).slice(0, 6).map(function(prop) {
@@ -3501,6 +3615,7 @@
             e('a', { className: 'navbar-link' + (currentPage === 'search' ? ' active' : ''), onClick: function() { onNavigate('search'); } }, 'Search'),
             e('a', { className: 'navbar-link' + (currentPage === 'map' ? ' active' : ''), onClick: function() { onNavigate('map'); } }, 'Map'),
             e('a', { className: 'navbar-link' + (currentPage === 'blog' || currentPage === 'blogpost' ? ' active' : ''), onClick: function() { onNavigate('blog'); } }, 'Blog'),
+            e('a', { className: 'navbar-link' + (currentPage === 'about' ? ' active' : ''), onClick: function() { onNavigate('about'); } }, 'About'),
             user ? e('a', { className: 'navbar-link' + (currentPage === 'dashboard' ? ' active' : ''), onClick: function() { onNavigate('dashboard'); } }, 'Dashboard', unreadCount > 0 ? e('span', { className: 'unread-badge' }, unreadCount) : null) : null,
             !user ? e('button', { className: 'btn-primary', onClick: function() { onNavigate('login'); } }, 'Sign In') : e('button', { className: 'btn-secondary', onClick: onLogout }, 'Logout')
           )
@@ -3533,6 +3648,7 @@
         modal && e(FooterModal, { title: modal, onClose: function() { setModal(null); } }),
         e('p', null, '© 2026 AffittoDiretto.it - Book Direct in Italy'),
         e('div', { className: 'footer-links' },
+          e('a', { href: '#/about', onClick: function(ev) { ev.preventDefault(); window.location.hash = '#/about'; window.scrollTo(0, 0); } }, 'About Us'),
           e('a', { href: '#', onClick: function(ev) { ev.preventDefault(); setModal('Privacy'); } }, 'Privacy'),
           e('a', { href: '#', onClick: function(ev) { ev.preventDefault(); setModal('Terms'); } }, 'Terms'),
           e('a', { href: '#', onClick: function(ev) { ev.preventDefault(); setModal('Contact'); } }, 'Contact')
@@ -3569,7 +3685,7 @@
           setUser(u);
         }
         var hash = window.location.hash.replace('#/', '');
-        if (hash === 'dashboard' || hash === 'search' || hash === 'map' || hash === 'admin' || hash === 'blog') {
+        if (hash === 'dashboard' || hash === 'search' || hash === 'map' || hash === 'admin' || hash === 'blog' || hash === 'about') {
           setCurrentPage(hash);
         } else if (hash.startsWith('blog/')) {
           var postSlug = hash.substring(5);
@@ -3653,6 +3769,7 @@
         currentPage === 'admin' ? e(AdminPanel, { listings: listings, onBack: function() { handleNavigate('home'); } }) :
         currentPage === 'blog' ? e(BlogPage, { onNavigate: handleNavigate }) :
         currentPage === 'blogpost' ? e(BlogPost, { slug: pageState.postSlug, handleBack: function() { handleNavigate('blog'); }, onNavigate: handleNavigate }) :
+        currentPage === 'about' ? e(AboutPage, { onNavigate: handleNavigate }) :
         e('div', null),
         e(Footer, null)
       );
