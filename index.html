@@ -77,6 +77,7 @@
       padding: 0.5rem 0;
       border-bottom: 2px solid transparent;
       transition: all 0.2s;
+      position: relative;
     }
 
     .navbar-link:hover {
@@ -87,6 +88,20 @@
     .navbar-link.active {
       color: var(--primary-blue);
       border-bottom-color: var(--primary-blue);
+    }
+
+    .unread-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--error);
+      color: #fff;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-left: 0.3rem;
     }
 
     .btn-primary {
@@ -281,6 +296,18 @@
       font-weight: 600;
     }
 
+    .price-tag {
+      color: var(--secondary-orange);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .price-tag-small {
+      color: var(--secondary-orange);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
     .card-content {
       padding: 1rem;
     }
@@ -375,6 +402,13 @@
       margin-bottom: 0.3rem;
     }
 
+    .h-card-price {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--secondary-orange);
+      margin-bottom: 0.5rem;
+    }
+
     .h-card-stats {
       display: flex;
       gap: 1.5rem;
@@ -465,11 +499,20 @@
       padding: 0.6rem;
       border: 1px solid var(--border-light);
       border-radius: 4px;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      font-family: inherit;
     }
 
-    .slider-container {
-      padding: 0.5rem 0;
+    .filter-checkbox {
+      width: auto;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
     }
 
     .slider {
@@ -484,29 +527,11 @@
 
     .slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      appearance: none;
       width: 16px;
       height: 16px;
       background: var(--primary-blue);
       cursor: pointer;
       border-radius: 50%;
-    }
-
-    .slider::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      background: var(--primary-blue);
-      cursor: pointer;
-      border-radius: 50%;
-      border: none;
-    }
-
-    .slider-value {
-      display: block;
-      text-align: center;
-      margin-top: 0.5rem;
-      font-size: 0.85rem;
-      color: var(--text-light);
     }
 
     .amenities-chips {
@@ -531,10 +556,7 @@
       border-color: var(--primary-blue);
     }
 
-    /* RESULTS AREA */
-    .results-area {
-      flex: 1;
-    }
+    .results-area { flex: 1; }
 
     .results-header {
       display: flex;
@@ -546,15 +568,9 @@
       border-radius: 6px;
     }
 
-    .results-count {
-      font-size: 0.95rem;
-      color: var(--text-light);
-    }
+    .results-count { font-size: 0.95rem; color: var(--text-light); }
 
-    .sort-buttons {
-      display: flex;
-      gap: 0.5rem;
-    }
+    .sort-buttons { display: flex; gap: 0.5rem; }
 
     .sort-btn {
       padding: 0.5rem 1rem;
@@ -572,7 +588,6 @@
       border-color: var(--primary-blue);
     }
 
-    /* PAGINATION */
     .pagination {
       display: flex;
       justify-content: center;
@@ -589,7 +604,6 @@
       cursor: pointer;
       border-radius: 4px;
       font-size: 0.9rem;
-      transition: all 0.2s;
       min-width: 40px;
     }
 
@@ -599,83 +613,78 @@
       border-color: var(--primary-blue);
     }
 
-    .page-btn:hover:not(.ellipsis) {
-      border-color: var(--primary-blue);
-      color: var(--primary-blue);
-    }
+    .page-btn.ellipsis { cursor: default; border: none; }
 
-    .page-btn.ellipsis {
-      cursor: default;
-      border: none;
-    }
-
-    /* MAP */
-    .map-container {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    .map-filter-bar {
-      background: #fff;
-      border-bottom: 1px solid var(--border-light);
-      padding: 1rem 2rem;
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .map-filter-bar select {
-      padding: 0.6rem;
-      border: 1px solid var(--border-light);
-      border-radius: 4px;
-      font-size: 0.9rem;
-    }
-
-    .map-count {
-      margin-left: auto;
-      font-size: 0.9rem;
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
       color: var(--text-light);
     }
 
-    #map {
-      flex: 1;
-    }
+    .empty-state h3 { margin-bottom: 0.5rem; color: var(--text-dark); }
 
-    .map-legend {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      background: #fff;
-      padding: 1rem;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      font-size: 0.9rem;
-      z-index: 400;
-    }
-
-    .legend-item {
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
       display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
+      z-index: 2000;
     }
 
-    .legend-color {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      border: 2px solid #333;
+    .modal {
+      background: #fff;
+      border-radius: 6px;
+      padding: 2rem;
+      max-width: 700px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
     }
+
+    .modal-close {
+      float: right;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-light);
+      background: none;
+      border: none;
+    }
+
+    .property-type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .type-card {
+      padding: 1rem;
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+    }
+
+    .type-name { font-weight: 600; color: var(--primary-blue); margin-bottom: 0.5rem; }
+    .type-desc { font-size: 0.85rem; color: var(--text-light); margin-bottom: 0.5rem; line-height: 1.4; }
+    .type-tax { font-size: 0.85rem; color: var(--secondary-orange); font-weight: 500; }
 
     /* PROPERTY DETAIL */
+    .detail-page {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
     .detail-hero {
       position: relative;
       width: 100%;
       height: 400px;
       background: var(--bg-light);
+      border-radius: 6px;
       overflow: hidden;
+      margin-bottom: 2rem;
     }
 
     .detail-hero img {
@@ -684,38 +693,10 @@
       object-fit: cover;
     }
 
-    .detail-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 2rem;
-      color: #fff;
-    }
-
-    .detail-title {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .detail-meta {
-      font-size: 1rem;
-      opacity: 0.95;
-    }
-
-    .detail-container {
+    .detail-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr;
+      grid-template-columns: 1fr 350px;
       gap: 2rem;
-      max-width: 1400px;
-      margin: 2rem auto;
-      padding: 0 2rem;
     }
 
     .detail-left {
@@ -723,6 +704,69 @@
       padding: 2rem;
       border-radius: 6px;
       border: 1px solid var(--border-light);
+    }
+
+    .detail-left h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-dark);
+    }
+
+    .detail-left .property-type {
+      font-size: 0.95rem;
+      color: var(--text-light);
+      margin-bottom: 1rem;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      background: var(--bg-light);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      margin: 1rem 2rem;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: var(--primary-blue);
+      color: #fff;
+      border-color: var(--primary-blue);
+    }
+
+    .claim-btn {
+      background: var(--success);
+      color: #fff;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      width: 100%;
+      margin-bottom: 1rem;
+      transition: background 0.2s;
+    }
+
+    .claim-btn:hover {
+      background: #0a5c5f;
+    }
+
+    .notification-banner {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .notification-banner p {
+      font-size: 0.9rem;
+      color: #856404;
     }
 
     .info-grid {
@@ -796,6 +840,20 @@
       color: var(--text-dark);
     }
 
+    .host-info {
+      background: var(--bg-light);
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .host-info strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--primary-blue);
+    }
+
     .website-link {
       display: block;
       background: var(--primary-blue);
@@ -824,7 +882,7 @@
       color: var(--text-dark);
     }
 
-    .form-input, .form-textarea {
+    .form-input, .form-textarea, .form-select {
       width: 100%;
       padding: 0.6rem;
       border: 1px solid var(--border-light);
@@ -936,6 +994,53 @@
       font-weight: 500;
     }
 
+    /* EMAIL PREVIEW MODAL */
+    .email-preview-modal {
+      background: #fff;
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .email-header {
+      background: var(--bg-light);
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .email-header .label {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .email-header .value {
+      font-size: 1rem;
+      color: var(--text-dark);
+    }
+
+    .email-body {
+      padding: 1.5rem;
+      line-height: 1.6;
+      color: var(--text-dark);
+    }
+
+    .email-body p {
+      margin-bottom: 1rem;
+    }
+
+    .email-button {
+      display: inline-block;
+      background: var(--primary-blue);
+      color: #fff;
+      padding: 0.8rem 1.5rem;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+
     /* LOGIN PAGE */
     .login-container {
       display: flex;
@@ -946,60 +1051,46 @@
       background: var(--bg-light);
     }
 
-    .login-card {
+    .login-form {
       background: #fff;
       padding: 2.5rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 380px;
+      border-radius: 6px;
       border: 1px solid var(--border-light);
+      width: 100%;
+      max-width: 500px;
     }
 
-    .login-tabs {
-      display: flex;
-      gap: 1rem;
+    .login-form h2 {
+      color: var(--primary-blue);
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+    }
+
+    .login-form .form-group {
       margin-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-light);
     }
 
-    .tab-btn {
-      flex: 1;
-      padding: 0.75rem;
+    .login-form .form-submit {
+      background: var(--primary-blue);
+    }
+
+    .login-form .form-submit:hover {
+      background: var(--primary-blue-light);
+    }
+
+    .login-toggle {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .login-toggle button {
       background: none;
       border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-light);
-      border-bottom: 3px solid transparent;
-      transition: all 0.2s;
-    }
-
-    .tab-btn.active {
       color: var(--primary-blue);
-      border-bottom-color: var(--primary-blue);
-    }
-
-    .user-type-select {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .type-option {
-      padding: 1rem;
-      border: 2px solid var(--border-light);
-      border-radius: 6px;
-      text-align: center;
       cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .type-option.selected {
-      border-color: var(--primary-blue);
-      background: var(--bg-light);
+      font-weight: 600;
+      text-decoration: underline;
     }
 
     /* DASHBOARD */
@@ -1009,24 +1100,42 @@
       padding: 0 2rem;
     }
 
+    .dashboard-header {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-light);
+      margin-bottom: 2rem;
+    }
+
+    .dashboard-header h1 {
+      font-size: 1.8rem;
+      color: var(--primary-blue);
+      margin-bottom: 0.5rem;
+    }
+
+    .dashboard-header p {
+      font-size: 0.95rem;
+      color: var(--text-light);
+    }
+
     .dashboard-tabs {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 2rem;
+      gap: 2rem;
       border-bottom: 2px solid var(--border-light);
+      margin-bottom: 2rem;
+      padding-bottom: 0;
     }
 
     .dashboard-tab {
-      padding: 0.75rem 1.5rem;
-      background: none;
-      border: none;
-      cursor: pointer;
+      padding: 1rem 0;
       font-size: 1rem;
       font-weight: 600;
       color: var(--text-light);
       border-bottom: 3px solid transparent;
-      margin-bottom: -2px;
       transition: all 0.2s;
+      position: relative;
+      cursor: pointer;
     }
 
     .dashboard-tab.active {
@@ -1034,126 +1143,324 @@
       border-bottom-color: var(--primary-blue);
     }
 
-    .empty-state {
-      text-align: center;
-      padding: 3rem 2rem;
+    .dashboard-tab-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--error);
+      color: #fff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-left: 0.3rem;
+    }
+
+    .dashboard-content {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-light);
+    }
+
+    .profile-form {
+      max-width: 600px;
+    }
+
+    .profile-form .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-form .form-submit {
+      background: var(--primary-blue);
+      width: auto;
+      padding: 0.8rem 2rem;
+    }
+
+    .profile-form .form-submit:hover {
+      background: var(--primary-blue-light);
+    }
+
+    /* CHAT SYSTEM */
+    .chat-container {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 0;
+      height: 70vh;
+      background: #fff;
+      border-radius: 6px;
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+    }
+
+    .chat-sidebar {
+      border-right: 1px solid var(--border-light);
+      overflow-y: auto;
+      background: var(--bg-light);
+    }
+
+    .conversation-item {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .conversation-item:hover {
+      background: #e8e8e8;
+    }
+
+    .conversation-item.active {
+      background: #fff;
+      border-left: 4px solid var(--primary-blue);
+    }
+
+    .conversation-item.unread {
+      font-weight: 700;
+    }
+
+    .conversation-property {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.3rem;
+    }
+
+    .conversation-preview {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0.3rem;
+    }
+
+    .conversation-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
       color: var(--text-light);
     }
 
-    .empty-state h3 {
-      margin-bottom: 0.5rem;
+    .conversation-badge {
+      background: var(--error);
+      color: #fff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .chat-main {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-light);
+      background: var(--bg-light);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message-bubble {
+      max-width: 70%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      word-wrap: break-word;
+    }
+
+    .message-bubble.sent {
+      align-self: flex-end;
+      background: var(--primary-blue);
+      color: #fff;
+    }
+
+    .message-bubble.received {
+      align-self: flex-start;
+      background: var(--bg-light);
       color: var(--text-dark);
+    }
+
+    .message-bubble.system {
+      align-self: center;
+      background: var(--secondary-orange);
+      color: #fff;
+      font-size: 0.85rem;
+      text-align: center;
+      max-width: 80%;
+    }
+
+    .message-meta {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-top: 0.3rem;
+    }
+
+    .chat-input-area {
+      padding: 1rem;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .chat-input-area button {
+      background: var(--secondary-orange);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .chat-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-light);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* PRIVACY TOGGLES */
+    .privacy-toggle {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: var(--bg-light);
+      border-radius: 4px;
+    }
+
+    .privacy-toggle input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .privacy-toggle label {
+      flex: 1;
+      cursor: pointer;
+      font-weight: 500;
     }
 
     /* FOOTER */
     .footer {
       background: var(--text-dark);
       color: #fff;
-      padding: 3rem 2rem 1rem;
+      padding: 2rem;
+      text-align: center;
       margin-top: 4rem;
     }
 
-    .footer-content {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2rem;
-      max-width: 1400px;
-      margin: 0 auto 2rem;
-    }
-
-    .footer-column h4 {
-      margin-bottom: 1rem;
-      color: #fff;
-    }
-
-    .footer-link {
-      display: block;
-      color: #ccc;
-      text-decoration: none;
-      margin-bottom: 0.5rem;
+    .footer p {
       font-size: 0.9rem;
-      transition: color 0.2s;
+      opacity: 0.8;
     }
 
-    .footer-link:hover {
-      color: #fff;
-    }
-
-    .footer-bottom {
-      text-align: center;
-      padding-top: 1.5rem;
-      border-top: 1px solid rgba(255,255,255,0.1);
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1rem;
       font-size: 0.85rem;
-      color: #999;
     }
 
-    /* RESPONSIVE */
+    .footer-links a {
+      color: #fff;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .footer-links a:hover {
+      opacity: 0.7;
+    }
+
     @media (max-width: 768px) {
-      .hero h1 {
-        font-size: 1.8rem;
-      }
-
-      .value-props {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-
       .search-container {
         grid-template-columns: 1fr;
-        gap: 1rem;
       }
-
       .filter-sidebar {
         position: static;
         top: auto;
       }
-
-      .detail-container {
+      .detail-grid {
         grid-template-columns: 1fr;
       }
-
       .detail-right {
         position: static;
+        top: auto;
       }
-
+      .chat-container {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      .chat-sidebar {
+        display: none;
+      }
       .info-grid {
         grid-template-columns: repeat(2, 1fr);
       }
-
       .property-grid {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       }
-
-      .footer-content {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .horizontal-card {
-        flex-direction: column;
-      }
-
-      .h-card-image {
-        width: 100%;
-        height: 200px;
+      .value-props {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
   <div id="root"></div>
-
   <script>
-    var { useState, useEffect, useMemo, useRef, useCallback } = React;
+    var React = window.React;
+    var ReactDOM = window.ReactDOM;
+    var useState = React.useState;
+    var useEffect = React.useEffect;
+    var useMemo = React.useMemo;
+    var useRef = React.useRef;
+    var useCallback = React.useCallback;
     var e = React.createElement;
 
-    /* ---- REGION DATA ---- */
-    var REGION_CENTERS = {
-      0: [41.9, 12.5, 9],
-      1: [45.0, 7.7, 8],
-      2: [41.0, 16.5, 8],
-      3: [45.4, 11.8, 8],
-      4: [44.3, 8.5, 9]
+    var AMENITY_LABELS = {
+      ac: 'A/C', pool: 'Pool', paidParking: 'Paid Parking',
+      freeParking: 'Free Parking', restaurant: 'Restaurant',
+      elevator: 'Elevator', garage: 'Garage', pets: 'Pets Allowed',
+      disability: 'Accessible', sauna: 'Sauna', tennis: 'Tennis',
+      bikeRental: 'Bike Rental', indoorPool: 'Indoor Pool', gym: 'Gym',
+      shuttle: 'Shuttle'
     };
+
+    var REGION_CENTERS = {
+      0: [41.9, 12.5, 9], 1: [45.0, 7.7, 8], 2: [41.0, 16.5, 8],
+      3: [45.4, 11.8, 8], 4: [44.3, 8.5, 9]
+    };
+
     var REGION_PHOTOS = {
       0: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&h=600&fit=crop',
       1: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=600&fit=crop',
@@ -1161,6 +1468,7 @@
       3: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1200&h=600&fit=crop',
       4: 'https://images.unsplash.com/photo-1537631468332-b93e15cbc7e4?w=1200&h=600&fit=crop'
     };
+
     var PROPERTY_PHOTOS = {
       0: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=250&fit=crop',
       1: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&h=250&fit=crop',
@@ -1173,14 +1481,14 @@
     };
 
     var PROPERTY_TYPE_INFO = {
-      'Affittacamere': { desc: 'Private rooms in a residential home, sometimes with breakfast.', tax: '€1-3.50/person/night' },
-      'Agriturismo': { desc: 'Working farm accommodation with local food and rural experience.', tax: '€1-2/person/night' },
+      'Affittacamere': { desc: 'Private rooms in a residential home, sometimes with breakfast.', tax: '1-3.50/person/night' },
+      'Agriturismo': { desc: 'Working farm accommodation with local food and rural experience.', tax: '1-2/person/night' },
       'Altro': { desc: 'Other accommodation types (apartments, villas, etc.).', tax: 'Varies by municipality' },
-      'B&B': { desc: 'Small guesthouse with breakfast included in the rate.', tax: '€2-5/person/night' },
-      'Campeggio': { desc: 'Campgrounds and holiday parks with pitches or mobile homes.', tax: '€0.50-1.50/person/night' },
-      'Hotel': { desc: 'Full-service accommodation with daily housekeeping and amenities.', tax: '€1-7/person/night (varies by star rating)' },
-      'Residence': { desc: 'Self-catering serviced apartments, usually with kitchenette.', tax: '€1-3/person/night' },
-      'Villaggio Turistico': { desc: 'Resort complexes with shared pools, restaurants, and entertainment.', tax: '€1-3/person/night' }
+      'B&B': { desc: 'Small guesthouse with breakfast included in the rate.', tax: '2-5/person/night' },
+      'Campeggio': { desc: 'Campgrounds and holiday parks with pitches or mobile homes.', tax: '0.50-1.50/person/night' },
+      'Hotel': { desc: 'Full-service accommodation with daily housekeeping and amenities.', tax: '1-7/person/night (varies by star rating)' },
+      'Residence': { desc: 'Self-catering serviced apartments, usually with kitchenette.', tax: '1-3/person/night' },
+      'Villaggio Turistico': { desc: 'Resort complexes with shared pools, restaurants, and entertainment.', tax: '1-3/person/night' }
     };
 
     var ROME_CAP_NEIGHBORHOODS = {
@@ -1192,15 +1500,6 @@
     var VENICE_CAP_SESTIERI = {
       '30121': 'Cannaregio', '30122': 'Castello', '30123': 'Dorsoduro',
       '30124': 'San Marco', '30125': 'San Polo', '30126': 'Santa Croce'
-    };
-
-    var AMENITY_LABELS = {
-      ac: 'A/C', pool: 'Pool', paidParking: 'Paid Parking',
-      freeParking: 'Free Parking', restaurant: 'Restaurant',
-      elevator: 'Elevator', garage: 'Garage', pets: 'Pets Allowed',
-      disability: 'Accessible', sauna: 'Sauna', tennis: 'Tennis',
-      bikeRental: 'Bike Rental', indoorPool: 'Indoor Pool', gym: 'Gym',
-      shuttle: 'Shuttle'
     };
 
     function getNeighborhood(prop) {
@@ -1241,14 +1540,20 @@
           baths: d[14] || 0,
           website: d[15] || '',
           amenities: {
-            ac: !!(amenBits & 2), pool: !!(amenBits & 4),
-            paidParking: !!(amenBits & 8), freeParking: !!(amenBits & 16),
+            ac: !!(amenBits & 2),
+            pool: !!(amenBits & 4),
+            paidParking: !!(amenBits & 8),
+            freeParking: !!(amenBits & 16),
             restaurant: !!(amenBits & 32),
-            elevator: !!(amenBits & 128), garage: !!(amenBits & 256),
+            elevator: !!(amenBits & 128),
+            garage: !!(amenBits & 256),
             pets: !!(amenBits & 1024),
-            disability: !!(amenBits & 2048), sauna: !!(amenBits & 4096),
-            tennis: !!(amenBits & 8192), bikeRental: !!(amenBits & 16384),
-            indoorPool: !!(amenBits & 32768), gym: !!(amenBits & 131072),
+            disability: !!(amenBits & 2048),
+            sauna: !!(amenBits & 4096),
+            tennis: !!(amenBits & 8192),
+            bikeRental: !!(amenBits & 16384),
+            indoorPool: !!(amenBits & 32768),
+            gym: !!(amenBits & 131072),
             shuttle: !!(amenBits & 2097152)
           },
           claimed: CLAIMED_IDS.has(propId),
@@ -1279,154 +1584,191 @@
     }
 
     function buildCommunesByAllRegions(listings) {
-      var allCommunes = new Set();
-      listings.forEach(function(l) { allCommunes.add(l.comune); });
-      return Array.from(allCommunes).sort();
-    }
-
-    function buildNeighborhoodsByComune(listings) {
       var map = {};
-      listings.forEach(function(l) {
-        var key = l.comune;
-        if (!map[key]) map[key] = new Set();
-        map[key].add(l.neighborhood);
+      listings.forEach(function(prop) {
+        if (prop.region && prop.comune) {
+          if (!map[prop.region]) map[prop.region] = [];
+          if (map[prop.region].indexOf(prop.comune) === -1) {
+            map[prop.region].push(prop.comune);
+          }
+        }
       });
-      Object.keys(map).forEach(function(k) { map[k] = Array.from(map[k]).sort(); });
       return map;
     }
 
-    function getTopAmenities(prop, limit) {
-      if (!limit) limit = 3;
-      var amenities = Object.entries(prop.amenities).filter(function(a) { return a[1]; }).map(function(a) { return AMENITY_LABELS[a[0]]; });
-      return amenities.slice(0, limit);
+    function buildNeighborhoodsByComune(listings, targetComune) {
+      var neighborhoods = [];
+      listings.forEach(function(prop) {
+        if (prop.comune === targetComune && prop.neighborhood) {
+          if (neighborhoods.indexOf(prop.neighborhood) === -1) {
+            neighborhoods.push(prop.neighborhood);
+          }
+        }
+      });
+      return neighborhoods;
+    }
+
+    function getTopAmenities(prop) {
+      var result = [];
+      if (!prop || !prop.amenities) return result;
+      Object.keys(prop.amenities).forEach(function(key) {
+        if (prop.amenities[key] && AMENITY_LABELS[key]) {
+          result.push(AMENITY_LABELS[key]);
+        }
+      });
+      return result.slice(0, 3);
     }
 
     function renderStars(stars) {
-      return String.fromCharCode(9733).repeat(stars) + String.fromCharCode(9734).repeat(5 - stars);
+      var html = '';
+      for (var i = 0; i < 5; i++) {
+        html += i < stars ? '★' : '☆';
+      }
+      return html;
     }
 
     function smartPagination(current, total) {
       var pages = [];
-      var maxShow = 7;
-      if (total <= maxShow) {
-        for (var i = 1; i <= total; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        var start = Math.max(2, current - 2);
-        var end = Math.min(total - 1, current + 2);
-        if (start > 2) pages.push('...');
-        for (var i = start; i <= end; i++) pages.push(i);
-        if (end < total - 1) pages.push('...');
-        pages.push(total);
+      var start = Math.max(1, current - 2);
+      var end = Math.min(total, current + 2);
+      if (start > 1) pages.push(1);
+      if (start > 2) pages.push('...');
+      for (var i = start; i <= end; i++) {
+        pages.push(i);
       }
+      if (end < total - 1) pages.push('...');
+      if (end < total) pages.push(total);
       return pages;
     }
 
-    /* ---- COMPONENTS ---- */
+    function estimatePrice(prop) {
+      var basePrices = {
+        'Hotel': 80,
+        'B&B': 55,
+        'Agriturismo': 65,
+        'Affittacamere': 45,
+        'Campeggio': 30,
+        'Residence': 70,
+        'Villaggio Turistico': 85,
+        'Altro': 50
+      };
+      var starMultipliers = {
+        0: 0.7,
+        1: 0.8,
+        2: 0.9,
+        3: 1.0,
+        4: 1.5,
+        5: 2.5
+      };
+      var base = basePrices[prop.type] || 60;
+      var mult = starMultipliers[prop.stars] || 1.0;
+      var price = base * mult;
+      if (prop.amenities && prop.amenities.pool) price += 15;
+      if (prop.amenities && prop.amenities.restaurant) price += 10;
+      if (prop.amenities && prop.amenities.ac) price += 5;
+      return Math.round(price);
+    }
 
-    function Nav(props) {
-      var isActive = function(page) {
-        return props.currentPage === page ? 'active' : '';
-      };
-      var logout = function() {
-        localStorage.removeItem('ad_current_user');
-        props.setUser(null);
-        props.onNavigate('home');
-      };
-      return e('nav', { className: 'navbar' },
-        e('div', { className: 'navbar-container' },
-          e('div', { className: 'navbar-logo', onClick: function() { props.onNavigate('home'); } }, 'AffittoDiretto.it'),
-          e('div', { className: 'navbar-links' },
-            e('a', { className: 'navbar-link ' + isActive('home'), onClick: function() { props.onNavigate('home'); } }, 'Home'),
-            e('a', { className: 'navbar-link ' + isActive('search'), onClick: function() { props.onNavigate('search'); } }, 'Search'),
-            e('a', { className: 'navbar-link ' + isActive('map'), onClick: function() { props.onNavigate('map'); } }, 'Map'),
-            props.user && e('a', { className: 'navbar-link ' + isActive('dashboard'), onClick: function() { props.onNavigate('dashboard'); } }, 'Dashboard'),
-            props.user ? e('button', { className: 'btn-primary', onClick: logout }, 'Logout (' + props.user.name + ')') : e('button', { className: 'btn-primary', onClick: function() { props.onNavigate('login'); } }, 'Login')
+    function PropertyCard(props) {
+      var prop = props.prop;
+      var onSelect = props.onSelect;
+      var amenities = getTopAmenities(prop);
+      var price = estimatePrice(prop);
+      return e('div', { className: 'property-card', onClick: function() { onSelect(prop); } },
+        e('div', { className: 'card-image' },
+          prop.verified ? e('div', { className: 'verified-badge' }, 'VERIFIED') : null,
+          e('img', { src: getCardImage(prop), alt: prop.name }),
+          e('div', { className: 'sample-label' }, 'Sample')
+        ),
+        e('div', { className: 'card-content' },
+          e('div', { className: 'card-name' }, prop.name),
+          e('div', { className: 'card-meta' }, prop.type + ' • ' + prop.region),
+          e('div', { className: 'card-stars' }, renderStars(prop.stars)),
+          e('div', { className: 'card-amenities' },
+            amenities.map(function(amenity) {
+              return e('span', { className: 'amenity-chip', key: amenity }, amenity);
+            })
+          ),
+          e('div', { className: 'price-tag-small' }, 'From €' + price + '/night')
+        )
+      );
+    }
+
+    function HorizontalPropertyCard(props) {
+      var prop = props.prop;
+      var onSelect = props.onSelect;
+      var amenities = getTopAmenities(prop);
+      var price = estimatePrice(prop);
+      return e('div', { className: 'horizontal-card', onClick: function() { onSelect(prop); } },
+        e('div', { className: 'h-card-image' },
+          e('img', { src: getCardImage(prop), alt: prop.name })
+        ),
+        e('div', { className: 'h-card-content' },
+          e('div', { className: 'h-card-header' },
+            e('div', { className: 'h-card-name' }, prop.name),
+            e('div', { className: 'h-card-meta' }, prop.type + ' • ' + prop.region),
+            e('div', { className: 'h-card-price' }, '€' + price + '/night'),
+            e('div', { className: 'h-card-stats' },
+              e('span', null, prop.beds + ' beds'),
+              e('span', null, prop.baths + ' baths'),
+              e('span', null, renderStars(prop.stars))
+            )
+          ),
+          e('div', { className: 'h-card-amenities' },
+            amenities.map(function(amenity) {
+              return e('span', { className: 'amenity-chip', key: amenity }, amenity);
+            })
+          ),
+          e('div', { className: 'h-card-footer' },
+            e('button', { className: 'h-card-button', onClick: function(evt) { evt.stopPropagation(); onSelect(prop); } }, 'View Details')
           )
         )
       );
     }
 
     function HomePage(props) {
-      var handleSearch = function() {
-        if (props.searchCity) {
-          props.onNavigate('search', { city: props.searchCity });
-        }
-      };
+      var listings = props.listings;
+      var onSelectProperty = props.onSelectProperty;
+      var featuredListings = listings.slice(0, 6);
       return e('div', null,
         e('div', { className: 'hero' },
           e('div', { className: 'hero-content' },
             e('h1', null, 'Book Direct in Italy'),
-            e('p', null, 'Discover authentic accommodations across Italy, direct from owners.'),
+            e('p', null, 'Direct accommodations with no middleman fees'),
             e('div', { className: 'search-bar' },
-              e('input', { type: 'text', placeholder: 'City or region...', value: props.searchCity, onChange: function(ev) { props.setSearchCity(ev.target.value); } }),
-              e('button', { onClick: handleSearch }, 'Search')
+              e('input', { type: 'text', placeholder: 'Region or city' }),
+              e('select', null,
+                e('option', null, 'Property Type'),
+                e('option', null, 'Hotel'),
+                e('option', null, 'B&B'),
+                e('option', null, 'Agriturismo')
+              ),
+              e('button', null, 'Search')
             )
           )
         ),
         e('div', { className: 'value-props' },
           e('div', { className: 'value-prop' },
+            e('div', { className: 'value-prop-icon' }, '🔒'),
+            e('h3', null, 'Direct Booking'),
+            e('p', null, 'Book directly with hosts, no middleman')
+          ),
+          e('div', { className: 'value-prop' },
             e('div', { className: 'value-prop-icon' }, '💰'),
-            e('h3', null, 'Best Price Guarantee'),
-            e('p', null, 'Book direct without intermediaries and get better rates.')
+            e('h3', null, 'Best Prices'),
+            e('p', null, 'Lower prices without commission fees')
           ),
           e('div', { className: 'value-prop' },
-            e('div', { className: 'value-prop-icon' }, '🤝'),
-            e('h3', null, 'Direct Connection'),
-            e('p', null, 'Communicate directly with property owners.')
-          ),
-          e('div', { className: 'value-prop' },
-            e('div', { className: 'value-prop-icon' }, '✔'),
-            e('h3', null, 'Quality Assured'),
-            e('p', null, 'All properties verified for authentic Italian hospitality.')
+            e('div', { className: 'value-prop-icon' }, '⭐'),
+            e('h3', null, 'Verified Properties'),
+            e('p', null, 'All accommodations verified and rated')
           )
         ),
         e('div', { className: 'featured-section' },
           e('h2', { className: 'section-title' }, 'Featured Properties'),
           e('div', { className: 'property-grid' },
-            props.listings.slice(0, 8).map(function(prop) {
-              return e(PropertyCard, { key: prop.id, prop: prop, onNavigate: props.onNavigate });
-            })
-          )
-        )
-      );
-    }
-
-    function PropertyCard(props) {
-      return e('div', { className: 'property-card', onClick: function() { sessionStorage.setItem('ad_current_property', props.prop.id); props.onNavigate('detail'); } },
-        e('div', { className: 'card-image' },
-          e('img', { src: getCardImage(props.prop), alt: props.prop.name }),
-          props.prop.verified && e('div', { className: 'verified-badge' }, 'VERIFIED'),
-          e('div', { className: 'sample-label' }, 'Sample Photo')
-        ),
-        e('div', { className: 'card-content' },
-          e('div', { className: 'card-name' }, props.prop.name),
-          e('div', { className: 'card-meta' }, props.prop.type + ' • ' + props.prop.neighborhood),
-          e('div', { className: 'card-stars' }, renderStars(props.prop.stars)),
-          e('div', { className: 'card-meta' }, props.prop.beds + ' beds • ' + props.prop.rooms + ' rooms'),
-          e('div', { className: 'card-amenities' },
-            getTopAmenities(props.prop).map(function(amen, idx) {
-              return e('div', { key: idx, className: 'amenity-chip' }, amen);
-            })
-          )
-        )
-      );
-    }
-
-    function PropertyTypeInfoModal(props) {
-      return e('div', { className: 'modal-overlay', onClick: function() { props.onClose(); } },
-        e('div', { className: 'modal', onClick: function(ev) { ev.stopPropagation(); } },
-          e('button', { className: 'modal-close', onClick: function() { props.onClose(); } }, '✕'),
-          e('h2', null, 'Property Types & Taxes'),
-          e('div', { className: 'property-type-grid' },
-            Object.entries(PROPERTY_TYPE_INFO).map(function(entry) {
-              var type = entry[0];
-              var info = entry[1];
-              return e('div', { key: type, className: 'type-card' },
-                e('div', { className: 'type-name' }, type),
-                e('div', { className: 'type-desc' }, info.desc),
-                e('div', { className: 'type-tax' }, 'Tax: ' + info.tax)
-              );
+            featuredListings.map(function(prop) {
+              return e(PropertyCard, { key: prop.id, prop: prop, onSelect: onSelectProperty });
             })
           )
         )
@@ -1434,7 +1776,10 @@
     }
 
     function SearchPage(props) {
-      var stateCity = useState(props.initialCity || '');
+      var listings = props.listings;
+      var onSelectProperty = props.onSelectProperty;
+
+      var stateCity = useState('');
       var city = stateCity[0];
       var setCity = stateCity[1];
 
@@ -1470,18 +1815,19 @@
       var showModal = stateShowModal[0];
       var setShowModal = stateShowModal[1];
 
-      var allCommunes = useMemo(function() { return buildCommunesByAllRegions(props.listings); }, [props.listings]);
-      var neighborhoodsByComune = useMemo(function() { return buildNeighborhoodsByComune(props.listings); }, [props.listings]);
+      var allCommunes = useMemo(function() { return buildCommunesByAllRegions(listings); }, [listings]);
+      var neighborhoodsByComune = useMemo(function() { return buildNeighborhoodsByComune(listings); }, [listings]);
 
       var filteredListings = useMemo(function() {
-        var result = props.listings.filter(function(l) {
+        var result = listings.filter(function(l) {
           if (city && l.comune !== city) return false;
           if (neighborhood && l.neighborhood !== neighborhood) return false;
           if (selectedType && l.type !== selectedType) return false;
           if (l.stars < minStars) return false;
           if (l.beds < minBeds) return false;
-          for (var amen of selectedAmenities) {
-            if (!l.amenities[amen]) return false;
+          var amenArr = Array.from(selectedAmenities);
+          for (var i = 0; i < amenArr.length; i++) {
+            if (!l.amenities[amenArr[i]]) return false;
           }
           return true;
         });
@@ -1489,25 +1835,23 @@
           result.sort(function(a, b) { return a.name.localeCompare(b.name); });
         } else if (sortBy === 'rated') {
           result.sort(function(a, b) { return b.stars - a.stars; });
+        } else if (sortBy === 'price_low') {
+          result.sort(function(a, b) { return estimatePrice(a) - estimatePrice(b); });
+        } else if (sortBy === 'price_high') {
+          result.sort(function(a, b) { return estimatePrice(b) - estimatePrice(a); });
         }
         return result;
-      }, [props.listings, city, neighborhood, selectedType, minStars, minBeds, selectedAmenities, sortBy]);
+      }, [listings, city, neighborhood, selectedType, minStars, minBeds, selectedAmenities, sortBy]);
 
       var itemsPerPage = 10;
       var totalPages = Math.ceil(filteredListings.length / itemsPerPage);
-      var paginatedListings = useMemo(function() {
-        var start = (currentPage - 1) * itemsPerPage;
-        return filteredListings.slice(start, start + itemsPerPage);
-      }, [filteredListings, currentPage]);
+      var paginatedListings = filteredListings.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
       var handleAmenityToggle = function(amen) {
         var newSet = new Set(selectedAmenities);
-        if (newSet.has(amen)) {
-          newSet.delete(amen);
-        } else {
-          newSet.add(amen);
-        }
+        if (newSet.has(amen)) { newSet.delete(amen); } else { newSet.add(amen); }
         setSelectedAmenities(newSet);
+        setCurrentPage(1);
       };
 
       return e('div', null,
@@ -1517,7 +1861,7 @@
             e('div', { className: 'filter-group' },
               e('label', { className: 'filter-label' }, 'City'),
               e('select', { className: 'filter-select', value: city, onChange: function(ev) { setCity(ev.target.value); setNeighborhood(''); setCurrentPage(1); } },
-                e('option', { value: '' }, 'All cities'),
+                e('option', { value: '' }, 'All cities (' + listings.length + ')'),
                 allCommunes.map(function(c) { return e('option', { key: c, value: c }, c); })
               )
             ),
@@ -1531,7 +1875,7 @@
             e('div', { className: 'filter-group' },
               e('label', { className: 'filter-label' },
                 'Property Type ',
-                e('span', { className: 'help-icon', onClick: function() { setShowModal(true); } }, '?')
+                e('span', { className: 'help-icon', onClick: function() { setShowModal(true); }, style: { display: 'inline-block', width: '18px', height: '18px', background: 'var(--primary-blue)', color: '#fff', borderRadius: '50%', textAlign: 'center', lineHeight: '18px', fontSize: '0.75rem', marginLeft: '0.3rem', cursor: 'pointer' } }, '?')
               ),
               e('select', { className: 'filter-select', value: selectedType, onChange: function(ev) { setSelectedType(ev.target.value); setCurrentPage(1); } },
                 e('option', { value: '' }, 'All types'),
@@ -1540,20 +1884,16 @@
             ),
             e('div', { className: 'filter-group' },
               e('label', { className: 'filter-label' }, 'Min Stars: ' + minStars),
-              e('div', { className: 'slider-container' },
-                e('input', { type: 'range', min: '0', max: '5', value: minStars, className: 'slider', onChange: function(ev) { setMinStars(parseInt(ev.target.value)); setCurrentPage(1); } })
-              )
+              e('input', { type: 'range', min: '0', max: '5', value: minStars, className: 'slider', style: { width: '100%' }, onChange: function(ev) { setMinStars(parseInt(ev.target.value)); setCurrentPage(1); } })
             ),
             e('div', { className: 'filter-group' },
               e('label', { className: 'filter-label' }, 'Min Beds: ' + minBeds),
-              e('div', { className: 'slider-container' },
-                e('input', { type: 'range', min: '0', max: '10', value: minBeds, className: 'slider', onChange: function(ev) { setMinBeds(parseInt(ev.target.value)); setCurrentPage(1); } })
-              )
+              e('input', { type: 'range', min: '0', max: '10', value: minBeds, className: 'slider', style: { width: '100%' }, onChange: function(ev) { setMinBeds(parseInt(ev.target.value)); setCurrentPage(1); } })
             ),
             e('div', { className: 'filter-group' },
               e('label', { className: 'filter-label' }, 'Amenities'),
               e('div', { className: 'amenities-chips' },
-                ['pool', 'pets', 'ac', 'gym', 'restaurant', 'shuttle'].map(function(amen) {
+                ['pool', 'pets', 'ac', 'gym', 'restaurant', 'shuttle', 'freeParking', 'elevator'].map(function(amen) {
                   return e('button', {
                     key: amen,
                     className: 'amenity-toggle' + (selectedAmenities.has(amen) ? ' active' : ''),
@@ -1569,19 +1909,19 @@
               e('div', { className: 'sort-buttons' },
                 e('button', { className: 'sort-btn' + (sortBy === 'relevant' ? ' active' : ''), onClick: function() { setSortBy('relevant'); } }, 'Relevant'),
                 e('button', { className: 'sort-btn' + (sortBy === 'name' ? ' active' : ''), onClick: function() { setSortBy('name'); } }, 'Name'),
-                e('button', { className: 'sort-btn' + (sortBy === 'rated' ? ' active' : ''), onClick: function() { setSortBy('rated'); } }, 'Top Rated')
+                e('button', { className: 'sort-btn' + (sortBy === 'rated' ? ' active' : ''), onClick: function() { setSortBy('rated'); } }, 'Top Rated'),
+                e('button', { className: 'sort-btn' + (sortBy === 'price_low' ? ' active' : ''), onClick: function() { setSortBy('price_low'); } }, 'Price Low'),
+                e('button', { className: 'sort-btn' + (sortBy === 'price_high' ? ' active' : ''), onClick: function() { setSortBy('price_high'); } }, 'Price High')
               )
             ),
             paginatedListings.map(function(prop) {
-              return e(HorizontalPropertyCard, { key: prop.id, prop: prop, onNavigate: props.onNavigate });
+              return e(HorizontalPropertyCard, { key: prop.id, prop: prop, onSelect: onSelectProperty });
             }),
             filteredListings.length === 0 && e('div', { className: 'empty-state' }, e('h3', null, 'No properties found'), e('p', null, 'Try adjusting your filters.')),
             totalPages > 1 && e('div', { className: 'pagination' },
-              smartPagination(currentPage, totalPages).map(function(page, idx) {
-                if (page === '...') {
-                  return e('div', { key: idx, className: 'page-btn ellipsis' }, '...');
-                }
-                return e('button', { key: page, className: 'page-btn' + (page === currentPage ? ' active' : ''), onClick: function() { setCurrentPage(page); } }, page);
+              smartPagination(currentPage, totalPages).map(function(pg, idx) {
+                if (pg === '...') return e('div', { key: 'ell-' + idx, className: 'page-btn ellipsis' }, '...');
+                return e('button', { key: pg, className: 'page-btn' + (pg === currentPage ? ' active' : ''), onClick: function() { setCurrentPage(pg); window.scrollTo(0, 0); } }, pg);
               })
             )
           )
@@ -1589,377 +1929,489 @@
       );
     }
 
-    function HorizontalPropertyCard(props) {
-      return e('div', { className: 'horizontal-card', onClick: function() { sessionStorage.setItem('ad_current_property', props.prop.id); props.onNavigate('detail'); } },
-        e('div', { className: 'h-card-image' },
-          e('img', { src: getCardImage(props.prop), alt: props.prop.name }),
-          props.prop.verified && e('div', { className: 'verified-badge' }, 'VERIFIED'),
-          e('div', { className: 'sample-label' }, 'Sample Photo')
-        ),
-        e('div', { className: 'h-card-content' },
-          e('div', { className: 'h-card-header' },
-            e('div', { className: 'h-card-name' }, props.prop.name),
-            e('div', { className: 'h-card-meta' }, props.prop.neighborhood + ', ' + props.prop.region),
-            e('div', { className: 'h-card-meta' }, renderStars(props.prop.stars)),
-            e('div', { className: 'h-card-meta' }, props.prop.type),
-            e('div', { className: 'h-card-amenities' },
-              getTopAmenities(props.prop, 5).map(function(amen, idx) {
-                return e('div', { key: idx, className: 'amenity-chip' }, amen);
-              })
-            )
-          ),
-          e('div', { className: 'h-card-footer' },
-            e('div', { className: 'h-card-stats' },
-              e('span', null, props.prop.beds + ' beds'),
-              e('span', null, props.prop.rooms + ' rooms'),
-              e('span', null, props.prop.baths + ' baths')
-            ),
-            e('button', { className: 'h-card-button' }, 'View Details')
+    function PropertyTypeInfoModal(props) {
+      return e('div', { className: 'modal-overlay', onClick: function() { props.onClose(); } },
+        e('div', { className: 'modal', onClick: function(ev) { ev.stopPropagation(); } },
+          e('button', { className: 'modal-close', onClick: function() { props.onClose(); } }, 'X'),
+          e('h2', null, 'Property Types and Tourist Tax'),
+          e('div', { className: 'property-type-grid' },
+            Object.entries(PROPERTY_TYPE_INFO).map(function(entry) {
+              var typeName = entry[0];
+              var info = entry[1];
+              return e('div', { key: typeName, className: 'type-card' },
+                e('div', { className: 'type-name' }, typeName),
+                e('div', { className: 'type-desc' }, info.desc),
+                e('div', { className: 'type-tax' }, 'Tax: ' + info.tax)
+              );
+            })
           )
         )
       );
     }
 
     function MapPage(props) {
-      var stateCity = useState('');
-      var city = stateCity[0];
-      var setCity = stateCity[1];
-
-      var stateNeighborhood = useState('');
-      var neighborhood = stateNeighborhood[0];
-      var setNeighborhood = stateNeighborhood[1];
-
+      var listings = props.listings;
+      var onSelectProperty = props.onSelectProperty;
       var mapRef = useRef(null);
-      var mapInstanceRef = useRef(null);
-      var markersRef = useRef([]);
-
-      var allCommunes = useMemo(function() { return buildCommunesByAllRegions(props.listings); }, [props.listings]);
-      var neighborhoodsByComune = useMemo(function() { return buildNeighborhoodsByComune(props.listings); }, [props.listings]);
-
-      var filteredListings = useMemo(function() {
-        var result = props.listings.filter(function(l) {
-          if (city && l.comune !== city) return false;
-          if (neighborhood && l.neighborhood !== neighborhood) return false;
-          return l.lat && l.lon;
-        });
-        return result;
-      }, [props.listings, city, neighborhood]);
-
+      var leafletMapRef = useRef(null);
       useEffect(function() {
         if (!mapRef.current) return;
-
-        if (!mapInstanceRef.current) {
-          mapInstanceRef.current = L.map(mapRef.current).setView([42.8, 12.5], 6);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-          }).addTo(mapInstanceRef.current);
-        }
-
-        markersRef.current.forEach(function(marker) { mapInstanceRef.current.removeLayer(marker); });
-        markersRef.current = [];
-
-        filteredListings.slice(0, 1000).forEach(function(prop) {
-          var color = prop.verified ? '#0d7377' : (prop.website ? '#0066d4' : '#dc2626');
-          var marker = L.circleMarker([prop.lat, prop.lon], {
-            radius: 6,
-            fillColor: color,
-            color: '#333',
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.8
-          }).addTo(mapInstanceRef.current).bindPopup(prop.name);
-          markersRef.current.push(marker);
+        if (leafletMapRef.current) leafletMapRef.current.remove();
+        var bounds = [[35, 6], [47, 19]];
+        var map = window.L.map(mapRef.current).fitBounds(bounds);
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors',
+          maxZoom: 19
+        }).addTo(map);
+        listings.forEach(function(prop) {
+          if (prop.lat && prop.lon) {
+            var marker = window.L.marker([prop.lat, prop.lon]).addTo(map);
+            var price = estimatePrice(prop);
+            var popupHtml = '<b>' + prop.name + '</b><br/>' + prop.type + '<br/><span style="color:#c4652a;font-weight:700">€' + price + '/night</span>';
+            marker.bindPopup(popupHtml);
+            marker.on('click', function() {
+              sessionStorage.setItem('ad_current_property', prop.id);
+              onSelectProperty(prop);
+            });
+          }
         });
-      }, [filteredListings]);
-
-      return e('div', { className: 'map-container' },
-        e('div', { className: 'map-filter-bar' },
-          e('select', { value: city, onChange: function(ev) { setCity(ev.target.value); setNeighborhood(''); } },
-            e('option', { value: '' }, 'All cities'),
-            allCommunes.map(function(c) { return e('option', { key: c, value: c }, c); })
-          ),
-          city && e('select', { value: neighborhood, onChange: function(ev) { setNeighborhood(ev.target.value); } },
-            e('option', { value: '' }, 'All neighborhoods'),
-            (neighborhoodsByComune[city] || []).map(function(n) { return e('option', { key: n, value: n }, n); })
-          ),
-          e('div', { className: 'map-count' }, filteredListings.length + ' of ' + props.listings.length + ' properties have location data')
-        ),
-        e('div', { ref: mapRef, id: 'map' }),
-        e('div', { className: 'map-legend' },
-          e('div', { className: 'legend-item' },
-            e('div', { className: 'legend-color', style: { backgroundColor: '#0d7377' } }),
-            'Verified'
-          ),
-          e('div', { className: 'legend-item' },
-            e('div', { className: 'legend-color', style: { backgroundColor: '#0066d4' } }),
-            'Has Website'
-          ),
-          e('div', { className: 'legend-item' },
-            e('div', { className: 'legend-color', style: { backgroundColor: '#dc2626' } }),
-            'No Website'
-          )
-        )
+        leafletMapRef.current = map;
+        return function() {
+          if (leafletMapRef.current) {
+            leafletMapRef.current.remove();
+            leafletMapRef.current = null;
+          }
+        };
+      }, [listings, onSelectProperty]);
+      return e('div', { className: 'detail-page' },
+        e('button', { className: 'back-btn', onClick: props.onNavigate }, '← Back'),
+        e('h1', null, 'Browse on Map'),
+        e('div', { ref: mapRef, className: 'map-embed', style: { height: '70vh', marginTop: '1rem' } })
       );
     }
 
     function PropertyDetail(props) {
       var prop = props.currentProperty;
-      if (!prop) {
-        return e('div', { style: { padding: '2rem', textAlign: 'center' } }, 'Loading...');
-      }
-
-      var stateForm = useState({ name: '', email: '', checkIn: '', checkOut: '', guests: 1, message: '' });
-      var form = stateForm[0];
-      var setForm = stateForm[1];
-
-      var handleFormChange = function(field, value) {
-        setForm(Object.assign({}, form, { [field]: value }));
+      var handleBack = props.handleBack;
+      var stateInquiry = useState({});
+      var inquiry = stateInquiry[0];
+      var setInquiry = stateInquiry[1];
+      if (!prop) return e('div', null, e('p', { style: { padding: '2rem', textAlign: 'center' } }, 'Property not found'), e('button', { className: 'back-btn', onClick: handleBack }, '← Back'));
+      var amenities = getTopAmenities(prop);
+      var price = estimatePrice(prop);
+      var handleSubmitInquiry = function() {
+        if (!inquiry.name || !inquiry.email || !inquiry.message) {
+          alert('Please fill in all fields');
+          return;
+        }
+        var convId = 'conv_' + Date.now();
+        var conversations = JSON.parse(localStorage.getItem('ad_conversations') || '[]');
+        conversations.push({
+          id: convId,
+          propertyId: prop.id,
+          propertyName: prop.name,
+          guestName: inquiry.name,
+          guestEmail: inquiry.email,
+          hostId: null,
+          createdAt: new Date().toISOString(),
+          lastMessageAt: new Date().toISOString(),
+          unread: true
+        });
+        localStorage.setItem('ad_conversations', JSON.stringify(conversations));
+        var messages = [{
+          id: Date.now(),
+          sender: 'guest',
+          senderName: inquiry.name,
+          text: inquiry.message,
+          timestamp: new Date().toISOString(),
+          read: false
+        }];
+        localStorage.setItem('ad_messages_' + convId, JSON.stringify(messages));
+        alert('Inquiry sent to ' + prop.name + '! Check your messages for replies.');
+        setInquiry({});
       };
-
-      var handleSubmit = function() {
-        var proposals = JSON.parse(localStorage.getItem('ad_proposals') || '[]');
-        proposals.push(Object.assign({}, form, { propertyId: prop.id, propertyName: prop.name, date: new Date().toISOString() }));
-        localStorage.setItem('ad_proposals', JSON.stringify(proposals));
-        alert('Proposal sent! The property owner will review your request.');
-        setForm({ name: '', email: '', checkIn: '', checkOut: '', guests: 1, message: '' });
-      };
-
       return e('div', null,
-        e('div', { className: 'detail-hero' },
-          e('img', { src: getHeroImage(prop), alt: prop.name }),
-          e('div', { className: 'detail-overlay' },
-            e('div', { className: 'detail-title' }, prop.name),
-            prop.verified && e('div', { className: 'verified-badge' }, 'VERIFIED'),
-            e('div', { className: 'detail-meta' }, prop.type + ' • ' + prop.neighborhood + ', ' + prop.region)
-          )
-        ),
-        e('div', { className: 'detail-container' },
-          e('div', { className: 'detail-left' },
-            e('div', { className: 'info-grid' },
-              e('div', { className: 'info-item' },
-                e('div', { className: 'info-value' }, renderStars(prop.stars)),
-                e('div', { className: 'info-label' }, 'Rating')
-              ),
-              e('div', { className: 'info-item' },
-                e('div', { className: 'info-value' }, prop.beds),
-                e('div', { className: 'info-label' }, 'Beds')
-              ),
-              e('div', { className: 'info-item' },
-                e('div', { className: 'info-value' }, prop.rooms),
-                e('div', { className: 'info-label' }, 'Rooms')
-              ),
-              e('div', { className: 'info-item' },
-                e('div', { className: 'info-value' }, prop.baths),
-                e('div', { className: 'info-label' }, 'Bathrooms')
-              )
-            ),
-            e('div', { className: 'address-section' },
-              e('div', { className: 'address-label' }, 'Address'),
-              e('div', { className: 'address-text' }, prop.street + ' ' + prop.number + ', ' + prop.cap + ' ' + prop.comune)
-            ),
-            e('div', { className: 'amenities-section' },
-              e('h3', null, 'Amenities'),
-              e('div', { className: 'card-amenities' },
-                Object.entries(prop.amenities).filter(function(a) { return a[1]; }).map(function(a) {
-                  return e('div', { key: a[0], className: 'amenity-chip' }, AMENITY_LABELS[a[0]]);
-                })
-              )
-            ),
-            prop.lat && prop.lon && e(MapEmbed, { lat: prop.lat, lon: prop.lon })
+        e('button', { className: 'back-btn', onClick: handleBack }, '← Back'),
+        e('div', { className: 'detail-page' },
+          e('div', { className: 'detail-hero' },
+            e('img', { src: getHeroImage(prop), alt: prop.name })
           ),
-          e('div', { className: 'detail-right' },
-            e('div', { className: 'contact-section' },
-              e('h3', null, 'Contact & Book'),
-              prop.website && e('a', { href: ensureUrl(prop.website), target: '_blank', rel: 'noopener noreferrer', className: 'website-link' }, 'Visit Website'),
-              e('form', { onSubmit: function(ev) { ev.preventDefault(); handleSubmit(); } },
+          e('div', { className: 'detail-grid' },
+            e('div', { className: 'detail-left' },
+              e('h1', null, prop.name),
+              e('div', { className: 'property-type' }, prop.type + ' • ' + prop.region),
+              e('div', { className: 'price-tag' }, '€' + price + '/night'),
+              e('div', { className: 'info-grid' },
+                e('div', { className: 'info-item' },
+                  e('div', { className: 'info-value' }, prop.beds),
+                  e('div', { className: 'info-label' }, 'Bedrooms')
+                ),
+                e('div', { className: 'info-item' },
+                  e('div', { className: 'info-value' }, prop.rooms),
+                  e('div', { className: 'info-label' }, 'Rooms')
+                ),
+                e('div', { className: 'info-item' },
+                  e('div', { className: 'info-value' }, prop.baths),
+                  e('div', { className: 'info-label' }, 'Bathrooms')
+                ),
+                e('div', { className: 'info-item' },
+                  e('div', { className: 'info-value' }, renderStars(prop.stars)),
+                  e('div', { className: 'info-label' }, 'Rating')
+                )
+              ),
+              e('div', { className: 'address-section' },
+                e('div', { className: 'address-label' }, 'Address'),
+                e('div', { className: 'address-text' }, prop.street + ' ' + (prop.number || '') + ', ' + (prop.cap || '') + ' ' + prop.comune),
+                e('div', { className: 'address-label', style: { marginTop: '0.3rem' } }, prop.neighborhood + ', ' + prop.provincia + ', ' + prop.region)
+              ),
+              e('div', { className: 'amenities-section' },
+                e('h3', null, 'Amenities'),
+                e('div', { className: 'card-amenities' },
+                  Object.entries(prop.amenities).filter(function(a) { return a[1]; }).map(function(a) {
+                    return e('span', { className: 'amenity-chip', key: a[0] }, AMENITY_LABELS[a[0]]);
+                  })
+                )
+              ),
+              prop.lat && prop.lon ? e('div', { className: 'map-embed', id: 'detail-map-' + prop.id, ref: function(el) {
+                if (el && !el.dataset.init) {
+                  el.dataset.init = 'true';
+                  var m = window.L.map(el).setView([prop.lat, prop.lon], 14);
+                  window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(m);
+                  window.L.circleMarker([prop.lat, prop.lon], { radius: 8, fillColor: '#0066d4', color: '#333', weight: 2, opacity: 1, fillOpacity: 0.8 }).addTo(m);
+                }
+              } }) : null
+            ),
+            e('div', { className: 'detail-right' },
+              prop.verified ? e('div', { className: 'notification-banner' },
+                e('p', null, '✓ This property is verified and claimed by the host')
+              ) : null,
+              e('div', { className: 'contact-section' },
+                e('h3', null, 'Send an Inquiry'),
                 e('div', { className: 'form-group' },
                   e('label', { className: 'form-label' }, 'Your Name'),
-                  e('input', { className: 'form-input', type: 'text', value: form.name, onChange: function(ev) { handleFormChange('name', ev.target.value); }, required: true })
+                  e('input', { className: 'form-input', type: 'text', value: inquiry.name || '', onChange: function(evt) { setInquiry(Object.assign({}, inquiry, { name: evt.target.value })); } })
                 ),
                 e('div', { className: 'form-group' },
                   e('label', { className: 'form-label' }, 'Email'),
-                  e('input', { className: 'form-input', type: 'email', value: form.email, onChange: function(ev) { handleFormChange('email', ev.target.value); }, required: true })
-                ),
-                e('div', { className: 'form-group' },
-                  e('label', { className: 'form-label' }, 'Check-in'),
-                  e('input', { className: 'form-input', type: 'date', value: form.checkIn, onChange: function(ev) { handleFormChange('checkIn', ev.target.value); }, required: true })
-                ),
-                e('div', { className: 'form-group' },
-                  e('label', { className: 'form-label' }, 'Check-out'),
-                  e('input', { className: 'form-input', type: 'date', value: form.checkOut, onChange: function(ev) { handleFormChange('checkOut', ev.target.value); }, required: true })
-                ),
-                e('div', { className: 'form-group' },
-                  e('label', { className: 'form-label' }, 'Guests'),
-                  e('input', { className: 'form-input', type: 'number', min: '1', value: form.guests, onChange: function(ev) { handleFormChange('guests', ev.target.value); }, required: true })
+                  e('input', { className: 'form-input', type: 'email', value: inquiry.email || '', onChange: function(evt) { setInquiry(Object.assign({}, inquiry, { email: evt.target.value })); } })
                 ),
                 e('div', { className: 'form-group' },
                   e('label', { className: 'form-label' }, 'Message'),
-                  e('textarea', { className: 'form-textarea', value: form.message, onChange: function(ev) { handleFormChange('message', ev.target.value); } })
+                  e('textarea', { className: 'form-textarea', value: inquiry.message || '', onChange: function(evt) { setInquiry(Object.assign({}, inquiry, { message: evt.target.value })); } })
                 ),
-                e('button', { className: 'form-submit', type: 'submit' }, 'Send Proposal')
-              )
+                e('button', { className: 'form-submit', onClick: handleSubmitInquiry }, 'Send Inquiry')
+              ),
+              prop.website ? e('a', { href: ensureUrl(prop.website), target: '_blank', rel: 'noopener noreferrer', className: 'website-link' }, 'Visit Website') : null
             )
           )
         )
       );
     }
 
-    function MapEmbed(props) {
-      var mapRef = useRef(null);
+    function MessagesTab(props) {
+      var user = props.user;
+      var stateConversations = useState([]);
+      var conversations = stateConversations[0];
+      var setConversations = stateConversations[1];
+      var stateSelectedConv = useState(null);
+      var selectedConv = stateSelectedConv[0];
+      var setSelectedConv = stateSelectedConv[1];
+      var stateMessages = useState([]);
+      var messages = stateMessages[0];
+      var setMessages = stateMessages[1];
+      var stateNewMessage = useState('');
+      var newMessage = stateNewMessage[0];
+      var setNewMessage = stateNewMessage[1];
       useEffect(function() {
-        if (!mapRef.current) return;
-        var map = L.map(mapRef.current).setView([props.lat, props.lon], 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        L.circleMarker([props.lat, props.lon], { radius: 8, fillColor: '#0066d4', color: '#333', weight: 2, opacity: 1, fillOpacity: 0.8 }).addTo(map);
-      }, [props.lat, props.lon]);
-      return e('div', { ref: mapRef, className: 'map-embed' });
-    }
-
-    function LoginPage(props) {
-      var stateTab = useState('login');
-      var tab = stateTab[0];
-      var setTab = stateTab[1];
-
-      var stateUserType = useState('Traveler');
-      var userType = stateUserType[0];
-      var setUserType = stateUserType[1];
-
-      var stateLoginEmail = useState('');
-      var loginEmail = stateLoginEmail[0];
-      var setLoginEmail = stateLoginEmail[1];
-
-      var stateLoginPassword = useState('');
-      var loginPassword = stateLoginPassword[0];
-      var setLoginPassword = stateLoginPassword[1];
-
-      var stateSignupName = useState('');
-      var signupName = stateSignupName[0];
-      var setSignupName = stateSignupName[1];
-
-      var stateSignupEmail = useState('');
-      var signupEmail = stateSignupEmail[0];
-      var setSignupEmail = stateSignupEmail[1];
-
-      var stateSignupPassword = useState('');
-      var signupPassword = stateSignupPassword[0];
-      var setSignupPassword = stateSignupPassword[1];
-
-      var handleLogin = function() {
-        var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
-        var user = users.find(function(u) { return u.email === loginEmail && u.password === loginPassword; });
-        if (user) {
-          localStorage.setItem('ad_current_user', JSON.stringify(user));
-          props.setUser(user);
-          props.onNavigate('home');
-        } else {
-          alert('Invalid credentials');
+        var saved = localStorage.getItem('ad_conversations');
+        var convs = saved ? JSON.parse(saved) : [];
+        setConversations(convs);
+        if (convs.length > 0) {
+          setSelectedConv(convs[0].id);
+          var msgs = localStorage.getItem('ad_messages_' + convs[0].id);
+          setMessages(msgs ? JSON.parse(msgs) : []);
         }
+      }, []);
+      var handleSelectConversation = function(convId) {
+        setSelectedConv(convId);
+        var msgs = localStorage.getItem('ad_messages_' + convId);
+        setMessages(msgs ? JSON.parse(msgs) : []);
       };
-
-      var handleSignup = function() {
-        var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
-        if (users.find(function(u) { return u.email === signupEmail; })) {
-          alert('Email already exists');
-          return;
-        }
-        var newUser = { id: Date.now(), name: signupName, email: signupEmail, password: signupPassword, type: userType };
-        users.push(newUser);
-        localStorage.setItem('ad_users', JSON.stringify(users));
-        localStorage.setItem('ad_current_user', JSON.stringify(newUser));
-        props.setUser(newUser);
-        props.onNavigate('home');
+      var handleSendMessage = function() {
+        if (!newMessage.trim() || !selectedConv) return;
+        var updatedMessages = messages.slice();
+        updatedMessages.push({
+          id: Date.now(),
+          sender: user ? user.id : 'guest',
+          text: newMessage,
+          timestamp: new Date().toISOString(),
+          read: false
+        });
+        setMessages(updatedMessages);
+        localStorage.setItem('ad_messages_' + selectedConv, JSON.stringify(updatedMessages));
+        setNewMessage('');
       };
-
-      return e('div', { className: 'login-container' },
-        e('div', { className: 'login-card' },
-          e('div', { className: 'login-tabs' },
-            e('button', { className: 'tab-btn' + (tab === 'login' ? ' active' : ''), onClick: function() { setTab('login'); } }, 'Login'),
-            e('button', { className: 'tab-btn' + (tab === 'signup' ? ' active' : ''), onClick: function() { setTab('signup'); } }, 'Sign Up')
+      var unreadCount = conversations.filter(function(c) { return c.unread; }).length;
+      return e('div', null,
+        e('div', { className: 'chat-container' },
+          e('div', { className: 'chat-sidebar' },
+            conversations.length === 0 ?
+              e('div', { style: { padding: '1rem' } }, 'No conversations yet') :
+              conversations.map(function(conv) {
+                var isActive = selectedConv === conv.id;
+                return e('div', {
+                  key: conv.id,
+                  className: 'conversation-item' + (isActive ? ' active' : '') + (conv.unread ? ' unread' : ''),
+                  onClick: function() { handleSelectConversation(conv.id); }
+                },
+                  e('div', { className: 'conversation-property' }, conv.propertyName),
+                  e('div', { className: 'conversation-preview' }, conv.lastMessage || 'No messages'),
+                  e('div', { className: 'conversation-meta' },
+                    e('span', null, new Date(conv.lastUpdated).toLocaleDateString()),
+                    conv.unread ? e('div', { className: 'conversation-badge' }, conv.unreadCount) : null
+                  )
+                );
+              })
           ),
-          tab === 'login' && e('div', null,
-            e('div', { className: 'form-group' },
-              e('label', { className: 'form-label' }, 'Email'),
-              e('input', { className: 'form-input', type: 'email', value: loginEmail, onChange: function(ev) { setLoginEmail(ev.target.value); } })
-            ),
-            e('div', { className: 'form-group' },
-              e('label', { className: 'form-label' }, 'Password'),
-              e('input', { className: 'form-input', type: 'password', value: loginPassword, onChange: function(ev) { setLoginPassword(ev.target.value); } })
-            ),
-            e('button', { className: 'btn-primary', style: { width: '100%' }, onClick: handleLogin }, 'Login')
-          ),
-          tab === 'signup' && e('div', null,
-            e('label', { className: 'form-label' }, 'I am a...'),
-            e('div', { className: 'user-type-select' },
-              e('div', { className: 'type-option' + (userType === 'Traveler' ? ' selected' : ''), onClick: function() { setUserType('Traveler'); } }, 'Traveler'),
-              e('div', { className: 'type-option' + (userType === 'Property Owner' ? ' selected' : ''), onClick: function() { setUserType('Property Owner'); } }, 'Property Owner')
-            ),
-            e('div', { className: 'form-group' },
-              e('label', { className: 'form-label' }, 'Full Name'),
-              e('input', { className: 'form-input', type: 'text', value: signupName, onChange: function(ev) { setSignupName(ev.target.value); } })
-            ),
-            e('div', { className: 'form-group' },
-              e('label', { className: 'form-label' }, 'Email'),
-              e('input', { className: 'form-input', type: 'email', value: signupEmail, onChange: function(ev) { setSignupEmail(ev.target.value); } })
-            ),
-            e('div', { className: 'form-group' },
-              e('label', { className: 'form-label' }, 'Password'),
-              e('input', { className: 'form-input', type: 'password', value: signupPassword, onChange: function(ev) { setSignupPassword(ev.target.value); } })
-            ),
-            e('button', { className: 'btn-primary', style: { width: '100%' }, onClick: handleSignup }, 'Sign Up')
+          e('div', { className: 'chat-main' },
+            selectedConv ? e('div', null,
+              e('div', { className: 'chat-header' },
+                e('h3', null, conversations.find(function(c) { return c.id === selectedConv; }).propertyName || 'Conversation'),
+                e('p', null, 'with host')
+              ),
+              e('div', { className: 'chat-messages' },
+                messages.length === 0 ?
+                  e('div', { className: 'chat-empty' }, e('p', null, 'No messages yet')) :
+                  messages.map(function(msg) {
+                    var isSent = msg.sender === (user ? user.id : 'guest');
+                    return e('div', { key: msg.id },
+                      e('div', { className: 'message-bubble ' + (isSent ? 'sent' : 'received') }, msg.text),
+                      e('div', { className: 'message-meta' }, new Date(msg.timestamp).toLocaleTimeString())
+                    );
+                  })
+              ),
+              e('div', { className: 'chat-input-area' },
+                e('input', { type: 'text', placeholder: 'Type a message...', value: newMessage, onChange: function(evt) { setNewMessage(evt.target.value); }, onKeyPress: function(evt) { if (evt.key === 'Enter') handleSendMessage(); } }),
+                e('button', { onClick: handleSendMessage }, 'Send')
+              )
+            ) : e('div', { className: 'chat-empty' }, e('p', null, 'Select a conversation'))
           )
         )
       );
     }
 
+    function SettingsTab(props) {
+      var user = props.user;
+      var onSaveSettings = props.onSaveSettings;
+      var stateSettings = useState({
+        shareEmail: (user && user.shareEmail) || false,
+        sharePhone: (user && user.sharePhone) || false,
+        shareWhatsapp: (user && user.shareWhatsapp) || false,
+        phone: (user && user.phone) || '',
+        whatsapp: (user && user.whatsapp) || ''
+      });
+      var settings = stateSettings[0];
+      var setSettings = stateSettings[1];
+      var handleSave = function() {
+        onSaveSettings(settings);
+        alert('Settings saved!');
+      };
+      return e('div', null,
+        e('h2', null, 'Privacy & Contact Settings'),
+        e('div', { style: { marginTop: '1.5rem' } },
+          e('div', { className: 'privacy-toggle' },
+            e('input', { type: 'checkbox', checked: settings.shareEmail, onChange: function(evt) { setSettings(Object.assign({}, settings, { shareEmail: evt.target.checked })); } }),
+            e('label', null, 'Share my email with guests')
+          ),
+          e('div', { className: 'privacy-toggle' },
+            e('input', { type: 'checkbox', checked: settings.sharePhone, onChange: function(evt) { setSettings(Object.assign({}, settings, { sharePhone: evt.target.checked })); } }),
+            e('label', null, 'Share my phone number with guests')
+          ),
+          e('div', { className: 'form-group' },
+            e('label', { className: 'form-label' }, 'Phone Number'),
+            e('input', { className: 'form-input', type: 'tel', value: settings.phone, onChange: function(evt) { setSettings(Object.assign({}, settings, { phone: evt.target.value })); } })
+          ),
+          e('div', { className: 'privacy-toggle' },
+            e('input', { type: 'checkbox', checked: settings.shareWhatsapp, onChange: function(evt) { setSettings(Object.assign({}, settings, { shareWhatsapp: evt.target.checked })); } }),
+            e('label', null, 'Share my WhatsApp with guests')
+          ),
+          e('div', { className: 'form-group' },
+            e('label', { className: 'form-label' }, 'WhatsApp Number'),
+            e('input', { className: 'form-input', type: 'tel', value: settings.whatsapp, onChange: function(evt) { setSettings(Object.assign({}, settings, { whatsapp: evt.target.value })); } })
+          ),
+          e('button', { className: 'btn-primary', onClick: handleSave, style: { marginTop: '1.5rem' } }, 'Save Settings')
+        )
+      );
+    }
+
     function Dashboard(props) {
+      var user = props.user;
+      var onLogout = props.onLogout;
+      var listings = props.listings;
       var stateTab = useState('profile');
       var tab = stateTab[0];
       var setTab = stateTab[1];
-
-      var stateProposals = useState([]);
-      var proposals = stateProposals[0];
-      var setProposals = stateProposals[1];
-
-      useEffect(function() {
-        var data = JSON.parse(localStorage.getItem('ad_proposals') || '[]');
-        setProposals(data);
-      }, []);
-
-      return e('div', { className: 'dashboard-container' },
-        e('h1', { style: { marginBottom: '2rem' } }, 'My Dashboard'),
-        e('div', { className: 'dashboard-tabs' },
-          e('button', { className: 'dashboard-tab' + (tab === 'profile' ? ' active' : ''), onClick: function() { setTab('profile'); } }, 'Profile'),
-          props.user.type === 'Property Owner' && e('button', { className: 'dashboard-tab' + (tab === 'properties' ? ' active' : ''), onClick: function() { setTab('properties'); } }, 'My Properties'),
-          e('button', { className: 'dashboard-tab' + (tab === 'proposals' ? ' active' : ''), onClick: function() { setTab('proposals'); } }, 'Proposals')
-        ),
-        tab === 'profile' && e('div', null,
-          e('div', { style: { background: '#fff', padding: '2rem', borderRadius: '6px', border: '1px solid #ddd' } },
-            e('h3', null, 'Profile Information'),
-            e('p', null, 'Name: ' + props.user.name),
-            e('p', null, 'Email: ' + props.user.email),
-            e('p', null, 'Type: ' + props.user.type)
+      var isHost = user && user.role === 'host';
+      var myProperties = isHost ? listings.filter(function(p) { return p.claimedBy === user.id; }) : [];
+      var unreadMessages = 0;
+      var handleSaveSettings = function(settings) {
+        var updated = Object.assign({}, user, settings);
+        localStorage.setItem('ad_user', JSON.stringify(updated));
+      };
+      return e('div', null,
+        e('div', { className: 'dashboard-container' },
+          e('div', { className: 'dashboard-header' },
+            e('h1', null, 'Welcome, ' + (user ? user.name : 'Guest')),
+            e('p', null, 'Manage your ' + (isHost ? 'properties and bookings' : 'account and messages'))
+          ),
+          e('div', { className: 'dashboard-tabs' },
+            e('button', { className: 'dashboard-tab' + (tab === 'profile' ? ' active' : ''), onClick: function() { setTab('profile'); } }, 'Profile'),
+            !isHost ? e('button', { className: 'dashboard-tab' + (tab === 'messages' ? ' active' : ''), onClick: function() { setTab('messages'); } }, 'Messages', unreadMessages > 0 ? e('span', { className: 'dashboard-tab-badge' }, unreadMessages) : null) : null,
+            isHost ? e('button', { className: 'dashboard-tab' + (tab === 'properties' ? ' active' : ''), onClick: function() { setTab('properties'); } }, 'My Properties') : null,
+            isHost ? e('button', { className: 'dashboard-tab' + (tab === 'settings' ? ' active' : ''), onClick: function() { setTab('settings'); } }, 'Settings') : null,
+            e('button', { className: 'dashboard-tab', onClick: onLogout, style: { marginLeft: 'auto' } }, 'Logout')
+          ),
+          e('div', { className: 'dashboard-content' },
+            tab === 'profile' ? e('div', null,
+              e('h2', null, 'Profile Information'),
+              e('div', { className: 'profile-form' },
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Name'),
+                  e('input', { className: 'form-input', type: 'text', value: user ? user.name : '', disabled: true })
+                ),
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Email'),
+                  e('input', { className: 'form-input', type: 'email', value: user ? user.email : '', disabled: true })
+                ),
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Role'),
+                  e('input', { className: 'form-input', type: 'text', value: user ? user.role : '', disabled: true })
+                )
+              )
+            ) : null,
+            tab === 'messages' ? e(MessagesTab, { user: user }) : null,
+            tab === 'properties' && isHost ? e('div', null,
+              e('h2', null, 'My Properties'),
+              myProperties.length === 0 ?
+                e('p', null, 'You have no claimed properties yet') :
+                myProperties.map(function(prop) {
+                  return e('div', { key: prop.id, style: { marginBottom: '1rem', padding: '1rem', border: '1px solid var(--border-light)', borderRadius: '4px' } },
+                    e('h3', null, prop.name),
+                    e('p', null, prop.type + ' in ' + prop.region)
+                  );
+                })
+            ) : null,
+            tab === 'settings' && isHost ? e(SettingsTab, { user: user, onSaveSettings: handleSaveSettings }) : null
           )
-        ),
-        props.user.type === 'Property Owner' && tab === 'properties' && e('div', null,
-          e('div', { className: 'empty-state' },
-            e('h3', null, 'No Properties Listed'),
-            e('p', null, 'Start by adding your first property to get bookings.')
+        )
+      );
+    }
+
+    function LoginPage(props) {
+      var onLogin = props.onLogin;
+      var stateMode = useState('login');
+      var mode = stateMode[0];
+      var setMode = stateMode[1];
+      var stateEmail = useState('');
+      var email = stateEmail[0];
+      var setEmail = stateEmail[1];
+      var statePassword = useState('');
+      var password = statePassword[0];
+      var setPassword = statePassword[1];
+      var stateName = useState('');
+      var name = stateName[0];
+      var setName = stateName[1];
+      var stateRole = useState('traveler');
+      var role = stateRole[0];
+      var setRole = stateRole[1];
+      var handleLogin = function() {
+        if (!email || !password) {
+          alert('Please fill in all fields');
+          return;
+        }
+        var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
+        var found = users.find(function(u) { return u.email === email && u.password === password; });
+        if (found) {
+          localStorage.setItem('ad_user', JSON.stringify(found));
+          onLogin(found);
+        } else {
+          alert('Invalid email or password. Please sign up first.');
+        }
+      };
+      var handleSignup = function() {
+        if (!name || !email || !password) {
+          alert('Please fill in all fields');
+          return;
+        }
+        var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
+        if (users.find(function(u) { return u.email === email; })) {
+          alert('Email already registered. Please login instead.');
+          return;
+        }
+        var user = {
+          id: 'user-' + Date.now(),
+          email: email,
+          password: password,
+          name: name,
+          role: role,
+          phone: '',
+          whatsapp: '',
+          shareEmail: false,
+          sharePhone: false,
+          shareWhatsapp: false,
+          claimedProperties: []
+        };
+        users.push(user);
+        localStorage.setItem('ad_users', JSON.stringify(users));
+        localStorage.setItem('ad_user', JSON.stringify(user));
+        onLogin(user);
+      };
+      return e('div', { className: 'login-container' },
+        e('div', { className: 'login-form' },
+          e('h2', null, mode === 'login' ? 'Sign In' : 'Create Account'),
+          mode === 'signup' ? e('div', { className: 'form-group' },
+            e('label', { className: 'form-label' }, 'Full Name'),
+            e('input', { className: 'form-input', type: 'text', placeholder: 'Your name', value: name, onChange: function(evt) { setName(evt.target.value); } })
+          ) : null,
+          e('div', { className: 'form-group' },
+            e('label', { className: 'form-label' }, 'Email'),
+            e('input', { className: 'form-input', type: 'email', placeholder: 'your@email.com', value: email, onChange: function(evt) { setEmail(evt.target.value); } })
+          ),
+          e('div', { className: 'form-group' },
+            e('label', { className: 'form-label' }, 'Password'),
+            e('input', { className: 'form-input', type: 'password', placeholder: 'Password', value: password, onChange: function(evt) { setPassword(evt.target.value); } })
+          ),
+          mode === 'signup' ? e('div', { className: 'form-group' },
+            e('label', { className: 'form-label' }, 'I am a...'),
+            e('select', { className: 'form-select', value: role, onChange: function(evt) { setRole(evt.target.value); } },
+              e('option', { value: 'traveler' }, 'Traveler'),
+              e('option', { value: 'host' }, 'Property Owner')
+            )
+          ) : null,
+          e('button', { className: 'form-submit', onClick: mode === 'login' ? handleLogin : handleSignup }, mode === 'login' ? 'Sign In' : 'Create Account'),
+          e('div', { className: 'login-toggle' },
+            e('span', null, mode === 'login' ? "Don't have an account? " : 'Already have an account? '),
+            e('button', { onClick: function() { setMode(mode === 'login' ? 'signup' : 'login'); } }, mode === 'login' ? 'Sign Up' : 'Sign In')
           )
-        ),
-        tab === 'proposals' && e('div', null,
-          proposals.length > 0 ? e('div', null,
-            proposals.map(function(prop, idx) {
-              return e('div', { key: idx, style: { background: '#fff', padding: '1.5rem', borderRadius: '6px', border: '1px solid #ddd', marginBottom: '1rem' } },
-                e('h4', null, prop.propertyName),
-                e('p', null, 'From: ' + prop.name + ' (' + prop.email + ')'),
-                e('p', null, 'Check-in: ' + prop.checkIn + ', Check-out: ' + prop.checkOut),
-                e('p', null, 'Guests: ' + prop.guests),
-                prop.message && e('p', null, 'Message: ' + prop.message)
-              );
-            })
-          ) : e('div', { className: 'empty-state' },
-            e('h3', null, 'No Proposals Yet'),
-            e('p', null, 'When someone sends a proposal, it will appear here.')
+        )
+      );
+    }
+
+    function Navbar(props) {
+      var currentPage = props.currentPage;
+      var onNavigate = props.onNavigate;
+      var user = props.user;
+      var onLogout = props.onLogout;
+      var unreadCount = 0;
+      return e('nav', { className: 'navbar' },
+        e('div', { className: 'navbar-container' },
+          e('a', { className: 'navbar-logo', onClick: function() { onNavigate('home'); } }, 'AffittoDiretto'),
+          e('div', { className: 'navbar-links' },
+            e('a', { className: 'navbar-link' + (currentPage === 'home' ? ' active' : ''), onClick: function() { onNavigate('home'); } }, 'Home'),
+            e('a', { className: 'navbar-link' + (currentPage === 'search' ? ' active' : ''), onClick: function() { onNavigate('search'); } }, 'Search'),
+            e('a', { className: 'navbar-link' + (currentPage === 'map' ? ' active' : ''), onClick: function() { onNavigate('map'); } }, 'Map'),
+            user ? e('a', { className: 'navbar-link' + (currentPage === 'dashboard' ? ' active' : ''), onClick: function() { onNavigate('dashboard'); } }, 'Dashboard', unreadCount > 0 ? e('span', { className: 'unread-badge' }, unreadCount) : null) : null,
+            !user ? e('button', { className: 'btn-primary', onClick: function() { onNavigate('login'); } }, 'Sign In') : e('button', { className: 'btn-secondary', onClick: onLogout }, 'Logout')
           )
         )
       );
@@ -1967,33 +2419,12 @@
 
     function Footer(props) {
       return e('footer', { className: 'footer' },
-        e('div', { className: 'footer-content' },
-          e('div', { className: 'footer-column' },
-            e('h4', null, 'About'),
-            e('a', { href: '#', className: 'footer-link' }, 'About Us'),
-            e('a', { href: '#', className: 'footer-link' }, 'Press'),
-            e('a', { href: '#', className: 'footer-link' }, 'Blog')
-          ),
-          e('div', { className: 'footer-column' },
-            e('h4', null, 'Support'),
-            e('a', { href: '#', className: 'footer-link' }, 'Help Center'),
-            e('a', { href: '#', className: 'footer-link' }, 'Contact Us'),
-            e('a', { href: '#', className: 'footer-link' }, 'Report a Bug')
-          ),
-          e('div', { className: 'footer-column' },
-            e('h4', null, 'Legal'),
-            e('a', { href: '#', className: 'footer-link' }, 'Privacy Policy'),
-            e('a', { href: '#', className: 'footer-link' }, 'Terms of Service'),
-            e('a', { href: '#', className: 'footer-link' }, 'Cookies')
-          ),
-          e('div', { className: 'footer-column' },
-            e('h4', null, 'Connect'),
-            e('a', { href: '#', className: 'footer-link' }, 'Facebook'),
-            e('a', { href: '#', className: 'footer-link' }, 'Twitter'),
-            e('a', { href: '#', className: 'footer-link' }, 'Instagram')
-          )
-        ),
-        e('div', { className: 'footer-bottom' }, '© 2026 AffittoDiretto.it. All rights reserved.')
+        e('p', null, '© 2026 AffittoDiretto.it - Book Direct in Italy'),
+        e('div', { className: 'footer-links' },
+          e('a', { href: '#' }, 'Privacy'),
+          e('a', { href: '#' }, 'Terms'),
+          e('a', { href: '#' }, 'Contact')
+        )
       );
     }
 
@@ -2001,81 +2432,75 @@
       var stateListings = useState([]);
       var listings = stateListings[0];
       var setListings = stateListings[1];
-
-      var stateLoading = useState(true);
-      var loading = stateLoading[0];
-      var setLoading = stateLoading[1];
-
-      var statePage = useState('home');
-      var currentPage = statePage[0];
-      var setCurrentPage = statePage[1];
-
+      var stateCurrentPage = useState('home');
+      var currentPage = stateCurrentPage[0];
+      var setCurrentPage = stateCurrentPage[1];
       var statePageState = useState({});
       var pageState = statePageState[0];
       var setPageState = statePageState[1];
-
       var stateUser = useState(null);
       var user = stateUser[0];
       var setUser = stateUser[1];
-
-      var stateSearchCity = useState('');
-      var searchCity = stateSearchCity[0];
-      var setSearchCity = stateSearchCity[1];
-
+      var stateNavHistory = useState([]);
+      var navHistory = stateNavHistory[0];
+      var setNavHistory = stateNavHistory[1];
       useEffect(function() {
         var parsed = parseListings();
         setListings(parsed);
-        setLoading(false);
-        var savedUser = localStorage.getItem('ad_current_user');
-        if (savedUser) setUser(JSON.parse(savedUser));
+        var savedUser = localStorage.getItem('ad_user');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
       }, []);
-
+      var currentProperty = useMemo(function() {
+        if (currentPage !== 'detail' || !pageState.propertyId) return null;
+        return listings.find(function(p) { return p.id === pageState.propertyId; });
+      }, [listings, currentPage, pageState]);
       var handleNavigate = function(page, state) {
+        var newHistory = navHistory.slice();
+        newHistory.push({ page: currentPage, state: pageState });
+        setNavHistory(newHistory);
         setCurrentPage(page);
         if (state) setPageState(state);
+        window.scrollTo(0, 0);
       };
-
-      var currentProperty = useMemo(function() {
-        var id = sessionStorage.getItem('ad_current_property');
-        return listings.find(function(l) { return l.id === id; });
-      }, [listings]);
-
-      if (loading) {
-        return e('div', { style: { padding: '2rem', textAlign: 'center', fontSize: '1.2rem' } }, 'Loading properties...');
-      }
-
-      var page = null;
-      switch (currentPage) {
-        case 'home':
-          page = e(HomePage, { listings: listings, searchCity: searchCity, setSearchCity: setSearchCity, onNavigate: handleNavigate });
-          break;
-        case 'search':
-          page = e(SearchPage, { listings: listings, initialCity: pageState.city || '', onNavigate: handleNavigate });
-          break;
-        case 'map':
-          page = e(MapPage, { listings: listings, onNavigate: handleNavigate });
-          break;
-        case 'detail':
-          page = e(PropertyDetail, { currentProperty: currentProperty, onNavigate: handleNavigate });
-          break;
-        case 'login':
-          page = e(LoginPage, { setUser: setUser, onNavigate: handleNavigate });
-          break;
-        case 'dashboard':
-          page = user ? e(Dashboard, { user: user, onNavigate: handleNavigate }) : e('div', null, 'Not logged in');
-          break;
-        default:
-          page = e(HomePage, { listings: listings, searchCity: searchCity, setSearchCity: setSearchCity, onNavigate: handleNavigate });
-      }
-
+      var handleBack = function() {
+        if (navHistory.length > 0) {
+          var prev = navHistory[navHistory.length - 1];
+          setNavHistory(navHistory.slice(0, -1));
+          setCurrentPage(prev.page);
+          if (prev.state) setPageState(prev.state);
+        } else {
+          setCurrentPage('home');
+        }
+      };
+      var handleSelectProperty = function(prop) {
+        var newHistory = navHistory.slice();
+        newHistory.push({ page: currentPage, state: pageState });
+        setNavHistory(newHistory);
+        setCurrentPage('detail');
+        setPageState({ propertyId: prop.id });
+        window.scrollTo(0, 0);
+      };
+      var handleLogout = function() {
+        localStorage.removeItem('ad_user');
+        setUser(null);
+        setCurrentPage('home');
+      };
       return e('div', null,
-        e(Nav, { currentPage: currentPage, user: user, setUser: setUser, onNavigate: handleNavigate }),
-        page,
-        e(Footer, {})
+        e(Navbar, { currentPage: currentPage, onNavigate: handleNavigate, user: user, onLogout: handleLogout }),
+        currentPage === 'home' ? e(HomePage, { listings: listings, onSelectProperty: handleSelectProperty }) :
+        currentPage === 'search' ? e(SearchPage, { listings: listings, onSelectProperty: handleSelectProperty, onNavigate: function() { handleNavigate('home'); } }) :
+        currentPage === 'map' ? e(MapPage, { listings: listings, onSelectProperty: handleSelectProperty, onNavigate: function() { handleNavigate('home'); } }) :
+        currentPage === 'detail' ? e(PropertyDetail, { currentProperty: currentProperty, onNavigate: handleNavigate, handleBack: handleBack, user: user }) :
+        currentPage === 'login' ? e(LoginPage, { onLogin: function(u) { setUser(u); setCurrentPage('dashboard'); } }) :
+        currentPage === 'dashboard' ? e(Dashboard, { user: user, onLogout: handleLogout, listings: listings }) :
+        e('div', null),
+        e(Footer, null)
       );
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(e(App, {}));
+    ReactDOM.createRoot(document.getElementById('root')).render(e(App, null));
   </script>
 </body>
 </html>
