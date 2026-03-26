@@ -3200,6 +3200,245 @@
       );
     }
 
+    function OutreachTab(props) {
+      var listings = props.listings;
+      var stateEmailProvider = useState('brevo');
+      var emailProvider = stateEmailProvider[0];
+      var setEmailProvider = stateEmailProvider[1];
+      var stateApiKey = useState('');
+      var apiKey = stateApiKey[0];
+      var setApiKey = stateApiKey[1];
+      var stateSenderEmail = useState('info@directbookingsitaly.com');
+      var senderEmail = stateSenderEmail[0];
+      var setSenderEmail = stateSenderEmail[1];
+      var stateSenderName = useState('Direct Bookings Italy');
+      var senderName = stateSenderName[0];
+      var setSenderName = stateSenderName[1];
+      var stateDailyLimit = useState(300);
+      var dailyLimit = stateDailyLimit[0];
+      var setDailyLimit = stateDailyLimit[1];
+      var stateShowEmailConfig = useState(false);
+      var showEmailConfig = stateShowEmailConfig[0];
+      var setShowEmailConfig = stateShowEmailConfig[1];
+      var stateEmailStatus = useState('not-started');
+      var emailStatus = stateEmailStatus[0];
+      var setEmailStatus = stateEmailStatus[1];
+      var stateShowWhatsappUpload = useState(false);
+      var showWhatsappUpload = stateShowWhatsappUpload[0];
+      var setShowWhatsappUpload = stateShowWhatsappUpload[1];
+      var stateTestEmail = useState('');
+      var testEmail = stateTestEmail[0];
+      var setTestEmail = stateTestEmail[1];
+      var stateEmailLogs = useState([]);
+      var emailLogs = stateEmailLogs[0];
+      var setEmailLogs = stateEmailLogs[1];
+      var stateTemplateIt = useState('Caro proprietario,\n\nDesideriamo invitarvi a lisciare la vostra proprietà su Direct Bookings Italy.\n\nAccedi: [LINK]?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim\n\nSaluti cordiali,\nDirect Bookings Italy');
+      var templateIt = stateTemplateIt[0];
+      var setTemplateIt = stateTemplateIt[1];
+      var stateTemplateEn = useState('Dear Property Owner,\n\nWe invite you to list your property on Direct Bookings Italy.\n\nClaim your property: [LINK]?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim\n\nBest regards,\nDirect Bookings Italy');
+      var templateEn = stateTemplateEn[0];
+      var setTemplateEn = stateTemplateEn[1];
+      var stateEditTemplate = useState(null);
+      var editTemplate = stateEditTemplate[0];
+      var setEditTemplate = stateEditTemplate[1];
+
+      var loadLocalStorage = function() {
+        var saved = JSON.parse(localStorage.getItem('dbi_outreach_stats') || '{"emailsSent":0,"whatsappSent":0,"linkClicks":0,"claims":0}');
+        return saved;
+      };
+
+      var stats = useMemo(function() {
+        var saved = loadLocalStorage();
+        return {
+          reachable: 29047,
+          whatsappContacts: 13337,
+          emailContacts: 15710,
+          emailsSent: saved.emailsSent || 0,
+          whatsappSent: saved.whatsappSent || 0,
+          linkClicks: saved.linkClicks || 0,
+          claims: saved.claims || 0
+        };
+      }, []);
+
+      var saveStats = function(newStats) {
+        localStorage.setItem('dbi_outreach_stats', JSON.stringify(newStats));
+      };
+
+      var sendBrevoEmail = function(to, subject, htmlContent) {
+        var payload = {
+          sender: { email: senderEmail, name: senderName },
+          to: [{ email: to }],
+          subject: subject,
+          htmlContent: htmlContent
+        };
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://api.brevo.com/v3/smtp/email', true);
+        xhr.setRequestHeader('api-key', apiKey);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function() {
+          if (xhr.status === 201) {
+            var newLogs = emailLogs.slice();
+            newLogs.unshift({ timestamp: new Date().toLocaleString(), email: to, subject: subject, status: 'sent' });
+            if (newLogs.length > 20) newLogs = newLogs.slice(0, 20);
+            setEmailLogs(newLogs);
+            var updated = Object.assign({}, loadLocalStorage(), { emailsSent: stats.emailsSent + 1 });
+            saveStats(updated);
+          }
+        };
+        xhr.onerror = function() {
+          var newLogs = emailLogs.slice();
+          newLogs.unshift({ timestamp: new Date().toLocaleString(), email: to, subject: subject, status: 'failed' });
+          if (newLogs.length > 20) newLogs = newLogs.slice(0, 20);
+          setEmailLogs(newLogs);
+        };
+        xhr.send(JSON.stringify(payload));
+      };
+
+      var handleSendTestEmail = function() {
+        if (!testEmail || !apiKey) { alert('Please enter test email and API key'); return; }
+        sendBrevoEmail(testEmail, 'Test Email', '<p>This is a test email from Direct Bookings Italy</p>');
+        setTestEmail('');
+      };
+
+      var handleDownloadWhatsappCsv = function() {
+        var csv = 'phone_number,property_name\n';
+        listings.slice(0, 100).forEach(function(l) {
+          if (l.phone) csv += l.phone + ',' + l.name + '\n';
+        });
+        var blob = new Blob([csv], { type: 'text/csv' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'outreach_whatsapp.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      var sty = { padding: '1rem 0' };
+      var cardSty = { background: '#f8f9fa', borderRadius: '8px', padding: '1.5rem', marginBottom: '1rem' };
+      var statCardSty = { background: '#fff', border: '1px solid #ddd', borderRadius: '8px', padding: '1.5rem', textAlign: 'center', minWidth: '140px', flex: '1 1 140px' };
+      var statusBadge = { display: 'inline-block', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600 };
+
+      return e('div', { style: sty },
+        e('h2', null, 'Email & WhatsApp Outreach Campaign'),
+        e('div', { style: { display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2rem', justifyContent: 'flex-start' } },
+          e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: 'var(--primary-blue)' } }, stats.reachable.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Total Reachable')),
+          e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#16a34a' } }, stats.whatsappContacts.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'WhatsApp Contacts')),
+          e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#0066d4' } }, stats.emailContacts.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Email Contacts')),
+          e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#f59e0b' } }, stats.emailsSent.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Emails Sent')),
+          e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#8b5cf6' } }, stats.whatsappSent.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'WhatsApp Sent')),
+          e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#ec4899' } }, stats.linkClicks.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Link Clicks')),
+          e('div', statCardSty, e('div', { style: { fontSize: '1.6rem', fontWeight: 700, color: '#0d7377' } }, stats.claims.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Claims from Outreach'))
+        ),
+        e('div', { style: { borderTop: '2px solid #ddd', paddingTop: '2rem' } },
+          e('h3', { style: { marginBottom: '1rem' } }, 'Email Campaign'),
+          e('div', cardSty,
+            e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' } },
+              e('div', null,
+                e('strong', null, 'Status: '),
+                e('span', Object.assign({}, statusBadge, { background: emailStatus === 'not-started' ? '#e5e7eb' : emailStatus === 'in-progress' ? '#fbbf24' : '#d1fae5', color: emailStatus === 'not-started' ? '#666' : emailStatus === 'in-progress' ? '#92400e' : '#065f46' }), emailStatus.replace('-', ' ').toUpperCase())
+              ),
+              e('button', { onClick: function() { setShowEmailConfig(!showEmailConfig); }, style: { background: 'var(--primary-blue)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' } }, showEmailConfig ? 'Hide Config' : 'Configure Email')
+            ),
+            showEmailConfig ? e('div', { style: { background: '#f3f4f6', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' } },
+              e('div', { style: { marginBottom: '0.75rem' } },
+                e('label', { style: { display: 'block', fontWeight: 600, marginBottom: '0.25rem' } }, 'API Provider:'),
+                e('select', { value: emailProvider, onChange: function(ev) { setEmailProvider(ev.target.value); }, style: { width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' } },
+                  e('option', { value: 'brevo' }, 'Brevo (Sendinblue)'),
+                  e('option', { value: 'sendgrid' }, 'SendGrid'),
+                  e('option', { value: 'mailchimp' }, 'Mailchimp')
+                )
+              ),
+              e('div', { style: { marginBottom: '0.75rem' } },
+                e('label', { style: { display: 'block', fontWeight: 600, marginBottom: '0.25rem' } }, 'API Key:'),
+                e('input', { type: 'password', value: apiKey, onChange: function(ev) { setApiKey(ev.target.value); }, placeholder: 'Your Brevo API key', style: { width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' } })
+              ),
+              e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' } },
+                e('div', null,
+                  e('label', { style: { display: 'block', fontWeight: 600, marginBottom: '0.25rem' } }, 'Sender Email:'),
+                  e('input', { type: 'email', value: senderEmail, onChange: function(ev) { setSenderEmail(ev.target.value); }, style: { width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' } })
+                ),
+                e('div', null,
+                  e('label', { style: { display: 'block', fontWeight: 600, marginBottom: '0.25rem' } }, 'Sender Name:'),
+                  e('input', { type: 'text', value: senderName, onChange: function(ev) { setSenderName(ev.target.value); }, style: { width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' } })
+                )
+              ),
+              e('div', { style: { marginBottom: '0.75rem' } },
+                e('label', { style: { display: 'block', fontWeight: 600, marginBottom: '0.25rem' } }, 'Daily Send Limit:'),
+                e('input', { type: 'number', value: dailyLimit, onChange: function(ev) { setDailyLimit(parseInt(ev.target.value) || 300); }, style: { width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' } })
+              ),
+              e('div', { style: { display: 'flex', gap: '0.5rem' } },
+                e('input', { type: 'email', value: testEmail, onChange: function(ev) { setTestEmail(ev.target.value); }, placeholder: 'Test email address', style: { flex: 1, padding: '8px', borderRadius: '4px', border: '1px solid #ddd' } }),
+                e('button', { onClick: handleSendTestEmail, style: { background: '#0d7377', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' } }, 'Send Test')
+              )
+            ) : null
+          ),
+          e('div', { style: { background: '#fff', border: '1px solid #ddd', borderRadius: '8px', padding: '1rem' } },
+            e('h4', null, 'Recent Sends (Last 20)'),
+            emailLogs.length === 0 ? e('p', { style: { color: '#888', fontSize: '0.9rem' } }, 'No sends yet') :
+            e('div', { style: { maxHeight: '300px', overflowY: 'auto' } },
+              emailLogs.map(function(log) {
+                return e('div', { key: log.timestamp + log.email, style: { display: 'flex', justifyContent: 'space-between', padding: '0.5rem', borderBottom: '1px solid #f0f0f0', fontSize: '0.85rem' } },
+                  e('div', null, log.timestamp, e('br'), log.email),
+                  e('span', { style: { background: log.status === 'sent' ? '#dcfce7' : '#fee2e2', color: log.status === 'sent' ? '#166534' : '#991b1b', padding: '2px 8px', borderRadius: '4px', fontWeight: 500 } }, log.status.toUpperCase())
+                );
+              })
+            )
+          )
+        ),
+        e('div', { style: { borderTop: '2px solid #ddd', paddingTop: '2rem', marginTop: '2rem' } },
+          e('h3', { style: { marginBottom: '1rem' } }, 'WhatsApp Campaign'),
+          e('div', cardSty,
+            e('div', { style: { marginBottom: '1rem' } },
+              e('strong', null, 'Status: '),
+              e('span', Object.assign({}, statusBadge, { background: '#e0f2fe', color: '#0369a1' }), 'Ready to Send')
+            ),
+            e('div', { style: { marginBottom: '1rem', padding: '1rem', background: '#f0f9ff', borderRadius: '8px', borderLeft: '4px solid #0369a1' } },
+              e('p', null, 'Download the WhatsApp contact list below. Use WATI.io or Twilio to send messages. After sending, upload the results CSV to track responses.')
+            ),
+            e('button', { onClick: handleDownloadWhatsappCsv, style: { background: '#16a34a', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '4px', cursor: 'pointer', marginRight: '0.5rem' } }, 'Download WhatsApp CSV'),
+            e('button', { onClick: function() { setShowWhatsappUpload(!showWhatsappUpload); }, style: { background: '#0066d4', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '4px', cursor: 'pointer' } }, showWhatsappUpload ? 'Hide Upload' : 'Upload Results'),
+            showWhatsappUpload ? e('div', { style: { marginTop: '1rem', padding: '1rem', background: '#f3f4f6', borderRadius: '8px' } },
+              e('p', { style: { fontSize: '0.85rem', marginBottom: '0.5rem' } }, 'Upload CSV with columns: phone_number, property_name, status (responded/no-response)'),
+              e('input', { type: 'file', accept: '.csv', style: { marginBottom: '0.5rem', display: 'block' } })
+            ) : null
+          )
+        ),
+        e('div', { style: { borderTop: '2px solid #ddd', paddingTop: '2rem', marginTop: '2rem' } },
+          e('h3', { style: { marginBottom: '1rem' } }, 'Email Templates'),
+          e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' } },
+            e('div', cardSty,
+              e('h4', null, 'Italian Template'),
+              e('div', { style: { background: '#fff', padding: '1rem', borderRadius: '4px', minHeight: '200px', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '0.5rem', border: '1px solid #e5e7eb', whiteSpace: 'pre-wrap', wordBreak: 'break-word' } }, templateIt),
+              e('button', { onClick: function() { setEditTemplate('it'); }, style: { background: 'var(--primary-blue)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' } }, 'Edit')
+            ),
+            e('div', cardSty,
+              e('h4', null, 'English Template'),
+              e('div', { style: { background: '#fff', padding: '1rem', borderRadius: '4px', minHeight: '200px', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '0.5rem', border: '1px solid #e5e7eb', whiteSpace: 'pre-wrap', wordBreak: 'break-word' } }, templateEn),
+              e('button', { onClick: function() { setEditTemplate('en'); }, style: { background: 'var(--primary-blue)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' } }, 'Edit')
+            )
+          ),
+          editTemplate ? e('div', { style: { marginTop: '1rem', padding: '1rem', background: '#fef3c7', borderRadius: '8px', border: '2px solid #f59e0b' } },
+            e('h4', null, 'Editing ' + (editTemplate === 'it' ? 'Italian' : 'English') + ' Template'),
+            e('textarea', { value: editTemplate === 'it' ? templateIt : templateEn, onChange: function(ev) { if (editTemplate === 'it') setTemplateIt(ev.target.value); else setTemplateEn(ev.target.value); }, style: { width: '100%', minHeight: '200px', padding: '0.75rem', borderRadius: '4px', border: '1px solid #ddd', fontFamily: 'monospace', fontSize: '0.85rem', marginBottom: '0.5rem' } }),
+            e('div', { style: { display: 'flex', gap: '0.5rem' } },
+              e('button', { onClick: function() { if (editTemplate === 'it') localStorage.setItem('dbi_email_template_it', templateIt); else localStorage.setItem('dbi_email_template_en', templateEn); setEditTemplate(null); }, style: { background: '#0d7377', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' } }, 'Save'),
+              e('button', { onClick: function() { setEditTemplate(null); }, style: { background: '#888', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' } }, 'Cancel')
+            )
+          ) : null
+        ),
+        e('div', { style: { borderTop: '2px solid #ddd', paddingTop: '2rem', marginTop: '2rem' } },
+          e('h3', { style: { marginBottom: '1rem' } }, 'Tracking Info'),
+          e('div', cardSty,
+            e('p', { style: { color: '#666', marginBottom: '1rem' } }, 'All outreach links include UTM parameters for tracking. Tracked visits appear below:'),
+            e('div', { style: { background: '#fff', border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', maxHeight: '300px', overflowY: 'auto' } },
+              e('p', { style: { color: '#888', fontSize: '0.9rem' } }, 'No tracked visits yet. UTM parameters: ?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim')
+            )
+          )
+        )
+      );
+    }
+
     function AdminPanel(props) {
       var listings = props.listings;
       var stateAdminTab = useState('stats');
@@ -3274,6 +3513,7 @@
           e('button', { className: 'dashboard-tab' + (adminTab === 'users' ? ' active' : ''), onClick: function() { setAdminTab('users'); } }, 'Users'),
           e('button', { className: 'dashboard-tab' + (adminTab === 'conversations' ? ' active' : ''), onClick: function() { setAdminTab('conversations'); } }, 'Messages'),
           e('button', { className: 'dashboard-tab' + (adminTab === 'featured' ? ' active' : ''), onClick: function() { setAdminTab('featured'); } }, 'Featured'),
+          e('button', { className: 'dashboard-tab' + (adminTab === 'outreach' ? ' active' : ''), onClick: function() { setAdminTab('outreach'); } }, 'Outreach'),
           e('button', { className: 'dashboard-tab', onClick: props.onBack, style: { marginLeft: 'auto' } }, 'Exit Admin')
         ),
         notice ? e('div', { style: { padding: '0.75rem 1rem', margin: '0.5rem 0', borderRadius: '8px', background: notice.type === 'success' ? '#e8f5e9' : '#fce4ec', color: notice.type === 'success' ? '#2e7d32' : '#c62828', fontWeight: 500 } }, notice.text) : null,
@@ -3377,7 +3617,8 @@
                 e('span', { style: { color: '#f59e0b', marginLeft: '0.5rem' } }, prop.googleRating.toFixed(1) + '/5 (' + prop.googleReviews.toLocaleString() + ' reviews)')
               );
             })
-          ) : null
+          ) : null,
+          adminTab === 'outreach' ? e(OutreachTab, { listings: listings }) : null
         )
       );
     }
@@ -3703,6 +3944,24 @@
         var savedConvs = localStorage.getItem('ad_conversations');
         if (savedConvs) {
           setConversations(JSON.parse(savedConvs));
+        }
+        // UTM tracking for outreach campaigns
+        var urlParams = new URLSearchParams(window.location.search);
+        var utmSource = urlParams.get('utm_source');
+        if (utmSource) {
+          var trackEntry = {
+            timestamp: new Date().toISOString(),
+            source: utmSource,
+            medium: urlParams.get('utm_medium') || '',
+            campaign: urlParams.get('utm_campaign') || '',
+            page: window.location.hash || '#/home'
+          };
+          var tracks = JSON.parse(localStorage.getItem('dbi_outreach_tracks') || '[]');
+          tracks.push(trackEntry);
+          localStorage.setItem('dbi_outreach_tracks', JSON.stringify(tracks));
+          var stats = JSON.parse(localStorage.getItem('dbi_outreach_stats') || '{"emailsSent":0,"whatsappSent":0,"linkClicks":0,"claims":0}');
+          stats.linkClicks = (stats.linkClicks || 0) + 1;
+          localStorage.setItem('dbi_outreach_stats', JSON.stringify(stats));
         }
       }, []);
 
