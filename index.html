@@ -67,11 +67,18 @@
     }
 
     .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--primary-blue);
       cursor: pointer;
       text-decoration: none;
+    }
+    .navbar-logo img {
+      height: 38px;
+      width: auto;
     }
 
     .navbar-links {
@@ -1362,7 +1369,23 @@
       .value-props {
         grid-template-columns: 1fr;
       }
+      .booking-channels { flex-wrap: wrap; }
     }
+    .booking-channels {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.75rem;
+    }
+    .booking-channel {
+      display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px;
+      border-radius: 6px; font-size: 0.78rem; font-weight: 500;
+      border: 1px solid #e0e0e0; background: #fafafa; color: #444;
+      text-decoration: none; cursor: default; transition: all 0.15s;
+    }
+    .booking-channel.active { background: #e8f5e9; border-color: #4caf50; color: #2e7d32; cursor: pointer; }
+    .booking-channel.active:hover { background: #c8e6c9; }
+    .booking-channel.inactive { background: #f5f5f5; border-color: #e0e0e0; color: #bbb; }
+    .booking-channel .channel-icon { font-size: 1rem; }
+    .booking-channel-section { margin-top: 1rem; }
+    .booking-channel-section h4 { font-size: 0.85rem; color: #666; margin-bottom: 0.4rem; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -1531,6 +1554,32 @@
       return REGION_PHOTOS[prop.regionCode] || REGION_PHOTOS[0];
     }
 
+    var CITY_ALIASES = {
+      'ROME': 'ROMA', 'MILAN': 'MILANO', 'FLORENCE': 'FIRENZE', 'VENICE': 'VENEZIA',
+      'NAPLES': 'NAPOLI', 'TURIN': 'TORINO', 'GENOA': 'GENOVA', 'PADUA': 'PADOVA',
+      'SYRACUSE': 'SIRACUSA', 'MANTUA': 'MANTOVA', 'LEGHORN': 'LIVORNO',
+      'SARDINIA': 'SARDEGNA', 'SICILY': 'SICILIA', 'CAPRI': 'CAPRI',
+      'SORRENTO': 'SORRENTO', 'AMALFI': 'AMALFI', 'COMO': 'COMO',
+      'VERONA': 'VERONA', 'PISA': 'PISA', 'SIENA': 'SIENA', 'LUCCA': 'LUCCA',
+      'ASSISI': 'ASSISI', 'PERUGIA': 'PERUGIA', 'PARMA': 'PARMA', 'BOLOGNA': 'BOLOGNA',
+      'BARI': 'BARI', 'PALERMO': 'PALERMO', 'CATANIA': 'CATANIA', 'TAORMINA': 'TAORMINA',
+      'RIMINI': 'RIMINI', 'RAVENNA': 'RAVENNA', 'TRIESTE': 'TRIESTE', 'BERGAMO': 'BERGAMO',
+      'BRESCIA': 'BRESCIA', 'MODENA': 'MODENA', 'TRENTO': 'TRENTO', 'BOLZANO': 'BOLZANO',
+      'CAGLIARI': 'CAGLIARI', 'SASSARI': 'SASSARI', 'TREVISO': 'TREVISO',
+      'UDINE': 'UDINE', 'LECCE': 'LECCE', 'REGGIO CALABRIA': 'REGGIO DI CALABRIA',
+      'CORTONA': 'CORTONA', 'POSITANO': 'POSITANO', 'PORTOFINO': 'PORTOFINO',
+      'CINQUE TERRE': 'RIOMAGGIORE', 'LAKE COMO': 'COMO', 'LAKE GARDA': 'DESENZANO DEL GARDA',
+      'TROPEA': 'TROPEA', 'MATERA': 'MATERA', 'ORVIETO': 'ORVIETO',
+      'SAN GIMIGNANO': 'SAN GIMIGNANO', 'ALBA': 'ALBA', 'ASTI': 'ASTI',
+      'NOVARA': 'NOVARA', 'CREMONA': 'CREMONA', 'STRESA': 'STRESA'
+    };
+    var REVERSE_ALIASES = {};
+    Object.keys(CITY_ALIASES).forEach(function(eng) {
+      var it = CITY_ALIASES[eng];
+      if (!REVERSE_ALIASES[it]) REVERSE_ALIASES[it] = [];
+      REVERSE_ALIASES[it].push(eng);
+    });
+
     function buildCommunesByAllRegions(listings) {
       var allCommunes = new Set();
       listings.forEach(function(l) { allCommunes.add(l.comune); });
@@ -1613,23 +1662,84 @@
       var prop = props.prop;
       var onSelect = props.onSelect;
       var amenities = getTopAmenities(prop);
-      var price = estimatePrice(prop);
+      var price = prop.googlePrice || estimatePrice(prop);
+      var imgSrc = prop.googleImage || getCardImage(prop);
       return e('div', { className: 'property-card', onClick: function() { onSelect(prop); } },
         e('div', { className: 'card-image' },
           prop.verified ? e('div', { className: 'verified-badge' }, 'VERIFIED') : null,
-          e('img', { src: getCardImage(prop), alt: prop.name }),
-          e('div', { className: 'sample-label' }, 'Sample')
+          e('img', { src: imgSrc, alt: prop.name }),
+          !prop.googleImage ? e('div', { className: 'sample-label' }, 'Sample') : null
         ),
         e('div', { className: 'card-content' },
           e('div', { className: 'card-name' }, prop.name),
-          e('div', { className: 'card-meta' }, prop.type + ' • ' + prop.region),
-          e('div', { className: 'card-stars' }, renderStars(prop.stars)),
+          e('div', { className: 'card-meta' }, prop.type + ' • ' + prop.comune + ', ' + prop.region),
+          prop.googleRating ? e('div', { className: 'card-stars', style: { color: '#f59e0b', fontWeight: 600 } }, prop.googleRating.toFixed(1) + '/5 (' + prop.googleReviews.toLocaleString() + ' reviews)') : e('div', { className: 'card-stars' }, renderStars(prop.stars)),
           e('div', { className: 'card-amenities' },
             amenities.map(function(amenity) {
               return e('span', { className: 'amenity-chip', key: amenity }, amenity);
             })
           ),
           e('div', { className: 'price-tag-small' }, 'From €' + price + '/night')
+        )
+      );
+    }
+
+    function BookingChannels(props) {
+      var prop = props.prop;
+      var compact = props.compact;
+      var channels = [];
+      if (prop.hasGoogle) {
+        channels.push({ key: 'google', icon: '🔍', label: 'Google', active: true, url: 'https://www.google.com/travel/hotels/s/' + encodeURIComponent(prop.name + ' ' + prop.comune + ' Italy') });
+      } else {
+        channels.push({ key: 'google', icon: '🔍', label: 'Google', active: false });
+      }
+      channels.push({ key: 'booking', icon: '🏨', label: 'Booking.com', active: false, note: 'Coming soon' });
+      if (prop.website) {
+        var wsUrl = prop.website.indexOf('http') === 0 ? prop.website : 'https://' + prop.website;
+        channels.push({ key: 'website', icon: '🌐', label: 'Website', active: true, url: wsUrl });
+      } else {
+        channels.push({ key: 'website', icon: '🌐', label: 'Website', active: false });
+      }
+      channels.push({ key: 'phone', icon: '📞', label: 'Phone', active: prop.verified, note: prop.verified ? 'Contact host' : 'Claim to add' });
+      channels.push({ key: 'email', icon: '✉', label: 'Email', active: prop.verified, note: prop.verified ? 'Contact host' : 'Claim to add' });
+      channels.push({ key: 'whatsapp', icon: '💬', label: 'WhatsApp', active: prop.verified, note: prop.verified ? 'Message host' : 'Claim to add' });
+      if (compact) {
+        var activeCount = channels.filter(function(c) { return c.active; }).length;
+        return e('div', { className: 'booking-channels' },
+          channels.slice(0, 4).map(function(ch) {
+            return e(ch.active && ch.url ? 'a' : 'span', {
+              key: ch.key,
+              className: 'booking-channel ' + (ch.active ? 'active' : 'inactive'),
+              href: ch.active && ch.url ? ch.url : undefined,
+              target: ch.active && ch.url ? '_blank' : undefined,
+              rel: ch.active && ch.url ? 'noopener noreferrer' : undefined,
+              onClick: ch.active && ch.url ? function(evt) { evt.stopPropagation(); } : undefined,
+              title: ch.note || ''
+            },
+              e('span', { className: 'channel-icon' }, ch.icon),
+              !compact ? ch.label : null
+            );
+          }),
+          activeCount > 4 ? e('span', { className: 'booking-channel active', style: { fontSize: '0.7rem' } }, '+' + (activeCount - 4)) : null
+        );
+      }
+      return e('div', { className: 'booking-channel-section' },
+        e('h4', null, 'Booking Channels'),
+        e('div', { className: 'booking-channels' },
+          channels.map(function(ch) {
+            return e(ch.active && ch.url ? 'a' : 'span', {
+              key: ch.key,
+              className: 'booking-channel ' + (ch.active ? 'active' : 'inactive'),
+              href: ch.active && ch.url ? ch.url : undefined,
+              target: ch.active && ch.url ? '_blank' : undefined,
+              rel: ch.active && ch.url ? 'noopener noreferrer' : undefined,
+              title: ch.note || ''
+            },
+              e('span', { className: 'channel-icon' }, ch.icon),
+              ch.label,
+              !ch.active ? e('span', { style: { fontSize: '0.65rem', color: '#bbb' } }, ' N/A') : null
+            );
+          })
         )
       );
     }
@@ -1667,6 +1777,7 @@
               return e('span', { className: 'amenity-chip', key: amenity }, amenity);
             })
           ),
+          e(BookingChannels, { prop: prop, compact: true }),
           e('div', { className: 'h-card-footer' },
             e('button', { className: 'h-card-button', onClick: function(evt) { evt.stopPropagation(); onSelect(prop); } }, 'View Details')
           )
@@ -1678,7 +1789,11 @@
       var listings = props.listings;
       var onSelectProperty = props.onSelectProperty;
       var onNavigate = props.onNavigate;
-      var featuredListings = listings.slice(0, 6);
+      var featuredListings = useMemo(function() {
+        return listings.filter(function(l) { return l.hasGoogle && l.googleRating; })
+          .sort(function(a, b) { return (b.googleRating * 1000 + b.googleReviews) - (a.googleRating * 1000 + a.googleReviews); })
+          .slice(0, 6);
+      }, [listings]);
 
       var stateQuery = useState('');
       var query = stateQuery[0];
@@ -1692,12 +1807,34 @@
       var filteredCities = useMemo(function() {
         if (!query || query.length < 2) return [];
         var q = query.toUpperCase();
-        return allCities.filter(function(c) { return c.indexOf(q) === 0; }).slice(0, 8);
+        var aliasTarget = CITY_ALIASES[q];
+        var results = [];
+        var seen = new Set();
+        if (aliasTarget) {
+          allCities.forEach(function(c) {
+            if (c === aliasTarget && !seen.has(c)) { seen.add(c); results.push(c); }
+          });
+        }
+        allCities.forEach(function(c) {
+          if (c.indexOf(q) === 0 && !seen.has(c)) { seen.add(c); results.push(c); }
+        });
+        allCities.forEach(function(c) {
+          if (c.indexOf(q) !== -1 && c.indexOf(q) !== 0 && !seen.has(c)) { seen.add(c); results.push(c); }
+        });
+        Object.keys(CITY_ALIASES).forEach(function(eng) {
+          if (eng.indexOf(q) !== -1 && !seen.has(CITY_ALIASES[eng])) {
+            var target = CITY_ALIASES[eng];
+            if (allCities.indexOf(target) !== -1) { seen.add(target); results.push(target); }
+          }
+        });
+        return results.slice(0, 10);
       }, [query, allCities]);
 
       var handleSearch = function() {
-        var cityMatch = allCities.find(function(c) { return c === query.toUpperCase(); });
-        onNavigate('search', { initialCity: cityMatch || query.toUpperCase() });
+        var q = query.toUpperCase();
+        var aliasTarget = CITY_ALIASES[q];
+        var cityMatch = allCities.find(function(c) { return c === q; }) || (aliasTarget && allCities.find(function(c) { return c === aliasTarget; }));
+        onNavigate('search', { initialCity: cityMatch || q });
       };
 
       var handleCitySelect = function(city) {
@@ -1719,7 +1856,7 @@
               e('div', { style: { position: 'relative', flex: 1 } },
                 e('input', {
                   type: 'text',
-                  placeholder: 'Where in Italy? (e.g. Roma, Venezia, Firenze...)',
+                  placeholder: 'Where in Italy? Try Rome, Florence, Venice, Milano...',
                   value: query,
                   onChange: function(ev) { setQuery(ev.target.value); setShowDropdown(true); },
                   onFocus: function() { setShowDropdown(true); },
@@ -1732,12 +1869,14 @@
                 },
                   filteredCities.map(function(city) {
                     var count = listings.filter(function(l) { return l.comune === city; }).length;
+                    var engNames = REVERSE_ALIASES[city];
+                    var hint = engNames ? ' (' + engNames[0] + ')' : '';
                     return e('div', {
                       key: city,
                       onMouseDown: function() { handleCitySelect(city); },
                       style: { padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }
                     },
-                      e('span', { style: { fontWeight: 500 } }, city),
+                      e('span', { style: { fontWeight: 500 } }, city, hint ? e('span', { style: { color: '#999', fontWeight: 400, fontSize: '0.85rem' } }, hint) : null),
                       e('span', { style: { color: '#888', fontSize: '0.85rem' } }, count + ' properties')
                     );
                   })
@@ -2187,6 +2326,7 @@
                   })
                 )
               ),
+              e(BookingChannels, { prop: prop, compact: false }),
               prop.lat && prop.lon ? e('div', { className: 'map-embed', id: 'detail-map-' + prop.id, ref: function(el) {
                 if (el && !el.dataset.init) {
                   el.dataset.init = 'true';
@@ -2811,6 +2951,188 @@
       );
     }
 
+    function AdminPanel(props) {
+      var listings = props.listings;
+      var stateAdminTab = useState('stats');
+      var adminTab = stateAdminTab[0];
+      var setAdminTab = stateAdminTab[1];
+      var stateSearch = useState('');
+      var search = stateSearch[0];
+      var setSearch = stateSearch[1];
+      var stateEditProp = useState(null);
+      var editProp = stateEditProp[0];
+      var setEditProp = stateEditProp[1];
+      var stateEditFields = useState({});
+      var editFields = stateEditFields[0];
+      var setEditFields = stateEditFields[1];
+      var stateNotice = useState(null);
+      var notice = stateNotice[0];
+      var setNotice = stateNotice[1];
+
+      var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
+      var conversations = JSON.parse(localStorage.getItem('ad_conversations') || '[]');
+
+      var stats = useMemo(function() {
+        var verified = listings.filter(function(l) { return l.verified; }).length;
+        var enriched = listings.filter(function(l) { return l.hasGoogle; }).length;
+        var withWebsite = listings.filter(function(l) { return l.website; }).length;
+        var withCoords = listings.filter(function(l) { return l.lat && l.lon; }).length;
+        var regions = {};
+        listings.forEach(function(l) { regions[l.region] = (regions[l.region] || 0) + 1; });
+        var types = {};
+        listings.forEach(function(l) { types[l.type] = (types[l.type] || 0) + 1; });
+        return { total: listings.length, verified: verified, enriched: enriched, withWebsite: withWebsite, withCoords: withCoords, regions: regions, types: types, users: users.length, conversations: conversations.length };
+      }, [listings]);
+
+      var filteredProps = useMemo(function() {
+        if (!search || search.length < 2) return [];
+        var q = search.toUpperCase();
+        return listings.filter(function(l) { return l.name.toUpperCase().indexOf(q) !== -1 || l.id.indexOf(q) !== -1 || l.comune.indexOf(q) !== -1; }).slice(0, 20);
+      }, [search, listings]);
+
+      var handleEditProperty = function(prop) {
+        setEditProp(prop);
+        setEditFields({ name: prop.name, stars: prop.stars, beds: prop.beds, rooms: prop.rooms, baths: prop.baths, verified: prop.verified, website: prop.website || '' });
+      };
+
+      var handleSaveEdit = function() {
+        // Save to localStorage overrides
+        var overrides = JSON.parse(localStorage.getItem('ad_admin_overrides') || '{}');
+        overrides[editProp.id] = editFields;
+        localStorage.setItem('ad_admin_overrides', JSON.stringify(overrides));
+        setNotice({ type: 'success', text: 'Changes saved for ' + editProp.name + '. Reload to see updates.' });
+        setEditProp(null);
+      };
+
+      var handleDeleteUser = function(userId) {
+        var u = users.filter(function(usr) { return usr.id !== userId; });
+        localStorage.setItem('ad_users', JSON.stringify(u));
+        setNotice({ type: 'success', text: 'User deleted. Reload to see updates.' });
+      };
+
+      var sty = { padding: '1rem 0' };
+      var cardSty = { background: '#f8f9fa', borderRadius: '8px', padding: '1rem', marginBottom: '0.5rem' };
+      var statCardSty = { background: '#fff', border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', textAlign: 'center', minWidth: '120px' };
+
+      return e('div', { className: 'dashboard-container' },
+        e('div', { className: 'dashboard-header' },
+          e('h1', null, 'Admin Panel'),
+          e('p', null, 'Manage properties, users, and site settings')
+        ),
+        e('div', { className: 'dashboard-tabs' },
+          e('button', { className: 'dashboard-tab' + (adminTab === 'stats' ? ' active' : ''), onClick: function() { setAdminTab('stats'); } }, 'Stats'),
+          e('button', { className: 'dashboard-tab' + (adminTab === 'properties' ? ' active' : ''), onClick: function() { setAdminTab('properties'); } }, 'Properties'),
+          e('button', { className: 'dashboard-tab' + (adminTab === 'users' ? ' active' : ''), onClick: function() { setAdminTab('users'); } }, 'Users'),
+          e('button', { className: 'dashboard-tab' + (adminTab === 'conversations' ? ' active' : ''), onClick: function() { setAdminTab('conversations'); } }, 'Messages'),
+          e('button', { className: 'dashboard-tab' + (adminTab === 'featured' ? ' active' : ''), onClick: function() { setAdminTab('featured'); } }, 'Featured'),
+          e('button', { className: 'dashboard-tab', onClick: props.onBack, style: { marginLeft: 'auto' } }, 'Exit Admin')
+        ),
+        notice ? e('div', { style: { padding: '0.75rem 1rem', margin: '0.5rem 0', borderRadius: '8px', background: notice.type === 'success' ? '#e8f5e9' : '#fce4ec', color: notice.type === 'success' ? '#2e7d32' : '#c62828', fontWeight: 500 } }, notice.text) : null,
+        e('div', { className: 'dashboard-content' },
+          adminTab === 'stats' ? e('div', sty,
+            e('div', { style: { display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.5rem' } },
+              e('div', statCardSty, e('div', { style: { fontSize: '1.8rem', fontWeight: 700, color: 'var(--primary-blue)' } }, stats.total.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Total Listings')),
+              e('div', statCardSty, e('div', { style: { fontSize: '1.8rem', fontWeight: 700, color: 'var(--success)' } }, stats.verified), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Verified')),
+              e('div', statCardSty, e('div', { style: { fontSize: '1.8rem', fontWeight: 700, color: '#4285f4' } }, stats.enriched), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Google Enriched')),
+              e('div', statCardSty, e('div', { style: { fontSize: '1.8rem', fontWeight: 700, color: 'var(--secondary-orange)' } }, stats.withWebsite.toLocaleString()), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Have Website')),
+              e('div', statCardSty, e('div', { style: { fontSize: '1.8rem', fontWeight: 700, color: '#666' } }, stats.users), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Users')),
+              e('div', statCardSty, e('div', { style: { fontSize: '1.8rem', fontWeight: 700, color: '#666' } }, stats.conversations), e('div', { style: { color: '#666', fontSize: '0.85rem' } }, 'Conversations'))
+            ),
+            e('h3', null, 'By Region'),
+            e('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.5rem', marginTop: '0.5rem' } },
+              Object.entries(stats.regions).sort(function(a, b) { return b[1] - a[1]; }).map(function(entry) {
+                return e('div', { key: entry[0], style: { display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0.8rem', background: '#f8f9fa', borderRadius: '4px', fontSize: '0.9rem' } }, e('span', null, entry[0]), e('span', { style: { fontWeight: 600 } }, entry[1].toLocaleString()));
+              })
+            ),
+            e('h3', { style: { marginTop: '1.5rem' } }, 'By Type'),
+            e('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.5rem', marginTop: '0.5rem' } },
+              Object.entries(stats.types).sort(function(a, b) { return b[1] - a[1]; }).map(function(entry) {
+                return e('div', { key: entry[0], style: { display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0.8rem', background: '#f8f9fa', borderRadius: '4px', fontSize: '0.9rem' } }, e('span', null, entry[0]), e('span', { style: { fontWeight: 600 } }, entry[1].toLocaleString()));
+              })
+            )
+          ) : null,
+          adminTab === 'properties' ? e('div', sty,
+            e('input', { className: 'form-input', type: 'text', placeholder: 'Search by name, ID, or city...', value: search, onChange: function(ev) { setSearch(ev.target.value); }, style: { marginBottom: '1rem' } }),
+            editProp ? e('div', { style: { border: '2px solid var(--primary-blue)', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' } },
+              e('h3', null, 'Editing: ' + editProp.name + ' (' + editProp.id + ')'),
+              e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '0.75rem' } },
+                e('div', null, e('label', { className: 'form-label' }, 'Name'), e('input', { className: 'form-input', value: editFields.name, onChange: function(ev) { setEditFields(Object.assign({}, editFields, { name: ev.target.value })); } })),
+                e('div', null, e('label', { className: 'form-label' }, 'Stars'), e('input', { className: 'form-input', type: 'number', min: '0', max: '5', value: editFields.stars, onChange: function(ev) { setEditFields(Object.assign({}, editFields, { stars: parseInt(ev.target.value) || 0 })); } })),
+                e('div', null, e('label', { className: 'form-label' }, 'Beds'), e('input', { className: 'form-input', type: 'number', value: editFields.beds, onChange: function(ev) { setEditFields(Object.assign({}, editFields, { beds: parseInt(ev.target.value) || 0 })); } })),
+                e('div', null, e('label', { className: 'form-label' }, 'Rooms'), e('input', { className: 'form-input', type: 'number', value: editFields.rooms, onChange: function(ev) { setEditFields(Object.assign({}, editFields, { rooms: parseInt(ev.target.value) || 0 })); } })),
+                e('div', null, e('label', { className: 'form-label' }, 'Baths'), e('input', { className: 'form-input', type: 'number', value: editFields.baths, onChange: function(ev) { setEditFields(Object.assign({}, editFields, { baths: parseInt(ev.target.value) || 0 })); } })),
+                e('div', null, e('label', { className: 'form-label' }, 'Website'), e('input', { className: 'form-input', value: editFields.website, onChange: function(ev) { setEditFields(Object.assign({}, editFields, { website: ev.target.value })); } })),
+                e('div', null, e('label', null, e('input', { type: 'checkbox', checked: editFields.verified, onChange: function() { setEditFields(Object.assign({}, editFields, { verified: !editFields.verified })); } }), ' Verified'))
+              ),
+              e('div', { style: { marginTop: '0.75rem', display: 'flex', gap: '0.5rem' } },
+                e('button', { className: 'cta-button', onClick: handleSaveEdit }, 'Save Changes'),
+                e('button', { className: 'back-btn', onClick: function() { setEditProp(null); } }, 'Cancel')
+              )
+            ) : null,
+            filteredProps.map(function(prop) {
+              return e('div', { key: prop.id, style: cardSty },
+                e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+                  e('div', null,
+                    e('strong', null, prop.name),
+                    e('span', { style: { color: '#888', marginLeft: '0.5rem', fontSize: '0.85rem' } }, prop.id),
+                    prop.verified ? e('span', { style: { background: '#0d7377', color: '#fff', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', marginLeft: '0.5rem' } }, 'VERIFIED') : null,
+                    prop.hasGoogle ? e('span', { style: { background: '#4285f4', color: '#fff', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', marginLeft: '0.3rem' } }, 'GOOGLE') : null
+                  ),
+                  e('button', { onClick: function() { handleEditProperty(prop); }, style: { background: 'var(--primary-blue)', color: '#fff', border: 'none', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' } }, 'Edit')
+                ),
+                e('div', { style: { color: '#666', fontSize: '0.85rem', marginTop: '0.25rem' } }, prop.type + ' | ' + prop.comune + ', ' + prop.region + ' | ' + prop.stars + ' stars | ' + prop.beds + ' beds | ' + (prop.website ? 'Has website' : 'No website'))
+              );
+            }),
+            filteredProps.length === 0 && search.length >= 2 ? e('p', { style: { color: '#888' } }, 'No properties found.') : null,
+            search.length < 2 ? e('p', { style: { color: '#888' } }, 'Type at least 2 characters to search ' + listings.length.toLocaleString() + ' properties.') : null
+          ) : null,
+          adminTab === 'users' ? e('div', sty,
+            e('h3', null, users.length + ' Registered Users'),
+            users.map(function(usr) {
+              return e('div', { key: usr.id, style: cardSty },
+                e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+                  e('div', null,
+                    e('strong', null, usr.name),
+                    e('span', { style: { color: '#888', marginLeft: '0.5rem', fontSize: '0.85rem' } }, usr.email),
+                    e('span', { style: { background: usr.role === 'host' ? 'var(--secondary-orange)' : 'var(--primary-blue)', color: '#fff', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', marginLeft: '0.5rem' } }, usr.role)
+                  ),
+                  e('button', { onClick: function() { handleDeleteUser(usr.id); }, style: { background: '#dc2626', color: '#fff', border: 'none', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' } }, 'Delete')
+                ),
+                usr.claimedProperties && usr.claimedProperties.length > 0 ? e('div', { style: { color: '#666', fontSize: '0.85rem', marginTop: '0.25rem' } }, 'Claimed: ' + usr.claimedProperties.join(', ')) : null
+              );
+            })
+          ) : null,
+          adminTab === 'conversations' ? e('div', sty,
+            e('h3', null, conversations.length + ' Conversations'),
+            conversations.map(function(conv) {
+              return e('div', { key: conv.id, style: cardSty },
+                e('div', { style: { display: 'flex', justifyContent: 'space-between' } },
+                  e('strong', null, conv.propertyName),
+                  e('span', { style: { background: conv.status === 'agreed' ? '#0d7377' : conv.status === 'withdrawn' ? '#888' : 'var(--primary-blue)', color: '#fff', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px' } }, conv.status)
+                ),
+                e('div', { style: { color: '#666', fontSize: '0.85rem', marginTop: '0.25rem' } }, 'Guest: ' + conv.guestName + ' | Host: ' + (conv.hostName || 'unclaimed') + ' | ' + conv.checkIn + ' to ' + conv.checkOut)
+              );
+            })
+          ) : null,
+          adminTab === 'featured' ? e('div', sty,
+            e('h3', null, 'Featured Properties Strategy'),
+            e('div', { style: { background: '#fff3cd', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', lineHeight: 1.6 } },
+              e('strong', null, 'Current: '), 'Top 6 by Google rating (free).', e('br'),
+              e('strong', null, 'Planned: '), 'Hosts can pay \u20AC20/month for a featured slot (10 max). Paid featured properties replace the free top-rated ones.', e('br'),
+              e('strong', null, 'Revenue potential: '), '10 slots x \u20AC20/mo = \u20AC200/mo = \u20AC2,400/year'
+            ),
+            e('h4', null, 'Current Featured (Top 6 Google-Rated)'),
+            listings.filter(function(l) { return l.hasGoogle && l.googleRating; }).sort(function(a, b) { return (b.googleRating * 1000 + b.googleReviews) - (a.googleRating * 1000 + a.googleReviews); }).slice(0, 6).map(function(prop) {
+              return e('div', { key: prop.id, style: cardSty },
+                e('strong', null, prop.name), ' - ', prop.comune, ', ', prop.region,
+                e('span', { style: { color: '#f59e0b', marginLeft: '0.5rem' } }, prop.googleRating.toFixed(1) + '/5 (' + prop.googleReviews.toLocaleString() + ' reviews)')
+              );
+            })
+          ) : null
+        )
+      );
+    }
+
     function Dashboard(props) {
       var user = props.user;
       var onLogout = props.onLogout;
@@ -3035,7 +3357,10 @@
 
       return e('nav', { className: 'navbar' },
         e('div', { className: 'navbar-container' },
-          e('a', { className: 'navbar-logo', onClick: function() { onNavigate('home'); } }, 'AffittoDiretto'),
+          e('a', { className: 'navbar-logo', onClick: function() { onNavigate('home'); } },
+            e('img', { src: 'dbi_logo_light.png', alt: 'DBI' }),
+            'AffittoDiretto'
+          ),
           e('div', { className: 'navbar-links' },
             e('a', { className: 'navbar-link' + (currentPage === 'home' ? ' active' : ''), onClick: function() { onNavigate('home'); } }, 'Home'),
             e('a', { className: 'navbar-link' + (currentPage === 'search' ? ' active' : ''), onClick: function() { onNavigate('search'); } }, 'Search'),
@@ -3106,9 +3431,15 @@
         if (savedUser) {
           var u = JSON.parse(savedUser);
           setUser(u);
-          var hash = window.location.hash.replace('#/', '');
-          if (hash === 'dashboard' || hash === 'search' || hash === 'map') {
-            setCurrentPage(hash);
+        }
+        var hash = window.location.hash.replace('#/', '');
+        if (hash === 'dashboard' || hash === 'search' || hash === 'map' || hash === 'admin') {
+          setCurrentPage(hash);
+        } else if (hash.startsWith('property/')) {
+          var propId = hash.split('/')[1];
+          if (propId) {
+            setCurrentPage('detail');
+            setPageState({ propertyId: propId });
           }
         }
         var savedConvs = localStorage.getItem('ad_conversations');
@@ -3149,6 +3480,8 @@
         setNavHistory(newHistory);
         setCurrentPage('detail');
         setPageState({ propertyId: prop.id });
+        var slug = (prop.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 60);
+        window.location.hash = '#/property/' + prop.id + '/' + slug;
         window.scrollTo(0, 0);
       };
 
@@ -3169,8 +3502,9 @@
         currentPage === 'search' ? e(SearchPage, { listings: listings, onSelectProperty: handleSelectProperty, onNavigate: function() { handleNavigate('home'); }, initialCity: pageState && pageState.initialCity ? pageState.initialCity : '' }) :
         currentPage === 'map' ? e(MapPage, { listings: listings, onSelectProperty: handleSelectProperty, onNavigate: function() { handleNavigate('home'); } }) :
         currentPage === 'detail' ? e(PropertyDetail, { currentProperty: currentProperty, onNavigate: handleNavigate, handleBack: handleBack, user: user, onPropertySaved: handlePropertySaved }) :
-        currentPage === 'login' ? e(LoginPage, { onLogin: function(u) { setUser(u); setCurrentPage('dashboard'); } }) :
+        currentPage === 'login' ? e(LoginPage, { onLogin: function(u) { setUser(u); var prev = navHistory.length > 0 ? navHistory[navHistory.length - 1] : null; if (prev && prev.page === 'detail') { setCurrentPage(prev.page); if (prev.state) setPageState(prev.state); } else { setCurrentPage('dashboard'); } } }) :
         currentPage === 'dashboard' ? e(Dashboard, { user: user, onLogout: handleLogout, listings: listings }) :
+        currentPage === 'admin' ? e(AdminPanel, { listings: listings, onBack: function() { handleNavigate('home'); } }) :
         e('div', null),
         e(Footer, null)
       );
