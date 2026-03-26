@@ -186,10 +186,14 @@
       'san giovanni': 'San Giovanni', 'appia': 'Appio', 'tuscolana': 'Tuscolano',
       'prenestina': 'Prenestino', 'casilina': 'Casilino', 'ardeatina': 'Ardeatino',
       'laurentina': 'Laurentino', 'portuense': 'Portuense', 'aurelia': 'Aurelio',
-      'cassia': 'Cassia', 'salaria': 'Salario', 'campitelli': 'Centro Storico',
+      'cassia': 'Cassia', 'salaria': 'Salario', 'campitelli': 'Centro Storico'
+    };
+    const VENICE_STREET_NEIGHBORHOODS = {
       'dorsoduro': 'Dorsoduro', 'cannaregio': 'Cannaregio', 'castello': 'Castello',
       'san marco': 'San Marco', 'san polo': 'San Polo', 'santa croce': 'Santa Croce',
-      'giudecca': 'Giudecca', 'murano': 'Murano', 'burano': 'Burano', 'lido': 'Lido'
+      'giudecca': 'Giudecca', 'murano': 'Murano', 'burano': 'Burano', 'lido': 'Lido',
+      'mestre': 'Mestre', 'marghera': 'Marghera', 'chirignago': 'Chirignago',
+      'zelarino': 'Zelarino', 'favaro': 'Favaro Veneto'
     };
 
     function getNeighborhood(prop) {
@@ -197,7 +201,7 @@
       if (prop.comune === 'VENEZIA' || prop.comune === 'Venezia') {
         if (VENICE_CAP_SESTIERI[prop.cap]) return VENICE_CAP_SESTIERI[prop.cap];
         const addr = ((prop.street || '') + ' ' + (prop.number || '')).toLowerCase();
-        for (const [key, hood] of Object.entries(ROME_STREET_NEIGHBORHOODS)) {
+        for (const [key, hood] of Object.entries(VENICE_STREET_NEIGHBORHOODS)) {
           if (addr.includes(key)) return hood;
         }
         return 'Venezia';
@@ -366,7 +370,7 @@
     }
 
     /* ---- NAV ---- */
-    function Nav({ onNavigate, currentPage, user }) {
+    function Nav({ onNavigate, currentPage, user, setUser }) {
       return e('nav', { className: 'nav' },
         e('div', { className: 'nav-logo', onClick: () => onNavigate('home') }, 'AffittoDiretto.it'),
         e('div', { className: 'nav-links' },
@@ -374,7 +378,7 @@
           e('a', { className: 'nav-link' + (currentPage === 'map' ? ' active' : ''), onClick: () => onNavigate('map') }, 'Map'),
           user ? [
             e('a', { className: 'nav-link' + (currentPage === 'dashboard' ? ' active' : ''), onClick: () => onNavigate('dashboard'), key: 'd' }, 'Dashboard'),
-            e('a', { className: 'nav-link', onClick: () => { localStorage.removeItem('ad_current_user'); onNavigate('home'); }, key: 'l' }, 'Logout (' + user.name + ')')
+            e('a', { className: 'nav-link', onClick: () => { localStorage.removeItem('ad_current_user'); if (setUser) setUser(null); onNavigate('home'); }, key: 'l' }, 'Logout (' + user.name + ')')
           ] : e('a', { className: 'nav-link' + (currentPage === 'login' ? ' active' : ''), onClick: () => onNavigate('login') }, 'Login/Sign Up')
         )
       );
@@ -622,13 +626,14 @@
         return neighborhoodsByComune[selectedRegion + ':' + selectedComune] || [];
       }, [selectedRegion, selectedComune, neighborhoodsByComune]);
 
-      const filtered = useMemo(() => {
+      const filteredAll = useMemo(() => {
         let res = listings;
         if (selectedRegion !== null) res = res.filter(l => l.regionCode === selectedRegion);
         if (selectedComune) res = res.filter(l => l.comune === selectedComune);
         if (selectedNeighborhood) res = res.filter(l => l.neighborhood === selectedNeighborhood);
-        return res.slice(0, 1000);
+        return res;
       }, [listings, selectedRegion, selectedComune, selectedNeighborhood]);
+      const filtered = useMemo(() => filteredAll.slice(0, 1000), [filteredAll]);
 
       useEffect(() => {
         if (!mapRef.current) return;
@@ -704,7 +709,7 @@
             )
           ),
           e('div', { style: { fontSize: '14px', color: '#666', marginTop: '16px' } },
-            'Showing ' + filtered.length + ' of ' + listings.length + ' properties'
+            (filteredAll.length > 1000 ? 'Showing 1,000 of ' + filteredAll.length.toLocaleString() + ' matching properties' : 'Showing ' + filteredAll.length.toLocaleString() + ' properties')
           )
         ),
         e('div', { ref: mapRef, className: 'map-container', style: { height: 'calc(100vh - 300px)', margin: '24px' } }),
@@ -837,7 +842,7 @@
     }
 
     /* ---- LOGIN/SIGNUP ---- */
-    function LoginPage({ onNavigate, user }) {
+    function LoginPage({ onNavigate, user, setUser }) {
       const [mode, setMode] = useState('login');
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
@@ -854,6 +859,7 @@
           const found = users.find(u => u.email === email && u.password === password);
           if (!found) { alert('Invalid credentials'); return; }
           localStorage.setItem('ad_current_user', JSON.stringify(found));
+          if (setUser) setUser(found);
           onNavigate('home');
         } else {
           if (users.some(u => u.email === email)) { alert('Email already registered'); return; }
@@ -861,6 +867,7 @@
           users.push(newUser);
           localStorage.setItem('ad_users', JSON.stringify(users));
           localStorage.setItem('ad_current_user', JSON.stringify(newUser));
+          if (setUser) setUser(newUser);
           onNavigate('home');
         }
       };
@@ -965,12 +972,12 @@
       const currentProp = page === 'detail' ? JSON.parse(sessionStorage.getItem('ad_current_property') || 'null') : null;
 
       return e('div', null,
-        e(Nav, { onNavigate: handleNavigate, currentPage: page, user }),
+        e(Nav, { onNavigate: handleNavigate, currentPage: page, user, setUser }),
         page === 'home' && e(HomePage, { listings, onNavigate: handleNavigate, onPropertyClick: handlePropertyClick }),
         page === 'search' && e(SearchPage, { listings, onPropertyClick: handlePropertyClick, onNavigate: handleNavigate }),
         page === 'map' && e(MapPage, { listings }),
         page === 'detail' && currentProp && e(PropertyDetail, { prop: currentProp, onNavigate: handleNavigate, user }),
-        page === 'login' && e(LoginPage, { onNavigate: handleNavigate, user }),
+        page === 'login' && e(LoginPage, { onNavigate: handleNavigate, user, setUser }),
         page === 'dashboard' && user && e(Dashboard, { user, listings, onNavigate: handleNavigate })
       );
     }
