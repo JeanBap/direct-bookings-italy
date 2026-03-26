@@ -403,11 +403,11 @@
           e('h2', { style: { fontSize: '28px', fontWeight: '700', marginBottom: '24px' } }, 'Featured Properties'),
           e('div', { className: 'property-grid' },
             featuredListings.map(listing =>
-              PropertyCard({ key: listing.id, prop: listing, onPropertyClick })
+              e(PropertyCard, { key: listing.id, prop: listing, onPropertyClick })
             )
           )
         ),
-        Footer({})
+        e(Footer)
       );
     }
 
@@ -544,9 +544,9 @@
                 )
               ),
               e('div', { className: 'filter-group' },
-                e('label', null, 'Comune'),
+                e('label', null, 'City'),
                 e('select', { value: selectedComune || '', onChange: (e) => { setSelectedComune(e.target.value || null); setSelectedNeighborhood(null); setPage(1); }, disabled: selectedRegion === null },
-                  e('option', { value: '' }, '-- Any Comune --'),
+                  e('option', { value: '' }, '-- Any City --'),
                   selectedRegion !== null && comunesByRegion[selectedRegion] && comunesByRegion[selectedRegion].map(c => e('option', { key: c, value: c }, c))
                 )
               ),
@@ -592,7 +592,7 @@
           )
         ),
         e('div', { className: 'property-grid' },
-          paged.map(p => PropertyCard({ key: p.id, prop: p, onPropertyClick }))
+          paged.map(p => e(PropertyCard, { key: p.id, prop: p, onPropertyClick }))
         ),
         e('div', { className: 'pagination' },
           page > 1 && e('button', { onClick: () => setPage(page - 1) }, '← Prev'),
@@ -602,7 +602,7 @@
           }),
           page < totalPages && e('button', { onClick: () => setPage(page + 1) }, 'Next →')
         ),
-        Footer({})
+        e(Footer)
       );
     }
 
@@ -689,9 +689,9 @@
               )
             ),
             e('div', { className: 'filter-group' },
-              e('label', null, 'Comune'),
+              e('label', null, 'City'),
               e('select', { value: selectedComune || '', onChange: (e) => { setSelectedComune(e.target.value || null); setSelectedNeighborhood(null); }, disabled: selectedRegion === null },
-                e('option', { value: '' }, '-- Any Comune --'),
+                e('option', { value: '' }, '-- Any City --'),
                 selectedRegion !== null && comunesByRegion[selectedRegion] && comunesByRegion[selectedRegion].map(c => e('option', { key: c, value: c }, c))
               )
             ),
@@ -714,7 +714,7 @@
           e('div', { className: 'legend-item' }, e('div', { className: 'legend-dot', style: { background: '#1e5f8c' } }), 'Has Website'),
           e('div', { className: 'legend-item' }, e('div', { className: 'legend-dot', style: { background: '#c0392b' } }), 'No Contact Info')
         ),
-        Footer({})
+        e(Footer)
       );
     }
 
@@ -820,7 +820,7 @@
             )
           )
         ),
-        Footer({})
+        e(Footer)
       );
     }
 
@@ -888,7 +888,7 @@
             e('a', { onClick: () => { setMode(mode === 'login' ? 'signup' : 'login'); setEmail(''); setPassword(''); setName(''); }, style: { color: 'var(--orange)', cursor: 'pointer', textDecoration: 'none' } }, mode === 'login' ? 'Sign up' : 'Login')
           )
         ),
-        Footer({})
+        e(Footer)
       );
     }
 
@@ -920,7 +920,7 @@
             e('p', { style: { color: '#666' } }, 'You have no submitted proposals yet.')
           )
         ),
-        Footer({})
+        e(Footer)
       );
     }
 
@@ -965,13 +965,13 @@
       const currentProp = page === 'detail' ? JSON.parse(sessionStorage.getItem('ad_current_property') || 'null') : null;
 
       return e('div', null,
-        Nav({ onNavigate: handleNavigate, currentPage: page, user }),
-        page === 'home' && HomePage({ listings, onNavigate: handleNavigate, onPropertyClick: handlePropertyClick }),
-        page === 'search' && SearchPage({ listings, onPropertyClick: handlePropertyClick, onNavigate: handleNavigate }),
-        page === 'map' && MapPage({ listings }),
-        page === 'detail' && currentProp && PropertyDetail({ prop: currentProp, onNavigate: handleNavigate, user }),
-        page === 'login' && LoginPage({ onNavigate: handleNavigate, user }),
-        page === 'dashboard' && user && Dashboard({ user, listings, onNavigate: handleNavigate })
+        e(Nav, { onNavigate: handleNavigate, currentPage: page, user }),
+        page === 'home' && e(HomePage, { listings, onNavigate: handleNavigate, onPropertyClick: handlePropertyClick }),
+        page === 'search' && e(SearchPage, { listings, onPropertyClick: handlePropertyClick, onNavigate: handleNavigate }),
+        page === 'map' && e(MapPage, { listings }),
+        page === 'detail' && currentProp && e(PropertyDetail, { prop: currentProp, onNavigate: handleNavigate, user }),
+        page === 'login' && e(LoginPage, { onNavigate: handleNavigate, user }),
+        page === 'dashboard' && user && e(Dashboard, { user, listings, onNavigate: handleNavigate })
       );
     }
 
