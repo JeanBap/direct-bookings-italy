@@ -26,6 +26,7 @@
     .btn-secondary:hover { background: #d0d0d0; }
     .btn-outline { background: transparent; border: 1px solid var(--orange); color: var(--orange); }
     .btn-outline:hover { background: #fff5f0; }
+    .btn-small { padding: 6px 12px; font-size: 12px; }
     .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
     .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
     .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
@@ -80,7 +81,17 @@
     .view-toggle button { padding: 8px 16px; border: none; background: transparent; cursor: pointer; border-radius: 6px; font-weight: 500; }
     .view-toggle button.active { background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
     .split-view { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 200px); }
-    .split-view .list-panel { overflow-y: auto; }
+    .split-view .list-panel { overflow-y: auto; padding: 24px; }
+    .map-legend { background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 400; position: absolute; bottom: 20px; right: 20px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .footer { background: #333; color: #ccc; padding: 32px 24px; text-align: center; font-size: 13px; margin-top: 32px; }
+    .footer a { color: var(--orange); text-decoration: none; }
+    .search-filters { background: white; padding: 24px; border-radius: 8px; margin-bottom: 24px; }
+    .filter-group { margin-bottom: 20px; }
+    .filter-group label { display: block; font-weight: 600; margin-bottom: 12px; font-size: 14px; }
+    textarea { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; width: 100%; box-sizing: border-box; font-family: system-ui; }
+    textarea:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(196,101,42,0.1); }
   </style>
 </head>
 <body>
@@ -89,29 +100,121 @@
     const { useState, useEffect, useMemo, useRef, useCallback } = React;
     const e = React.createElement;
 
-    /* ---- DUMMY DATA ---- */
-    const CLAIMED_IDS = new Set([
-      'IT000001','IT000005','IT000010','IT000020','IT000050',
-      'IT000100','IT000200','IT000500','IT001000','IT002000',
-      'IT003000','IT005000','IT010000','IT015000'
-    ]);
-    const DUMMY_OWNERS = [
-      { id: 'owner1', name: 'Marco Rossi', propertyIds: ['IT000001','IT000005'], reviews: 4.8, contactVisibility: 'all', phone: '+39 06 1234 5678', email: 'marco@esempio.it' },
-      { id: 'owner2', name: 'Anna Bianchi', propertyIds: ['IT000010','IT000020'], reviews: 4.6, contactVisibility: 'all', phone: '+39 06 9876 5432', email: 'anna@esempio.it' },
-      { id: 'owner3', name: 'Giovanni Verdi', propertyIds: ['IT000050'], reviews: 4.7, contactVisibility: 'matches', phone: '+39 06 5555 1111', email: 'giovanni@esempio.it' },
-      { id: 'owner4', name: 'Francesca Moretti', propertyIds: ['IT000100','IT000200'], reviews: 4.9, contactVisibility: 'all', phone: '+39 011 2222 3333', email: 'francesca@esempio.it' },
-      { id: 'owner5', name: 'Roberto Gallo', propertyIds: ['IT000500'], reviews: 4.5, contactVisibility: 'manual', phone: '+39 011 4444 5555', email: 'roberto@esempio.it' },
-      { id: 'owner6', name: 'Lucia Ferrari', propertyIds: ['IT001000'], reviews: 4.8, contactVisibility: 'all', phone: '+39 011 6666 7777', email: 'lucia@esempio.it' },
-      { id: 'owner7', name: 'Paolo Rizzo', propertyIds: ['IT002000','IT003000'], reviews: 4.7, contactVisibility: 'matches', phone: '+39 080 1234 5678', email: 'paolo@esempio.it' },
-      { id: 'owner8', name: 'Maria Palazzo', propertyIds: ['IT005000'], reviews: 4.9, contactVisibility: 'all', phone: '+39 080 9876 5432', email: 'maria@esempio.it' },
-      { id: 'owner9', name: 'Luca Colombo', propertyIds: ['IT010000'], reviews: 4.6, contactVisibility: 'matches', phone: '+39 041 1111 2222', email: 'luca@esempio.it' },
-      { id: 'owner10', name: 'Sofia Fontana', propertyIds: ['IT015000'], reviews: 4.8, contactVisibility: 'all', phone: '+39 010 3333 4444', email: 'sofia@esempio.it' }
-    ];
+    /* ---- PRICING MATRIX ---- */
+    const PRICE_MATRIX = {
+      0: { 0: 180, 1: 95, 2: 70, 3: 110, 4: 45, 5: 120, 6: 80, 7: 85 },
+      1: { 0: 130, 1: 75, 2: 55, 3: 90, 4: 35, 5: 95, 6: 60, 7: 65 },
+      2: { 0: 110, 1: 65, 2: 50, 3: 80, 4: 30, 5: 85, 6: 55, 7: 60 },
+      3: { 0: 170, 1: 90, 2: 65, 3: 100, 4: 40, 5: 110, 6: 70, 7: 80 },
+      4: { 0: 160, 1: 85, 2: 60, 3: 95, 4: 40, 5: 100, 6: 65, 7: 75 }
+    };
 
-    const OWNER_BY_PROP = {};
-    DUMMY_OWNERS.forEach(o => o.propertyIds.forEach(pid => { OWNER_BY_PROP[pid] = o; }));
+    const STAR_MULTIPLIERS = { 0: 0.7, 1: 0.7, 2: 0.85, 3: 1.0, 4: 1.3, 5: 1.8 };
+    const REGION_CENTERS = {
+      0: [41.9, 12.5, 9],
+      1: [45.0, 7.7, 8],
+      2: [41.0, 16.5, 8],
+      3: [45.4, 11.8, 8],
+      4: [44.3, 8.5, 9]
+    };
+    const REGION_PHOTOS = {
+      0: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&h=600&fit=crop',
+      1: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=600&fit=crop',
+      2: 'https://images.unsplash.com/photo-1534113414509-0eec2bfb493f?w=1200&h=600&fit=crop',
+      3: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1200&h=600&fit=crop',
+      4: 'https://images.unsplash.com/photo-1537631468332-b93e15cbc7e4?w=1200&h=600&fit=crop'
+    };
+    const PROPERTY_PHOTOS = {
+      0: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=250&fit=crop',
+      1: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&h=250&fit=crop',
+      2: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=400&h=250&fit=crop',
+      3: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=250&fit=crop',
+      4: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=250&fit=crop',
+      5: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=250&fit=crop',
+      6: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop',
+      7: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=250&fit=crop'
+    };
 
-    /* ---- AMENITY LABELS ---- */
+    /* ---- NEIGHBORHOOD MAPPING ---- */
+    const ROME_CAP_NEIGHBORHOODS = {
+      '00186': 'Centro Storico', '00187': 'Trevi / Via Veneto', '00184': 'Monti / Esquilino',
+      '00185': 'Esquilino / Termini', '00153': 'Trastevere / Testaccio', '00193': 'Prati / Vaticano',
+      '00192': 'Flaminio / Parioli', '00196': 'Parioli', '00197': 'Parioli / Salario',
+      '00198': 'Nomentano / Salario', '00199': 'Villa Ada', '00100': 'Centro Storico',
+      '00118': 'Appia Antica', '00120': 'Acilia / Ostia', '00121': 'Ostia Lido',
+      '00122': 'EUR / Torrino', '00123': 'Magliana / Portuense', '00124': 'Casalotti / Boccea',
+      '00125': 'Acilia Sud', '00126': 'Casal Palocco', '00127': 'Torrino Sud',
+      '00128': 'Trigoria / Falcognana', '00131': 'Settecamini', '00132': 'Tor Vergata / Romanina',
+      '00133': 'Torre Angela / Tor Bella Monaca', '00134': 'Casal Morena / Ciampino',
+      '00135': 'Casalpalocco / Axa', '00136': 'Primavalle / Torrevecchia', '00137': 'Cassia / Tomba di Nerone',
+      '00138': 'Labaro / Prima Porta', '00139': 'Fidene / Serpentara', '00141': 'Conca d\'Oro / Val Melaina',
+      '00142': 'Tor Marancia / Montagnola', '00143': 'EUR / Laurentino', '00144': 'EUR',
+      '00145': 'Ostiense / Garbatella', '00146': 'Aventino / San Saba', '00147': 'Ostiense',
+      '00148': 'Mostacciano / Spinaceto', '00149': 'Portuense / Magliana Vecchia',
+      '00151': 'Gianicolense / Monteverde', '00152': 'Monteverde', '00154': 'Testaccio / Piramide',
+      '00155': 'Centocelle / Prenestino', '00156': 'Torrenova / Torre Gaia',
+      '00157': 'Casal Bertone', '00158': 'Quarticciolo', '00159': 'Colli Aniene',
+      '00161': 'Nomentano', '00162': 'Bologna / Tiburtina', '00164': 'Aurelio / Boccea',
+      '00165': 'Aurelio / Gregorio VII', '00166': 'Aurelio / Pineta Sacchetti',
+      '00167': 'Balduina / Medaglie d\'Oro', '00168': 'Primavalle', '00169': 'Casilino',
+      '00171': 'Centocelle', '00172': 'Don Bosco / Cinecitt\u00e0', '00173': 'Appio Latino / Quarto Miglio',
+      '00174': 'Romanina', '00175': 'Appio Tuscolano', '00176': 'Pigneto / Torpignattara',
+      '00177': 'Tuscolano', '00178': 'Capannelle', '00179': 'Statuario / Capannelle',
+      '00181': 'Appio / Re di Roma', '00182': 'San Giovanni / Appio',
+      '00183': 'Celio / Colosseo', '00188': 'Flaminio', '00189': 'Acqua Acetosa',
+      '00191': 'Della Vittoria', '00194': 'Prati', '00195': 'Della Vittoria / Monte Mario'
+    };
+    const VENICE_CAP_SESTIERI = {
+      '30121': 'Cannaregio', '30122': 'Castello', '30123': 'Dorsoduro',
+      '30124': 'San Marco', '30125': 'San Polo', '30126': 'Santa Croce',
+      '30100': 'Venezia Centro', '30131': 'Mestre / Marghera', '30170': 'Mestre / Marghera',
+      '30171': 'Mestre', '30172': 'Mestre', '30173': 'Favaro Veneto', '30174': 'Zelarino',
+      '30175': 'Marghera', '30176': 'Chirignago'
+    };
+    const ROME_STREET_NEIGHBORHOODS = {
+      'trastevere': 'Trastevere', 'monti': 'Monti', 'prati': 'Prati', 'testaccio': 'Testaccio',
+      'san lorenzo': 'San Lorenzo', 'pigneto': 'Pigneto', 'flaminio': 'Flaminio',
+      'parioli': 'Parioli', 'aventino': 'Aventino', 'garbatella': 'Garbatella',
+      'monteverde': 'Monteverde', 'ostiense': 'Ostiense', 'eur': 'EUR',
+      'colosseo': 'Colosseo', 'vaticano': 'Vaticano', 'borgo': 'Borgo',
+      'navona': 'Centro Storico', 'pantheon': 'Centro Storico', 'campo de\' fiori': 'Centro Storico',
+      'trevi': 'Trevi', 'termini': 'Esquilino / Termini', 'tiburtina': 'Tiburtino',
+      'nomentano': 'Nomentano', 'celio': 'Celio / Colosseo', 'esquilino': 'Esquilino / Termini',
+      'cola di rienzo': 'Prati / Vaticano', 'piazza del popolo': 'Flaminio',
+      'corso': 'Centro Storico', 'condotti': 'Centro Storico', 'babuino': 'Centro Storico',
+      'ottaviano': 'Prati / Vaticano', 'cipro': 'Prati / Vaticano',
+      'san giovanni': 'San Giovanni', 'appia': 'Appio', 'tuscolana': 'Tuscolano',
+      'prenestina': 'Prenestino', 'casilina': 'Casilino', 'ardeatina': 'Ardeatino',
+      'laurentina': 'Laurentino', 'portuense': 'Portuense', 'aurelia': 'Aurelio',
+      'cassia': 'Cassia', 'salaria': 'Salario', 'campitelli': 'Centro Storico',
+      'dorsoduro': 'Dorsoduro', 'cannaregio': 'Cannaregio', 'castello': 'Castello',
+      'san marco': 'San Marco', 'san polo': 'San Polo', 'santa croce': 'Santa Croce',
+      'giudecca': 'Giudecca', 'murano': 'Murano', 'burano': 'Burano', 'lido': 'Lido'
+    };
+
+    function getNeighborhood(prop) {
+      // Venice: use CAP then address
+      if (prop.comune === 'VENEZIA' || prop.comune === 'Venezia') {
+        if (VENICE_CAP_SESTIERI[prop.cap]) return VENICE_CAP_SESTIERI[prop.cap];
+        const addr = ((prop.street || '') + ' ' + (prop.number || '')).toLowerCase();
+        for (const [key, hood] of Object.entries(ROME_STREET_NEIGHBORHOODS)) {
+          if (addr.includes(key)) return hood;
+        }
+        return 'Venezia';
+      }
+      // Rome: use CAP then street name matching
+      if (prop.comune === 'Roma' || prop.comune === 'ROMA') {
+        if (ROME_CAP_NEIGHBORHOODS[prop.cap]) return ROME_CAP_NEIGHBORHOODS[prop.cap];
+        const addr = ((prop.street || '') + ' ' + (prop.number || '')).toLowerCase();
+        for (const [key, hood] of Object.entries(ROME_STREET_NEIGHBORHOODS)) {
+          if (addr.includes(key)) return hood;
+        }
+        return 'Roma (altri)';
+      }
+      // Other: just use comune as neighborhood
+      return prop.comune;
+    }
+
     const AMENITY_LABELS = {
       wifi: 'WiFi', ac: 'A/C', pool: 'Pool', paidParking: 'Paid Parking',
       freeParking: 'Free Parking', restaurant: 'Restaurant', bar: 'Bar',
@@ -121,25 +224,38 @@
       conference: 'Conference', park: 'Park/Garden', laundry: 'Laundry', shuttle: 'Shuttle'
     };
 
-    /* ---- PARSE LISTINGS ---- */
+    function hashCode(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      return Math.abs(hash);
+    }
+
+    function calculatePrice(prop) {
+      let base = PRICE_MATRIX[prop.regionCode][prop.typeCode] || 80;
+      const starMult = STAR_MULTIPLIERS[prop.stars] || 1;
+      let price = base * starMult;
+      if (prop.beds > 100) price *= 1.2;
+      else if (prop.beds > 20) price *= 1.1;
+      const variation = 0.9 + ((hashCode(prop.id) % 20) / 100);
+      price *= variation;
+      return Math.round(price);
+    }
+
     function parseListings() {
       if (!window.RAW_DATA) return [];
-      const seededRandom = (seed) => { let x = Math.sin(seed) * 10000; return x - Math.floor(x); };
-      return window.RAW_DATA.map((d, idx) => {
+      const CLAIMED_IDS = new Set([
+        'IT000001','IT000005','IT000010','IT000020','IT000050',
+        'IT000100','IT000200','IT000500','IT001000','IT002000',
+        'IT003000','IT005000','IT010000','IT015000'
+      ]);
+      return window.RAW_DATA.map(d => {
         const amenBits = d[16] || 0;
         const langBits = d[17] || 0;
-        let price = 65;
-        if (d[11] >= 4) price = 180;
-        else if (d[11] === 3) price = 120;
-        else if (d[11] === 2) price = 90;
-        if (d[4] === 5) price *= 1.3;
-        if (d[4] === 1) price *= 0.8;
-        price = Math.round(price / 5) * 5;
-
         const propId = d[0];
-        const ownerData = OWNER_BY_PROP[propId] || null;
-        const isClaimed = !!ownerData;
-
         return {
           id: propId,
           region: window.REGIONS[d[1]],
@@ -176,27 +292,11 @@
             en: !!(langBits & 1), fr: !!(langBits & 2), de: !!(langBits & 4),
             es: !!(langBits & 8), ru: !!(langBits & 16), zh: !!(langBits & 32)
           },
-          address: (d[6] || '') + ' ' + (d[7] || '') + ', ' + d[3],
-          price,
-          claimed: isClaimed,
-          verified: isClaimed,
-          featured: seededRandom(idx * 7 + 3) > 0.97,
-          contactVisibility: isClaimed ? ownerData.contactVisibility : 'hidden',
-          ownerName: isClaimed ? ownerData.name : '',
-          ownerPhone: isClaimed && ownerData.contactVisibility === 'all' ? ownerData.phone : '',
-          ownerEmail: isClaimed && ownerData.contactVisibility === 'all' ? ownerData.email : '',
-          ownerId: isClaimed ? ownerData.id : null
+          claimed: CLAIMED_IDS.has(propId),
+          verified: CLAIMED_IDS.has(propId)
         };
-      });
+      }).map(p => ({ ...p, price: calculatePrice(p), neighborhood: getNeighborhood(p) }));
     }
-
-    const REGION_PHOTOS = {
-      0: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400&h=250&fit=crop',
-      1: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=250&fit=crop',
-      2: 'https://images.unsplash.com/photo-1534113414509-0eec2bfb493f?w=400&h=250&fit=crop',
-      3: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=400&h=250&fit=crop',
-      4: 'https://images.unsplash.com/photo-1537631468332-b93e15cbc7e4?w=400&h=250&fit=crop'
-    };
 
     function ensureUrl(url) {
       if (!url) return '';
@@ -204,31 +304,89 @@
       return 'https://' + url;
     }
 
-    /* ---- BUILD PROVINCE INDEX ---- */
-    function buildProvincesByRegion(listings) {
+    function getCardImage(prop) {
+      if (prop.website) {
+        return 'https://image.thum.io/get/width/400/' + ensureUrl(prop.website);
+      }
+      return PROPERTY_PHOTOS[prop.typeCode] || PROPERTY_PHOTOS[7];
+    }
+
+    function getHeroImage(prop) {
+      if (prop.website) {
+        return 'https://image.thum.io/get/width/1200/' + ensureUrl(prop.website);
+      }
+      return REGION_PHOTOS[prop.regionCode] || REGION_PHOTOS[0];
+    }
+
+    function buildComunesByRegion(listings) {
       const map = {};
       listings.forEach(l => {
         if (!map[l.regionCode]) map[l.regionCode] = new Set();
-        map[l.regionCode].add(l.provinciaCode);
+        map[l.regionCode].add(l.comune);
       });
+      Object.keys(map).forEach(k => { map[k] = Array.from(map[k]).sort(); });
       return map;
     }
 
+    function buildNeighborhoodsByComune(listings) {
+      const map = {};
+      listings.forEach(l => {
+        const key = l.regionCode + ':' + l.comune;
+        if (!map[key]) map[key] = new Set();
+        map[key].add(l.neighborhood);
+      });
+      Object.keys(map).forEach(k => { map[k] = Array.from(map[k]).sort(); });
+      return map;
+    }
+
+    function getTopAmenities(prop, limit = 3) {
+      const amenities = Object.entries(prop.amenities).filter(([,v]) => v).map(([k]) => AMENITY_LABELS[k]);
+      return amenities.slice(0, limit);
+    }
+
+    function renderStars(stars) {
+      return '★'.repeat(stars) + '☆'.repeat(5 - stars);
+    }
+
+    function smartPagination(current, total) {
+      const pages = [];
+      const maxShow = 7;
+      if (total <= maxShow) {
+        for (let i = 1; i <= total; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        const start = Math.max(2, current - 2);
+        const end = Math.min(total - 1, current + 2);
+        if (start > 2) pages.push('...');
+        for (let i = start; i <= end; i++) pages.push(i);
+        if (end < total - 1) pages.push('...');
+        pages.push(total);
+      }
+      return pages;
+    }
+
     /* ---- NAV ---- */
-    function Nav({ onNavigate, currentPage }) {
+    function Nav({ onNavigate, currentPage, user }) {
       return e('nav', { className: 'nav' },
         e('div', { className: 'nav-logo', onClick: () => onNavigate('home') }, 'AffittoDiretto.it'),
         e('div', { className: 'nav-links' },
           e('a', { className: 'nav-link' + (currentPage === 'search' ? ' active' : ''), onClick: () => onNavigate('search') }, 'Search'),
-          e('a', { className: 'nav-link' + (currentPage === 'rfp' ? ' active' : ''), onClick: () => onNavigate('rfp') }, 'Call for Proposals'),
-          e('a', { className: 'nav-link' + (currentPage === 'login' ? ' active' : ''), onClick: () => onNavigate('login') }, 'Login')
+          e('a', { className: 'nav-link' + (currentPage === 'map' ? ' active' : ''), onClick: () => onNavigate('map') }, 'Map'),
+          user ? [
+            e('a', { className: 'nav-link' + (currentPage === 'dashboard' ? ' active' : ''), onClick: () => onNavigate('dashboard'), key: 'd' }, 'Dashboard'),
+            e('a', { className: 'nav-link', onClick: () => { localStorage.removeItem('ad_current_user'); onNavigate('home'); }, key: 'l' }, 'Logout (' + user.name + ')')
+          ] : e('a', { className: 'nav-link' + (currentPage === 'login' ? ' active' : ''), onClick: () => onNavigate('login') }, 'Login/Sign Up')
         )
       );
     }
 
     /* ---- HOME ---- */
     function HomePage({ listings, onNavigate, onPropertyClick }) {
-      const featuredListings = useMemo(() => listings.filter(l => l.featured).slice(0, 8), [listings]);
+      const featuredListings = useMemo(() => {
+        const claimed = listings.filter(l => l.claimed).slice(0, 4);
+        const random = listings.filter(l => !l.claimed).sort(() => Math.random() - 0.5).slice(0, 4);
+        return [...claimed, ...random].slice(0, 8);
+      }, [listings]);
       return e('div', null,
         e('div', { className: 'hero' },
           e('h1', { className: 'hero-title' }, 'Book Direct in Italy'),
@@ -245,620 +403,580 @@
           e('h2', { style: { fontSize: '28px', fontWeight: '700', marginBottom: '24px' } }, 'Featured Properties'),
           e('div', { className: 'property-grid' },
             featuredListings.map(listing =>
-              e('div', { key: listing.id, className: 'card property-card', onClick: () => onPropertyClick(listing.id) },
-                e('div', { className: 'property-card-image', style: { backgroundImage: 'url(' + REGION_PHOTOS[listing.regionCode] + ')' } },
-                  e('div', { className: 'property-card-overlay' },
-                    e('div', { className: 'property-card-name' }, listing.name),
-                    e('div', { className: 'property-card-type' }, listing.type + ' - ' + listing.comune)
-                  )
-                ),
-                e('div', { className: 'property-card-info' },
-                  e('div', { className: 'price' }, '\u20AC' + listing.price + '/night'),
-                  listing.stars > 0 && e('div', { className: 'stars' }, '\u2605'.repeat(listing.stars)),
-                  e('div', { style: { fontSize: '13px', color: '#666', marginBottom: '8px' } }, listing.beds + ' beds \u2022 ' + listing.rooms + ' rooms'),
-                  listing.claimed && e('span', { className: 'badge badge-success' }, 'Verified Owner')
-                )
-              )
+              PropertyCard({ key: listing.id, prop: listing, onPropertyClick })
             )
           )
         ),
-        e('div', { style: { padding: '32px 24px', background: '#f5f5f5' } },
-          e('h2', { style: { fontSize: '28px', fontWeight: '700', marginBottom: '24px' } }, 'Explore Regions'),
-          e('div', { className: 'property-grid' },
-            Object.entries(window.REGIONS).map(([code, name]) => {
-              const count = listings.filter(l => l.regionCode === parseInt(code)).length;
-              return e('div', { key: code, className: 'card', onClick: () => onNavigate('search'), style: { cursor: 'pointer' } },
-                e('div', { style: { backgroundImage: 'url(' + REGION_PHOTOS[parseInt(code)] + ')', height: '200px', backgroundSize: 'cover', backgroundPosition: 'center' } }),
-                e('div', { style: { padding: '16px' } },
-                  e('h3', { style: { fontSize: '18px', fontWeight: '600', margin: '0 0 4px 0' } }, name),
-                  e('p', { style: { color: '#666', margin: '0', fontSize: '13px' } }, count.toLocaleString() + ' properties')
-                )
-              );
-            })
+        Footer({})
+      );
+    }
+
+    function PropertyCard({ prop, onPropertyClick }) {
+      const topAmenities = getTopAmenities(prop);
+      const cardImg = getCardImage(prop);
+      const statusColor = prop.claimed ? '#2a6847' : (prop.website ? '#1e5f8c' : '#c0392b');
+      const statusLabel = prop.claimed ? 'Claimed' : (prop.website ? 'Unclaimed' : 'No Contact');
+      return e('div', { className: 'card property-card', onClick: () => onPropertyClick(prop.id) },
+        e('div', { className: 'property-card-image', style: { backgroundImage: 'url(' + cardImg + ')' } },
+          e('div', { className: 'property-card-overlay' },
+            e('div', null,
+              e('div', { className: 'property-card-name' }, prop.name),
+              e('div', { className: 'property-card-type' }, prop.type + ' \u2022 ' + prop.neighborhood)
+            )
+          ),
+          e('div', { style: { position: 'absolute', top: '8px', right: '8px', display: 'flex', gap: '4px' } },
+            e('span', { style: { background: statusColor, color: 'white', padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: '600' } }, statusLabel),
+            prop.website && e('span', { style: { background: 'rgba(0,0,0,0.6)', color: 'white', padding: '4px 10px', borderRadius: '12px', fontSize: '11px' } }, 'Preview')
           )
         ),
-        e('div', { style: { padding: '48px 24px', textAlign: 'center', background: 'linear-gradient(135deg, var(--green), var(--blue))', color: 'white' } },
-          e('h2', { style: { fontSize: '28px', fontWeight: '700', marginBottom: '16px' } }, 'Are you a property owner?'),
-          e('p', { style: { fontSize: '16px', marginBottom: '24px', opacity: '0.95' } }, 'Claim your listing and reach tourists directly. Save on commission fees.'),
-          e('button', { className: 'btn btn-secondary', onClick: () => onNavigate('claim') }, 'Claim Your Property')
+        e('div', { className: 'property-card-info' },
+          e('div', { className: 'price' }, '\u20AC' + prop.price + '/night'),
+          prop.stars > 0 && e('div', { className: 'stars', title: prop.stars + ' stars' }, renderStars(prop.stars)),
+          e('div', { style: { fontSize: '13px', color: '#666', marginBottom: '8px' } },
+            prop.beds + ' beds \u2022 ' + prop.rooms + ' rooms'
+          ),
+          e('div', { className: 'amenities-chips' },
+            topAmenities.map((a, i) => e('span', { className: 'amenity-chip', key: i }, a))
+          )
         )
-      );
-    }
-
-    /* ---- SMART PAGINATION ---- */
-    function Pagination({ page, totalPages, onPageChange }) {
-      if (totalPages <= 1) return null;
-      const pages = [];
-      pages.push(1);
-      if (page > 3) pages.push('...');
-      for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) {
-        pages.push(i);
-      }
-      if (page < totalPages - 2) pages.push('...');
-      if (totalPages > 1) pages.push(totalPages);
-      return e('div', { className: 'pagination' },
-        e('button', { onClick: () => onPageChange(Math.max(1, page - 1)), disabled: page === 1 }, '\u2190'),
-        pages.map((p, i) =>
-          p === '...' ? e('span', { key: 'e' + i, style: { padding: '8px 4px' } }, '...') :
-          e('button', { key: p, className: p === page ? 'active' : '', onClick: () => onPageChange(p) }, p)
-        ),
-        e('button', { onClick: () => onPageChange(Math.min(totalPages, page + 1)), disabled: page === totalPages }, '\u2192')
-      );
-    }
-
-    /* ---- MAP VIEW ---- */
-    function MapView({ listings, onPropertyClick }) {
-      const mapRef = useRef(null);
-      const mapInstance = useRef(null);
-
-      useEffect(() => {
-        if (!mapRef.current || mapInstance.current) return;
-        const withCoords = listings.filter(l => l.lat && l.lon);
-        if (withCoords.length === 0) return;
-
-        const map = L.map(mapRef.current).setView([42.5, 12.5], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '\u00A9 OpenStreetMap'
-        }).addTo(map);
-        mapInstance.current = map;
-
-        const markers = L.layerGroup();
-        const sample = withCoords.slice(0, 500);
-        sample.forEach(l => {
-          const marker = L.marker([l.lat, l.lon])
-            .bindPopup('<b>' + l.name + '</b><br>' + l.type + '<br>\u20AC' + l.price + '/night');
-          marker.on('click', () => onPropertyClick(l.id));
-          markers.addLayer(marker);
-        });
-        markers.addTo(map);
-
-        return () => {
-          map.remove();
-          mapInstance.current = null;
-        };
-      }, [listings]);
-
-      const withCoords = listings.filter(l => l.lat && l.lon).length;
-      return e('div', null,
-        e('div', { style: { padding: '8px 16px', background: '#fff3e0', borderRadius: '4px', marginBottom: '8px', fontSize: '13px', color: '#e65100' } },
-          'Showing up to 500 of ' + withCoords + ' mapped properties (' + listings.length + ' total in results)'
-        ),
-        e('div', { ref: mapRef, style: { width: '100%', height: '500px', borderRadius: '8px' } })
       );
     }
 
     /* ---- SEARCH PAGE ---- */
-    function SearchPage({ listings, onPropertyClick, provincesByRegion }) {
-      const [region, setRegion] = useState(0);
-      const [provincia, setProvincia] = useState(-1);
-      const [comune, setComune] = useState('');
-      const [types, setTypes] = useState([]);
-      const [stars, setStars] = useState(-1);
-      const [budget, setBudget] = useState(500);
-      const [beds, setBeds] = useState(0);
-      const [amenities, setAmenities] = useState([]);
-      const [sort, setSort] = useState('relevance');
+    function SearchPage({ listings, onPropertyClick, onNavigate }) {
+      const [selectedRegion, setSelectedRegion] = useState(null);
+      const [selectedProvince, setSelectedProvince] = useState(null);
+      const [selectedComune, setSelectedComune] = useState(null);
+      const [selectedNeighborhood, setSelectedNeighborhood] = useState(null);
+      const [selectedTypes, setSelectedTypes] = useState(new Set());
+      const [selectedAmenities, setSelectedAmenities] = useState(new Set());
+      const [maxPrice, setMaxPrice] = useState(500);
+      const [minBeds, setMinBeds] = useState(0);
+      const [minStars, setMinStars] = useState(0);
       const [page, setPage] = useState(1);
-      const [viewMode, setViewMode] = useState('list');
 
-      const provincesForRegion = useMemo(() => {
-        const codes = provincesByRegion[region] || new Set();
-        return Array.from(codes).map(c => ({ code: c, name: window.PROVINCES[c] })).sort((a, b) => a.name.localeCompare(b.name));
-      }, [region, provincesByRegion]);
+      const comunesByRegion = useMemo(() => buildComunesByRegion(listings), [listings]);
+      const neighborhoodsByComune = useMemo(() => buildNeighborhoodsByComune(listings), [listings]);
 
-      const filteredListings = useMemo(() => {
+      const availableNeighborhoods = useMemo(() => {
+        if (selectedRegion === null || !selectedComune) return [];
+        const key = selectedRegion + ':' + selectedComune;
+        return neighborhoodsByComune[key] || [];
+      }, [selectedRegion, selectedComune, neighborhoodsByComune]);
+
+      const filtered = useMemo(() => {
         return listings.filter(l => {
-          if (l.regionCode !== region) return false;
-          if (provincia >= 0 && l.provinciaCode !== provincia) return false;
-          if (comune && !l.comune.toLowerCase().includes(comune.toLowerCase())) return false;
-          if (types.length > 0 && !types.includes(l.typeCode)) return false;
-          if (stars >= 0 && l.stars !== stars) return false;
-          if (l.price > budget) return false;
-          if (l.beds < beds) return false;
-          if (amenities.length > 0 && !amenities.every(a => l.amenities[a])) return false;
+          if (selectedRegion !== null && l.regionCode !== selectedRegion) return false;
+          if (selectedProvince !== null && l.provinciaCode !== selectedProvince) return false;
+          if (selectedComune && l.comune !== selectedComune) return false;
+          if (selectedNeighborhood && l.neighborhood !== selectedNeighborhood) return false;
+          if (selectedTypes.size > 0 && !selectedTypes.has(l.typeCode)) return false;
+          if (selectedAmenities.size > 0) {
+            for (let amen of selectedAmenities) {
+              const [key] = Object.entries(AMENITY_LABELS).find(([, v]) => v === amen) || [];
+              if (!key || !l.amenities[key]) return false;
+            }
+          }
+          if (l.price > maxPrice) return false;
+          if (l.beds < minBeds) return false;
+          if (l.stars < minStars) return false;
           return true;
-        }).sort((a, b) => {
-          if (sort === 'price-asc') return a.price - b.price;
-          if (sort === 'price-desc') return b.price - a.price;
-          if (sort === 'stars') return b.stars - a.stars;
-          if (sort === 'beds') return b.beds - a.beds;
-          return (b.claimed ? 1 : 0) - (a.claimed ? 1 : 0);
         });
-      }, [region, provincia, comune, types, stars, budget, beds, amenities, sort, listings]);
+      }, [listings, selectedRegion, selectedProvince, selectedComune, selectedNeighborhood, selectedTypes, selectedAmenities, maxPrice, minBeds, minStars]);
 
-      const itemsPerPage = 24;
-      const totalPages = Math.ceil(filteredListings.length / itemsPerPage);
-      const paginatedListings = filteredListings.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+      const pageSize = 12;
+      const totalPages = Math.ceil(filtered.length / pageSize);
+      const paged = filtered.slice((page - 1) * pageSize, page * pageSize);
 
-      const toggleType = (tc) => {
-        setTypes(prev => prev.includes(tc) ? prev.filter(x => x !== tc) : [...prev, tc]);
+      const handleRegionChange = (e) => {
+        const val = e.target.value ? parseInt(e.target.value) : null;
+        setSelectedRegion(val);
+        setSelectedProvince(null);
+        setSelectedComune(null);
+        setSelectedNeighborhood(null);
         setPage(1);
       };
-      const toggleAmenity = (a) => {
-        setAmenities(prev => prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a]);
+
+      const handleProvinceChange = (e) => {
+        const val = e.target.value ? parseInt(e.target.value) : null;
+        setSelectedProvince(val);
+        setSelectedComune(null);
+        setSelectedNeighborhood(null);
         setPage(1);
       };
 
-      const amenityOptions = ['wifi','ac','pool','freeParking','paidParking','restaurant','elevator','pets','gym','sauna','tv','disability'];
+      const toggleType = (typeCode) => {
+        const newSet = new Set(selectedTypes);
+        if (newSet.has(typeCode)) newSet.delete(typeCode);
+        else newSet.add(typeCode);
+        setSelectedTypes(newSet);
+        setPage(1);
+      };
 
-      return e('div', { style: { padding: '24px' } },
-        e('h1', { style: { fontSize: '28px', fontWeight: '700', marginBottom: '24px' } }, 'Search Properties'),
-        /* FILTERS */
-        e('div', { style: { background: 'white', padding: '24px', borderRadius: '8px', marginBottom: '24px' } },
-          e('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '16px' } },
-            e('div', null,
-              e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' } }, 'Region'),
-              e('select', { value: region, onChange: (ev) => { setRegion(parseInt(ev.target.value)); setProvincia(-1); setPage(1); }, style: { width: '100%' } },
-                Object.entries(window.REGIONS).map(([c, n]) => e('option', { key: c, value: c }, n))
+      const toggleAmenity = (label) => {
+        const newSet = new Set(selectedAmenities);
+        if (newSet.has(label)) newSet.delete(label);
+        else newSet.add(label);
+        setSelectedAmenities(newSet);
+        setPage(1);
+      };
+
+      const availableProvinces = selectedRegion !== null ?
+        Array.from(new Set(listings.filter(l => l.regionCode === selectedRegion).map(l => l.provinciaCode))).sort() : [];
+
+      return e('div', null,
+        e('div', { style: { padding: '24px', background: '#f9f9f9' } },
+          e('h1', { style: { fontSize: '32px', fontWeight: '700', marginBottom: '24px' } }, 'Search Properties'),
+          e('div', { className: 'search-filters' },
+            e('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '20px' } },
+              e('div', { className: 'filter-group' },
+                e('label', null, 'Region'),
+                e('select', { value: selectedRegion ?? '', onChange: handleRegionChange },
+                  e('option', { value: '' }, '-- Any Region --'),
+                  Object.entries(window.REGIONS).map(([code, name]) => e('option', { key: code, value: code }, name))
+                )
+              ),
+              e('div', { className: 'filter-group' },
+                e('label', null, 'Province'),
+                e('select', { value: selectedProvince ?? '', onChange: handleProvinceChange, disabled: selectedRegion === null },
+                  e('option', { value: '' }, '-- Any Province --'),
+                  availableProvinces.map(code => e('option', { key: code, value: code }, window.PROVINCES[code]))
+                )
+              ),
+              e('div', { className: 'filter-group' },
+                e('label', null, 'Comune'),
+                e('select', { value: selectedComune || '', onChange: (e) => { setSelectedComune(e.target.value || null); setSelectedNeighborhood(null); setPage(1); }, disabled: selectedRegion === null },
+                  e('option', { value: '' }, '-- Any Comune --'),
+                  selectedRegion !== null && comunesByRegion[selectedRegion] && comunesByRegion[selectedRegion].map(c => e('option', { key: c, value: c }, c))
+                )
+              ),
+              e('div', { className: 'filter-group' },
+                e('label', null, 'Neighborhood'),
+                e('select', { value: selectedNeighborhood || '', onChange: (e) => { setSelectedNeighborhood(e.target.value || null); setPage(1); }, disabled: !selectedComune || availableNeighborhoods.length <= 1 },
+                  e('option', { value: '' }, '-- Any Neighborhood --'),
+                  availableNeighborhoods.map(n => e('option', { key: n, value: n }, n))
+                )
               )
             ),
-            e('div', null,
-              e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' } }, 'Province'),
-              e('select', { value: provincia, onChange: (ev) => { setProvincia(parseInt(ev.target.value)); setPage(1); }, style: { width: '100%' } },
-                e('option', { value: -1 }, 'All Provinces'),
-                provincesForRegion.map(p => e('option', { key: p.code, value: p.code }, p.name))
+            e('div', { style: { marginBottom: '20px' } },
+              e('label', null, 'Property Types'),
+              e('div', null,
+                Object.entries(window.PROPERTY_TYPES).map(([code, name]) =>
+                  e('span', { key: code, className: 'chip' + (selectedTypes.has(parseInt(code)) ? ' active' : ''), onClick: () => toggleType(parseInt(code)) }, name)
+                )
               )
             ),
-            e('div', null,
-              e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' } }, 'Comune'),
-              e('input', { type: 'text', placeholder: 'City or area...', value: comune, onChange: (ev) => { setComune(ev.target.value); setPage(1); }, className: 'input' })
+            e('div', { style: { marginBottom: '20px' } },
+              e('label', null, 'Min Stars: ' + minStars),
+              e('input', { type: 'range', min: 0, max: 5, value: minStars, onChange: (e) => { setMinStars(parseInt(e.target.value)); setPage(1); }, style: { width: '100%' } })
+            ),
+            e('div', { style: { marginBottom: '20px' } },
+              e('label', null, 'Max Price: €' + maxPrice + '/night'),
+              e('input', { type: 'range', min: 20, max: 500, step: 10, value: maxPrice, onChange: (e) => { setMaxPrice(parseInt(e.target.value)); setPage(1); }, style: { width: '100%' } })
+            ),
+            e('div', { style: { marginBottom: '20px' } },
+              e('label', null, 'Min Beds: ' + minBeds),
+              e('input', { type: 'range', min: 0, max: 10, value: minBeds, onChange: (e) => { setMinBeds(parseInt(e.target.value)); setPage(1); }, style: { width: '100%' } })
             ),
             e('div', null,
-              e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' } }, 'Stars'),
-              e('select', { value: stars, onChange: (ev) => { setStars(parseInt(ev.target.value)); setPage(1); }, style: { width: '100%' } },
-                e('option', { value: -1 }, 'Any'),
-                [1,2,3,4,5].map(s => e('option', { key: s, value: s }, s + ' Star' + (s > 1 ? 's' : '')))
-              )
-            ),
-            e('div', null,
-              e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' } }, 'Max \u20AC' + budget + '/night'),
-              e('input', { type: 'range', min: 30, max: 500, step: 10, value: budget, onChange: (ev) => { setBudget(parseInt(ev.target.value)); setPage(1); }, style: { width: '100%' } })
-            ),
-            e('div', null,
-              e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' } }, 'Min Beds'),
-              e('select', { value: beds, onChange: (ev) => { setBeds(parseInt(ev.target.value)); setPage(1); }, style: { width: '100%' } },
-                e('option', { value: 0 }, 'Any'),
-                [1,2,3,5,10,20].map(b => e('option', { key: b, value: b }, b + '+'))
-              )
-            ),
-            e('div', null,
-              e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' } }, 'Sort'),
-              e('select', { value: sort, onChange: (ev) => setSort(ev.target.value), style: { width: '100%' } },
-                e('option', { value: 'relevance' }, 'Relevance'),
-                e('option', { value: 'price-asc' }, 'Price Low-High'),
-                e('option', { value: 'price-desc' }, 'Price High-Low'),
-                e('option', { value: 'stars' }, 'Highest Rated'),
-                e('option', { value: 'beds' }, 'Most Beds')
+              e('label', null, 'Amenities (all must be present)'),
+              e('div', null,
+                Object.values(AMENITY_LABELS).map(label =>
+                  e('span', { key: label, className: 'chip' + (selectedAmenities.has(label) ? ' active' : ''), onClick: () => toggleAmenity(label) }, label)
+                )
               )
             )
           ),
-          /* Property Type Chips */
-          e('div', { style: { marginBottom: '12px' } },
-            e('label', { style: { display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' } }, 'Property Type'),
-            e('div', { style: { display: 'flex', flexWrap: 'wrap' } },
-              Object.entries(window.PROPERTY_TYPES).map(([code, name]) =>
-                e('div', { key: code, className: 'chip' + (types.includes(parseInt(code)) ? ' active' : ''), onClick: () => toggleType(parseInt(code)) }, name)
-              )
-            )
-          ),
-          /* Amenity Chips */
-          e('div', null,
-            e('label', { style: { display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' } }, 'Amenities'),
-            e('div', { style: { display: 'flex', flexWrap: 'wrap' } },
-              amenityOptions.map(a =>
-                e('div', { key: a, className: 'chip' + (amenities.includes(a) ? ' active' : ''), onClick: () => toggleAmenity(a) }, AMENITY_LABELS[a] || a)
-              )
-            )
+          e('div', { style: { textAlign: 'center', fontSize: '16px', fontWeight: '600', marginBottom: '16px' } },
+            filtered.length + ' properties found'
           )
         ),
-        /* RESULTS HEADER */
-        e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' } },
-          e('div', { style: { color: '#666' } }, filteredListings.length.toLocaleString() + ' properties found'),
-          e('div', { className: 'view-toggle' },
-            e('button', { className: viewMode === 'list' ? 'active' : '', onClick: () => setViewMode('list') }, 'List'),
-            e('button', { className: viewMode === 'map' ? 'active' : '', onClick: () => setViewMode('map') }, 'Map'),
-            e('button', { className: viewMode === 'split' ? 'active' : '', onClick: () => setViewMode('split') }, 'Split')
-          )
+        e('div', { className: 'property-grid' },
+          paged.map(p => PropertyCard({ key: p.id, prop: p, onPropertyClick }))
         ),
-        /* VIEW MODES */
-        viewMode === 'list' && e('div', null,
-          e('div', { className: 'property-grid' },
-            paginatedListings.map(listing => e(PropertyCard, { key: listing.id, listing, onClick: () => onPropertyClick(listing.id) }))
-          ),
-          e(Pagination, { page, totalPages, onPageChange: setPage })
+        e('div', { className: 'pagination' },
+          page > 1 && e('button', { onClick: () => setPage(page - 1) }, '← Prev'),
+          smartPagination(page, totalPages).map((p, i) => {
+            if (p === '...') return e('span', { key: i }, '...');
+            return e('button', { key: i, onClick: () => setPage(p), className: p === page ? 'active' : '' }, p);
+          }),
+          page < totalPages && e('button', { onClick: () => setPage(page + 1) }, 'Next →')
         ),
-        viewMode === 'map' && e(MapView, { listings: filteredListings, onPropertyClick }),
-        viewMode === 'split' && e('div', { className: 'split-view' },
-          e('div', { className: 'list-panel' },
-            paginatedListings.map(listing => e(PropertyCard, { key: listing.id, listing, onClick: () => onPropertyClick(listing.id) })),
-            e(Pagination, { page, totalPages, onPageChange: setPage })
-          ),
-          e('div', null, e(MapView, { listings: filteredListings, onPropertyClick }))
-        )
+        Footer({})
       );
     }
 
-    /* ---- PROPERTY CARD ---- */
-    function PropertyCard({ listing, onClick }) {
-      return e('div', { className: 'card property-card', onClick },
-        e('div', { className: 'property-card-image', style: { backgroundImage: 'url(' + REGION_PHOTOS[listing.regionCode] + ')' } },
-          e('div', { className: 'property-card-overlay' },
-            e('div', { className: 'property-card-name' }, listing.name),
-            e('div', { className: 'property-card-type' }, listing.type + ' - ' + listing.comune)
+    /* ---- MAP PAGE ---- */
+    function MapPage({ listings }) {
+      const mapRef = useRef(null);
+      const mapInstanceRef = useRef(null);
+      const markersRef = useRef([]);
+      const [selectedRegion, setSelectedRegion] = useState(null);
+      const [selectedComune, setSelectedComune] = useState(null);
+      const [selectedNeighborhood, setSelectedNeighborhood] = useState(null);
+
+      const comunesByRegion = useMemo(() => buildComunesByRegion(listings), [listings]);
+      const neighborhoodsByComune = useMemo(() => buildNeighborhoodsByComune(listings), [listings]);
+      const availableNeighborhoods = useMemo(() => {
+        if (selectedRegion === null || !selectedComune) return [];
+        return neighborhoodsByComune[selectedRegion + ':' + selectedComune] || [];
+      }, [selectedRegion, selectedComune, neighborhoodsByComune]);
+
+      const filtered = useMemo(() => {
+        let res = listings;
+        if (selectedRegion !== null) res = res.filter(l => l.regionCode === selectedRegion);
+        if (selectedComune) res = res.filter(l => l.comune === selectedComune);
+        if (selectedNeighborhood) res = res.filter(l => l.neighborhood === selectedNeighborhood);
+        return res.slice(0, 1000);
+      }, [listings, selectedRegion, selectedComune, selectedNeighborhood]);
+
+      useEffect(() => {
+        if (!mapRef.current) return;
+        if (!mapInstanceRef.current) {
+          mapInstanceRef.current = L.map(mapRef.current).setView([42.5, 12.5], 6);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+            maxZoom: 19
+          }).addTo(mapInstanceRef.current);
+        }
+
+        markersRef.current.forEach(m => mapInstanceRef.current.removeLayer(m));
+        markersRef.current = [];
+
+        const map = mapInstanceRef.current;
+        filtered.forEach(prop => {
+          if (!prop.lat || !prop.lon) return;
+          const color = prop.claimed ? '#2a6847' : (prop.website ? '#1e5f8c' : '#c0392b');
+          const circle = L.circleMarker([prop.lat, prop.lon], {
+            radius: 6,
+            fillColor: color,
+            color: color,
+            weight: 1,
+            opacity: 0.8,
+            fillOpacity: 0.7
+          }).bindPopup(prop.name + ' - ' + prop.type);
+          circle.addTo(map);
+          markersRef.current.push(circle);
+        });
+
+        if (selectedRegion !== null && REGION_CENTERS[selectedRegion]) {
+          const [lat, lon, zoom] = REGION_CENTERS[selectedRegion];
+          map.setView([lat, lon], zoom);
+        }
+      }, [filtered, selectedRegion]);
+
+      useEffect(() => {
+        return () => {
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.remove();
+            mapInstanceRef.current = null;
+          }
+        };
+      }, []);
+
+      const availableProvinces = selectedRegion !== null ?
+        Array.from(new Set(listings.filter(l => l.regionCode === selectedRegion).map(l => l.provinciaCode))).sort() : [];
+
+      return e('div', null,
+        e('div', { style: { padding: '24px', background: '#f9f9f9' } },
+          e('h1', { style: { fontSize: '32px', fontWeight: '700', marginBottom: '24px' } }, 'Browse on Map'),
+          e('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' } },
+            e('div', { className: 'filter-group' },
+              e('label', null, 'Region'),
+              e('select', { value: selectedRegion ?? '', onChange: (e) => { setSelectedRegion(e.target.value ? parseInt(e.target.value) : null); setSelectedComune(null); setSelectedNeighborhood(null); } },
+                e('option', { value: '' }, '-- Any Region --'),
+                Object.entries(window.REGIONS).map(([code, name]) => e('option', { key: code, value: code }, name))
+              )
+            ),
+            e('div', { className: 'filter-group' },
+              e('label', null, 'Comune'),
+              e('select', { value: selectedComune || '', onChange: (e) => { setSelectedComune(e.target.value || null); setSelectedNeighborhood(null); }, disabled: selectedRegion === null },
+                e('option', { value: '' }, '-- Any Comune --'),
+                selectedRegion !== null && comunesByRegion[selectedRegion] && comunesByRegion[selectedRegion].map(c => e('option', { key: c, value: c }, c))
+              )
+            ),
+            e('div', { className: 'filter-group' },
+              e('label', null, 'Neighborhood'),
+              e('select', { value: selectedNeighborhood || '', onChange: (e) => setSelectedNeighborhood(e.target.value || null), disabled: !selectedComune || availableNeighborhoods.length <= 1 },
+                e('option', { value: '' }, '-- Any Neighborhood --'),
+                availableNeighborhoods.map(n => e('option', { key: n, value: n }, n))
+              )
+            )
+          ),
+          e('div', { style: { fontSize: '14px', color: '#666', marginTop: '16px' } },
+            'Showing ' + filtered.length + ' of ' + listings.length + ' properties'
           )
         ),
-        e('div', { className: 'property-card-info' },
-          e('div', { className: 'price' }, '\u20AC' + listing.price + '/night'),
-          listing.stars > 0 && e('div', { className: 'stars' }, '\u2605'.repeat(listing.stars) + ' (' + listing.stars + ')'),
-          e('div', { style: { fontSize: '13px', color: '#666', marginBottom: '8px' } },
-            listing.beds + ' beds \u2022 ' + listing.rooms + ' rooms' + (listing.baths ? ' \u2022 ' + listing.baths + ' baths' : '')
-          ),
-          listing.claimed && e('span', { className: 'badge badge-success', style: { marginRight: '4px' } }, 'Verified'),
-          listing.website && e('span', { className: 'badge badge-primary' }, 'Website'),
-          e('div', { className: 'amenities-chips' },
-            Object.entries(listing.amenities).filter(([_, v]) => v).slice(0, 4).map(([k]) =>
-              e('div', { key: k, className: 'amenity-chip' }, AMENITY_LABELS[k] || k)
-            )
-          )
-        )
+        e('div', { ref: mapRef, className: 'map-container', style: { height: 'calc(100vh - 300px)', margin: '24px' } }),
+        e('div', { className: 'map-legend' },
+          e('div', { style: { fontWeight: '600', marginBottom: '12px' } }, 'Legend'),
+          e('div', { className: 'legend-item' }, e('div', { className: 'legend-dot', style: { background: '#2a6847' } }), 'Claimed'),
+          e('div', { className: 'legend-item' }, e('div', { className: 'legend-dot', style: { background: '#1e5f8c' } }), 'Has Website'),
+          e('div', { className: 'legend-item' }, e('div', { className: 'legend-dot', style: { background: '#c0392b' } }), 'No Contact Info')
+        ),
+        Footer({})
       );
     }
 
     /* ---- PROPERTY DETAIL ---- */
-    function PropertyDetail({ propertyId, listings, onBack }) {
-      const listing = listings.find(l => l.id === propertyId);
-      if (!listing) return e('div', { style: { padding: '48px', textAlign: 'center' } }, 'Property not found');
-
-      const mapRef = useRef(null);
-      const mapInstance = useRef(null);
-
-      useEffect(() => {
-        if (!mapRef.current || !listing.lat || !listing.lon) return;
-        if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
-        const map = L.map(mapRef.current).setView([listing.lat, listing.lon], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '\u00A9 OpenStreetMap' }).addTo(map);
-        L.marker([listing.lat, listing.lon]).addTo(map).bindPopup(listing.name).openPopup();
-        mapInstance.current = map;
-        return () => { if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; } };
-      }, [listing.id]);
-
-      const websiteUrl = ensureUrl(listing.website);
-
-      return e('div', { style: { padding: '24px', maxWidth: '900px', margin: '0 auto' } },
-        e('button', { className: 'btn btn-secondary', onClick: onBack, style: { marginBottom: '16px' } }, '\u2190 Back to Search'),
-        e('div', { className: 'card', style: { marginBottom: '24px' } },
-          e('div', { style: { backgroundImage: 'url(' + REGION_PHOTOS[listing.regionCode] + ')', height: '400px', backgroundSize: 'cover', backgroundPosition: 'center' } })
-        ),
-        e('div', null,
-          e('div', { style: { display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '8px' } },
-            e('h1', { style: { fontSize: '32px', fontWeight: '700', margin: 0 } }, listing.name),
-            listing.claimed && e('span', { className: 'badge badge-success' }, 'Verified Owner'),
-            listing.website && e('span', { className: 'badge badge-primary' }, 'Has Website')
-          ),
-          e('div', { style: { color: '#666', marginBottom: '8px', fontSize: '15px' } }, listing.type + ' \u2022 ' + listing.comune + ', ' + listing.provincia + ', ' + listing.region),
-          e('div', { style: { color: '#999', marginBottom: '16px', fontSize: '13px' } }, listing.address + ' \u2022 CAP: ' + listing.cap),
-          listing.stars > 0 && e('div', { className: 'stars', style: { marginBottom: '16px', fontSize: '18px' } }, '\u2605'.repeat(listing.stars) + ' (' + listing.stars + ' stars)'),
-          e('div', { className: 'price', style: { margin: '16px 0 24px' } }, '\u20AC' + listing.price + ' per night'),
-          e('div', { style: { background: '#f9f9f9', padding: '20px', borderRadius: '8px', marginBottom: '24px' } },
-            e('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '16px', textAlign: 'center' } },
-              e('div', null, e('div', { style: { fontWeight: '700', fontSize: '20px' } }, listing.beds || '-'), e('div', { style: { color: '#666', fontSize: '12px' } }, 'Beds')),
-              e('div', null, e('div', { style: { fontWeight: '700', fontSize: '20px' } }, listing.rooms || '-'), e('div', { style: { color: '#666', fontSize: '12px' } }, 'Rooms')),
-              e('div', null, e('div', { style: { fontWeight: '700', fontSize: '20px' } }, listing.baths || '-'), e('div', { style: { color: '#666', fontSize: '12px' } }, 'Bathrooms')),
-              e('div', null, e('div', { style: { fontWeight: '700', fontSize: '20px' } }, listing.cap || '-'), e('div', { style: { color: '#666', fontSize: '12px' } }, 'CAP'))
-            )
-          ),
-          /* Amenities */
-          e('h3', { style: { fontWeight: '600', marginBottom: '12px' } }, 'Amenities'),
-          e('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' } },
-            Object.entries(listing.amenities).filter(([_, v]) => v).length > 0
-              ? Object.entries(listing.amenities).filter(([_, v]) => v).map(([k]) => e('span', { key: k, className: 'badge badge-primary' }, AMENITY_LABELS[k] || k))
-              : e('span', { style: { color: '#999' } }, 'No amenities listed')
-          ),
-          /* Languages */
-          Object.entries(listing.languages).some(([_, v]) => v) &&
-          e('div', { style: { marginBottom: '24px' } },
-            e('h3', { style: { fontWeight: '600', marginBottom: '12px' } }, 'Languages Spoken'),
-            e('div', { style: { display: 'flex', gap: '8px' } },
-              Object.entries(listing.languages).filter(([_, v]) => v).map(([k]) =>
-                e('span', { key: k, className: 'badge badge-primary' }, k.toUpperCase())
-              )
-            )
-          ),
-          /* Map */
-          listing.lat && listing.lon &&
-          e('div', { style: { marginBottom: '24px' } },
-            e('h3', { style: { fontWeight: '600', marginBottom: '12px' } }, 'Location'),
-            e('div', { ref: mapRef, className: 'map-container' })
-          ),
-          /* Website (PUBLIC - always shown) */
-          websiteUrl &&
-          e('div', { style: { marginBottom: '24px' } },
-            e('h3', { style: { fontWeight: '600', marginBottom: '12px' } }, 'Website'),
-            e('a', { href: websiteUrl, target: '_blank', rel: 'noopener noreferrer', style: { color: 'var(--blue)', textDecoration: 'underline' } }, listing.website)
-          ),
-          /* Contact Section */
-          e('div', { className: 'contact-section' },
-            e('h3', { style: { fontWeight: '600', marginBottom: '16px' } }, 'Contact Owner'),
-            listing.claimed && listing.contactVisibility === 'all'
-              ? e('div', null,
-                  e('p', { style: { marginBottom: '12px' } }, 'Owner: ' + listing.ownerName),
-                  e('div', { className: 'contact-buttons' },
-                    listing.ownerPhone && e('a', { href: 'tel:' + listing.ownerPhone.replace(/\s/g, ''), className: 'btn btn-primary' }, '\u260E Call'),
-                    listing.ownerPhone && e('a', { href: 'https://wa.me/' + listing.ownerPhone.replace(/\D/g, ''), target: '_blank', className: 'btn btn-primary', style: { background: '#25D366' } }, 'WhatsApp'),
-                    listing.ownerEmail && e('a', { href: 'mailto:' + listing.ownerEmail, className: 'btn btn-outline' }, '\u2709 Email')
-                  )
-                )
-              : listing.claimed && listing.contactVisibility === 'matches'
-                ? e('div', null,
-                    e('p', { style: { color: '#666', marginBottom: '12px' } }, 'This owner shares contact info only with matched proposals.'),
-                    e('button', { className: 'btn btn-primary' }, 'Submit a Proposal to Connect')
-                  )
-                : listing.claimed && listing.contactVisibility === 'manual'
-                  ? e('div', null,
-                      e('p', { style: { color: '#666', marginBottom: '12px' } }, 'This owner reviews contact requests individually.'),
-                      e('button', { className: 'btn btn-primary' }, 'Request Contact Info')
-                    )
-                  : e('div', null,
-                      e('p', { style: { color: '#666', marginBottom: '12px' } }, 'This property has not been claimed yet. Submit a proposal and we will try to connect you.'),
-                      e('button', { className: 'btn btn-primary' }, 'Submit Proposal')
-                    )
-          )
-        )
-      );
-    }
-
-    /* ---- RFP PAGE ---- */
-    function RFPPage({ onBack }) {
-      const [region, setRegion] = useState(0);
-      const [checkIn, setCheckIn] = useState('');
-      const [checkOut, setCheckOut] = useState('');
-      const [guests, setGuests] = useState(2);
-      const [budget, setBudget] = useState(100);
-      const [contactMethod, setContactMethod] = useState('email');
-      const [contactInfo, setContactInfo] = useState('');
-      const [notes, setNotes] = useState('');
+    function PropertyDetail({ prop, onNavigate, user }) {
+      const [showProposal, setShowProposal] = useState(false);
+      const [proposalData, setProposalData] = useState({ name: user?.name || '', email: user?.email || '', checkIn: '', checkOut: '', guests: 1, message: '' });
       const [submitted, setSubmitted] = useState(false);
 
-      if (submitted) {
-        return e('div', { style: { padding: '48px', textAlign: 'center' } },
-          e('div', { style: { fontSize: '48px', marginBottom: '16px' } }, '\u2705'),
-          e('h2', { style: { fontSize: '24px', fontWeight: '700', marginBottom: '8px' } }, 'Proposal Submitted!'),
-          e('p', { style: { color: '#666' } }, 'We will notify matching owners. You can expect responses within 48 hours.')
-        );
-      }
-
-      return e('div', { style: { padding: '24px', maxWidth: '600px', margin: '0 auto' } },
-        e('button', { className: 'btn btn-secondary', onClick: onBack, style: { marginBottom: '16px' } }, '\u2190 Back'),
-        e('h1', { style: { fontSize: '28px', fontWeight: '700', marginBottom: '8px' } }, 'Call for Proposals'),
-        e('p', { style: { color: '#666', marginBottom: '24px' } }, 'Tell us what you need and owners will reach out to you.'),
-        e('div', { className: 'card', style: { padding: '24px' } },
-          e('div', { style: { marginBottom: '16px' } },
-            e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600' } }, 'Region'),
-            e('select', { value: region, onChange: (ev) => setRegion(parseInt(ev.target.value)), className: 'input' },
-              Object.entries(window.REGIONS).map(([c, n]) => e('option', { key: c, value: c }, n))
-            )
-          ),
-          e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' } },
-            e('div', null,
-              e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600' } }, 'Check-in'),
-              e('input', { type: 'date', value: checkIn, onChange: (ev) => setCheckIn(ev.target.value), className: 'input' })
-            ),
-            e('div', null,
-              e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600' } }, 'Check-out'),
-              e('input', { type: 'date', value: checkOut, onChange: (ev) => setCheckOut(ev.target.value), className: 'input' })
-            )
-          ),
-          e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' } },
-            e('div', null,
-              e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600' } }, 'Guests'),
-              e('input', { type: 'number', min: 1, value: guests, onChange: (ev) => setGuests(parseInt(ev.target.value)), className: 'input' })
-            ),
-            e('div', null,
-              e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600' } }, 'Max Budget/night (\u20AC)'),
-              e('input', { type: 'number', min: 30, value: budget, onChange: (ev) => setBudget(parseInt(ev.target.value)), className: 'input' })
-            )
-          ),
-          e('div', { style: { marginBottom: '16px' } },
-            e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600' } }, 'Notes (optional)'),
-            e('textarea', { value: notes, onChange: (ev) => setNotes(ev.target.value), className: 'input', rows: 3, placeholder: 'Any special requirements...' })
-          ),
-          e('div', { style: { marginBottom: '16px' } },
-            e('label', { style: { display: 'block', marginBottom: '8px', fontWeight: '600' } }, 'How should owners contact you?'),
-            e('div', { style: { display: 'flex', gap: '16px' } },
-              ['phone', 'whatsapp', 'email'].map(m =>
-                e('label', { key: m, style: { cursor: 'pointer' } },
-                  e('input', { type: 'radio', name: 'method', value: m, checked: contactMethod === m, onChange: (ev) => setContactMethod(ev.target.value) }),
-                  ' ' + m.charAt(0).toUpperCase() + m.slice(1)
-                )
-              )
-            )
-          ),
-          e('div', { style: { marginBottom: '24px' } },
-            e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600' } }, 'Your ' + contactMethod.charAt(0).toUpperCase() + contactMethod.slice(1)),
-            e('input', { type: contactMethod === 'email' ? 'email' : 'text', placeholder: contactMethod === 'email' ? 'your@email.com' : '+39...', value: contactInfo, onChange: (ev) => setContactInfo(ev.target.value), className: 'input' })
-          ),
-          e('button', { className: 'btn btn-primary', style: { width: '100%', padding: '14px' }, onClick: () => { if (checkIn && checkOut && contactInfo) setSubmitted(true); } }, 'Submit Proposal')
-        )
-      );
-    }
-
-    /* ---- CLAIM PAGE ---- */
-    function ClaimPage({ listings, onBack }) {
-      const [searchTerm, setSearchTerm] = useState('');
-      const [results, setResults] = useState([]);
-      const [submitted, setSubmitted] = useState(false);
-
-      const handleSearch = () => {
-        if (searchTerm.length < 3) return;
-        const term = searchTerm.toLowerCase();
-        const found = listings.filter(l =>
-          l.name.toLowerCase().includes(term) || l.address.toLowerCase().includes(term)
-        ).slice(0, 10);
-        setResults(found);
+      const handleProposalSubmit = () => {
+        if (!proposalData.name || !proposalData.email || !proposalData.checkIn || !proposalData.checkOut) {
+          alert('Please fill all fields');
+          return;
+        }
+        let proposals = JSON.parse(localStorage.getItem('ad_proposals') || '[]');
+        proposals.push({ propertyId: prop.id, ...proposalData, submitted: new Date().toISOString() });
+        localStorage.setItem('ad_proposals', JSON.stringify(proposals));
+        setSubmitted(true);
       };
 
-      if (submitted) {
-        return e('div', { style: { padding: '48px', textAlign: 'center' } },
-          e('div', { style: { fontSize: '48px', marginBottom: '16px' } }, '\u2705'),
-          e('h2', { style: { fontSize: '24px', fontWeight: '700', marginBottom: '8px' } }, 'Claim Submitted!'),
-          e('p', { style: { color: '#666' } }, 'We will verify your ownership within 24-48 hours.')
-        );
-      }
+      const heroImg = getHeroImage(prop);
+      const statusColor = prop.claimed ? '#2a6847' : (prop.website ? '#1e5f8c' : '#c0392b');
+      const statusLabel = prop.claimed ? 'Verified Owner' : (prop.website ? 'Unclaimed' : 'No Contact Info');
 
-      return e('div', { style: { padding: '24px', maxWidth: '600px', margin: '0 auto' } },
-        e('button', { className: 'btn btn-secondary', onClick: onBack, style: { marginBottom: '16px' } }, '\u2190 Back'),
-        e('h1', { style: { fontSize: '28px', fontWeight: '700', marginBottom: '8px' } }, 'Claim Your Property'),
-        e('p', { style: { color: '#666', marginBottom: '24px' } }, 'Search for your property below and claim it to manage your listing, set contact preferences, and connect with tourists.'),
-        e('div', { className: 'card', style: { padding: '24px' } },
-          e('div', { style: { display: 'flex', gap: '8px', marginBottom: '16px' } },
-            e('input', { type: 'text', placeholder: 'Search by name or address (min 3 chars)...', value: searchTerm, onChange: (ev) => setSearchTerm(ev.target.value), className: 'input', onKeyDown: (ev) => { if (ev.key === 'Enter') handleSearch(); } }),
-            e('button', { className: 'btn btn-primary', onClick: handleSearch }, 'Search')
-          ),
-          results.length > 0 && e('div', null,
-            results.map(r =>
-              e('div', { key: r.id, style: { padding: '12px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
-                e('div', null,
-                  e('div', { style: { fontWeight: '600' } }, r.name),
-                  e('div', { style: { fontSize: '13px', color: '#666' } }, r.address + ' \u2022 ' + r.region),
-                  e('div', { style: { fontSize: '12px', color: '#999' } }, 'ID: ' + r.id)
+      return e('div', null,
+        e('div', { style: { backgroundImage: 'url(' + heroImg + ')', backgroundSize: 'cover', backgroundPosition: 'center', height: '400px', position: 'relative', display: 'flex', alignItems: 'flex-end', padding: '32px', color: 'white' } },
+          e('div', { style: { background: 'rgba(0,0,0,0.6)', padding: '24px', borderRadius: '8px', maxWidth: '600px' } },
+            e('h1', { style: { fontSize: '36px', fontWeight: '700', margin: '0 0 8px 0' } }, prop.name),
+            e('p', { style: { margin: '0 0 8px 0', fontSize: '16px' } }, prop.type + ' \u2022 ' + prop.neighborhood + ', ' + prop.region),
+            e('span', { style: { background: statusColor, color: 'white', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600' } }, statusLabel)
+          )
+        ),
+        e('div', { style: { maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' } },
+          e('div', { style: { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '32px' } },
+            e('div', null,
+              e('div', { style: { marginBottom: '32px' } },
+                e('h2', null, 'Property Details'),
+                e('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px', marginTop: '16px' } },
+                  e('div', null, e('strong', null, 'Price'), e('div', { className: 'price' }, '€' + prop.price + '/night')),
+                  e('div', null, e('strong', null, 'Rating'), e('div', { className: 'stars', title: prop.stars + ' stars' }, renderStars(prop.stars))),
+                  e('div', null, e('strong', null, 'Beds'), e('div', { style: { fontSize: '20px', fontWeight: '700', color: 'var(--orange)' } }, prop.beds)),
+                  e('div', null, e('strong', null, 'Rooms'), e('div', { style: { fontSize: '20px', fontWeight: '700', color: 'var(--orange)' } }, prop.rooms)),
+                  e('div', null, e('strong', null, 'Bathrooms'), e('div', { style: { fontSize: '20px', fontWeight: '700', color: 'var(--orange)' } }, prop.baths)),
+                  e('div', null, e('strong', null, 'Status'), e('div', { style: { fontSize: '14px' } }, prop.claimed ? e('span', { className: 'badge badge-success' }, '✓ Verified') : 'Unverified'))
+                )
+              ),
+              e('div', { style: { marginBottom: '32px' } },
+                e('h2', null, 'Address'),
+                e('p', null, (prop.street || '') + ' ' + (prop.number || '')),
+                e('p', null, prop.cap + ' ' + prop.comune),
+                e('p', null, prop.provincia + ', ' + prop.region)
+              ),
+              e('div', { style: { marginBottom: '32px' } },
+                e('h2', null, 'Amenities'),
+                e('div', { className: 'amenities-chips' },
+                  Object.entries(prop.amenities).filter(([,v]) => v).map(([k, ]) =>
+                    e('span', { className: 'amenity-chip', key: k }, AMENITY_LABELS[k])
+                  )
+                )
+              ),
+              prop.lat && prop.lon && e('div', { style: { marginBottom: '32px' } },
+                e('h2', null, 'Location'),
+                e('div', { id: 'detail-map', style: { height: '300px', borderRadius: '8px', overflow: 'hidden', marginTop: '16px' } },
+                  e(MapEmbed, { lat: prop.lat, lon: prop.lon, key: prop.id })
+                )
+              )
+            ),
+            e('div', null,
+              e('div', { className: 'contact-section' },
+                prop.website && e('div', { style: { marginBottom: '16px' } },
+                  e('a', { href: ensureUrl(prop.website), target: '_blank', rel: 'noopener noreferrer', className: 'btn btn-primary', style: { width: '100%', textAlign: 'center', textDecoration: 'none' } }, 'Visit Website')
                 ),
-                r.claimed
-                  ? e('span', { className: 'badge badge-warning' }, 'Already Claimed')
-                  : e('button', { className: 'btn btn-primary', onClick: () => setSubmitted(true), style: { padding: '6px 12px', fontSize: '13px' } }, 'Claim')
+                e('h3', null, 'Send Proposal'),
+                submitted ? e('div', { style: { padding: '16px', background: '#e8f5e9', borderRadius: '8px', color: '#2a6847' } },
+                  e('strong', null, 'Proposal Sent!'),
+                  e('p', { style: { marginTop: '8px', fontSize: '13px' } },
+                    'Your proposal has been sent. The property owner will need to claim their listing on AffittoDiretto to view your contact details.'
+                  )
+                ) : e('div', null,
+                  e('div', { style: { marginBottom: '12px' } },
+                    e('input', { type: 'text', className: 'input', placeholder: 'Name', value: proposalData.name, onChange: (e) => setProposalData({...proposalData, name: e.target.value }) })
+                  ),
+                  e('div', { style: { marginBottom: '12px' } },
+                    e('input', { type: 'email', className: 'input', placeholder: 'Email', value: proposalData.email, onChange: (e) => setProposalData({...proposalData, email: e.target.value }) })
+                  ),
+                  e('div', { style: { marginBottom: '12px' } },
+                    e('label', { style: { fontSize: '12px', fontWeight: '600' } }, 'Check-In'),
+                    e('input', { type: 'date', className: 'input', value: proposalData.checkIn, onChange: (e) => setProposalData({...proposalData, checkIn: e.target.value }) })
+                  ),
+                  e('div', { style: { marginBottom: '12px' } },
+                    e('label', { style: { fontSize: '12px', fontWeight: '600' } }, 'Check-Out'),
+                    e('input', { type: 'date', className: 'input', value: proposalData.checkOut, onChange: (e) => setProposalData({...proposalData, checkOut: e.target.value }) })
+                  ),
+                  e('div', { style: { marginBottom: '12px' } },
+                    e('input', { type: 'number', className: 'input', placeholder: 'Guests', min: 1, value: proposalData.guests, onChange: (e) => setProposalData({...proposalData, guests: parseInt(e.target.value) }) })
+                  ),
+                  e('div', { style: { marginBottom: '12px' } },
+                    e('textarea', { className: 'input', placeholder: 'Message (optional)', rows: 4, value: proposalData.message, onChange: (e) => setProposalData({...proposalData, message: e.target.value }) })
+                  ),
+                  e('button', { className: 'btn btn-primary', style: { width: '100%' }, onClick: handleProposalSubmit }, 'Send Proposal')
+                )
               )
             )
-          ),
-          results.length === 0 && searchTerm.length >= 3 && e('p', { style: { color: '#999', textAlign: 'center', padding: '24px' } }, 'No properties found. Try a different search.')
-        )
-      );
-    }
-
-    /* ---- LOGIN PAGE ---- */
-    function LoginPage({ onBack }) {
-      const [tab, setTab] = useState('tourist');
-      return e('div', { style: { padding: '24px', maxWidth: '400px', margin: '0 auto' } },
-        e('button', { className: 'btn btn-secondary', onClick: onBack, style: { marginBottom: '16px' } }, '\u2190 Back'),
-        e('h1', { style: { fontSize: '28px', fontWeight: '700', marginBottom: '24px' } }, 'Login'),
-        e('div', { style: { display: 'flex', marginBottom: '24px', borderBottom: '2px solid #eee' } },
-          e('button', { className: 'tab' + (tab === 'tourist' ? ' active' : ''), onClick: () => setTab('tourist') }, 'Tourist'),
-          e('button', { className: 'tab' + (tab === 'owner' ? ' active' : ''), onClick: () => setTab('owner') }, 'Owner')
-        ),
-        e('div', { className: 'card', style: { padding: '24px' } },
-          e('div', { style: { marginBottom: '16px' } },
-            e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600' } }, 'Email'),
-            e('input', { type: 'email', placeholder: 'your@email.com', className: 'input' })
-          ),
-          e('div', { style: { marginBottom: '24px' } },
-            e('label', { style: { display: 'block', marginBottom: '6px', fontWeight: '600' } }, 'Password'),
-            e('input', { type: 'password', placeholder: 'password', className: 'input' })
-          ),
-          e('button', { className: 'btn btn-primary', style: { width: '100%' } }, 'Sign In'),
-          e('p', { style: { textAlign: 'center', marginTop: '16px', fontSize: '13px', color: '#666' } }, 'Don\'t have an account? Sign up as a tourist or claim your property as an owner.')
-        )
-      );
-    }
-
-    /* ---- ADMIN PANEL (hidden, /admin) ---- */
-    function AdminPanel({ listings, onBack }) {
-      const claimed = listings.filter(l => l.claimed).length;
-      const withCoords = listings.filter(l => l.lat && l.lon).length;
-      const withWebsite = listings.filter(l => l.website).length;
-      const regionCounts = {};
-      listings.forEach(l => { regionCounts[l.region] = (regionCounts[l.region] || 0) + 1; });
-
-      return e('div', { style: { padding: '24px', maxWidth: '900px', margin: '0 auto' } },
-        e('button', { className: 'btn btn-secondary', onClick: onBack, style: { marginBottom: '16px' } }, '\u2190 Back'),
-        e('h1', { style: { fontSize: '28px', fontWeight: '700', marginBottom: '24px' } }, 'Admin Panel'),
-        e('div', { className: 'stats-bar' },
-          e('div', { className: 'stat' }, e('div', { className: 'stat-number' }, listings.length.toLocaleString()), e('div', { className: 'stat-label' }, 'Total Properties')),
-          e('div', { className: 'stat' }, e('div', { className: 'stat-number' }, claimed), e('div', { className: 'stat-label' }, 'Claimed')),
-          e('div', { className: 'stat' }, e('div', { className: 'stat-number' }, withCoords.toLocaleString()), e('div', { className: 'stat-label' }, 'With Coordinates')),
-          e('div', { className: 'stat' }, e('div', { className: 'stat-number' }, withWebsite.toLocaleString()), e('div', { className: 'stat-label' }, 'With Website'))
-        ),
-        e('h2', { style: { fontSize: '20px', fontWeight: '600', margin: '24px 0 16px' } }, 'Properties by Region'),
-        e('div', { className: 'card', style: { padding: '24px' } },
-          Object.entries(regionCounts).sort((a, b) => b[1] - a[1]).map(([region, count]) =>
-            e('div', { key: region, style: { display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f0f0f0' } },
-              e('span', { style: { fontWeight: '500' } }, region),
-              e('span', { style: { color: 'var(--orange)', fontWeight: '600' } }, count.toLocaleString())
-            )
           )
-        )
+        ),
+        Footer({})
       );
     }
 
-    /* ---- APP ---- */
+    function MapEmbed({ lat, lon }) {
+      const mapRef = useRef(null);
+      useEffect(() => {
+        if (!mapRef.current) return;
+        const map = L.map(mapRef.current).setView([lat, lon], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+        L.circleMarker([lat, lon], { radius: 8, color: 'var(--orange)', fillColor: 'var(--orange)', fillOpacity: 0.7 }).addTo(map);
+        return () => map.remove();
+      }, [lat, lon]);
+      return e('div', { ref: mapRef, style: { width: '100%', height: '100%' } });
+    }
+
+    /* ---- LOGIN/SIGNUP ---- */
+    function LoginPage({ onNavigate, user }) {
+      const [mode, setMode] = useState('login');
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [name, setName] = useState('');
+      const [userType, setUserType] = useState('tourist');
+
+      const handleSubmit = () => {
+        if (!email || !password || (mode === 'signup' && !name)) {
+          alert('Please fill all fields');
+          return;
+        }
+        let users = JSON.parse(localStorage.getItem('ad_users') || '[]');
+        if (mode === 'login') {
+          const found = users.find(u => u.email === email && u.password === password);
+          if (!found) { alert('Invalid credentials'); return; }
+          localStorage.setItem('ad_current_user', JSON.stringify(found));
+          onNavigate('home');
+        } else {
+          if (users.some(u => u.email === email)) { alert('Email already registered'); return; }
+          const newUser = { id: 'user_' + Date.now(), name, email, password, userType, created: new Date().toISOString() };
+          users.push(newUser);
+          localStorage.setItem('ad_users', JSON.stringify(users));
+          localStorage.setItem('ad_current_user', JSON.stringify(newUser));
+          onNavigate('home');
+        }
+      };
+
+      return e('div', { style: { maxWidth: '500px', margin: '60px auto', padding: '24px' } },
+        e('div', { className: 'card', style: { padding: '32px' } },
+          e('h1', { style: { textAlign: 'center', marginBottom: '24px' } }, mode === 'login' ? 'Login' : 'Sign Up'),
+          e('div', { style: { marginBottom: '20px', display: 'flex', gap: '12px', justifyContent: 'center' } },
+            e('button', { className: 'btn' + (mode === 'login' ? ' btn-primary' : ' btn-secondary'), onClick: () => setMode('login') }, 'Login'),
+            e('button', { className: 'btn' + (mode === 'signup' ? ' btn-primary' : ' btn-secondary'), onClick: () => setMode('signup') }, 'Sign Up')
+          ),
+          mode === 'signup' && e('div', { style: { marginBottom: '12px' } },
+            e('label', { style: { display: 'block', marginBottom: '8px', fontWeight: '600' } }, 'I am a...'),
+            e('select', { value: userType, onChange: (e) => setUserType(e.target.value), className: 'input' },
+              e('option', { value: 'tourist' }, 'Traveler/Guest'),
+              e('option', { value: 'owner' }, 'Property Owner')
+            )
+          ),
+          mode === 'signup' && e('input', { type: 'text', className: 'input', placeholder: 'Full Name', value: name, onChange: (e) => setName(e.target.value), style: { marginBottom: '12px' } }),
+          e('input', { type: 'email', className: 'input', placeholder: 'Email', value: email, onChange: (e) => setEmail(e.target.value), style: { marginBottom: '12px' } }),
+          e('input', { type: 'password', className: 'input', placeholder: 'Password', value: password, onChange: (e) => setPassword(e.target.value), style: { marginBottom: '12px' } }),
+          e('button', { className: 'btn btn-primary', onClick: handleSubmit, style: { width: '100%', marginBottom: '12px' } }, mode === 'login' ? 'Login' : 'Create Account'),
+          e('div', { style: { textAlign: 'center', fontSize: '13px', color: '#666' } },
+            mode === 'login' ? 'No account? ' : 'Have account? ',
+            e('a', { onClick: () => { setMode(mode === 'login' ? 'signup' : 'login'); setEmail(''); setPassword(''); setName(''); }, style: { color: 'var(--orange)', cursor: 'pointer', textDecoration: 'none' } }, mode === 'login' ? 'Sign up' : 'Login')
+          )
+        ),
+        Footer({})
+      );
+    }
+
+    /* ---- DASHBOARD ---- */
+    function Dashboard({ user, listings, onNavigate }) {
+      const [activeTab, setActiveTab] = useState('profile');
+
+      return e('div', { style: { maxWidth: '1000px', margin: '0 auto', padding: '32px 24px' } },
+        e('h1', { style: { marginBottom: '24px' } }, 'Dashboard'),
+        e('div', null,
+          e('button', { className: 'tab' + (activeTab === 'profile' ? ' active' : ''), onClick: () => setActiveTab('profile') }, 'Profile'),
+          user.userType === 'owner' && e('button', { className: 'tab' + (activeTab === 'properties' ? ' active' : ''), onClick: () => setActiveTab('properties') }, 'My Properties'),
+          e('button', { className: 'tab' + (activeTab === 'proposals' ? ' active' : ''), onClick: () => setActiveTab('proposals') }, 'Proposals')
+        ),
+        e('div', { style: { marginTop: '24px', padding: '24px', background: 'white', borderRadius: '8px' } },
+          activeTab === 'profile' && e('div', null,
+            e('h2', null, 'Profile'),
+            e('p', null, 'Name: ' + user.name),
+            e('p', null, 'Email: ' + user.email),
+            e('p', null, 'Type: ' + (user.userType === 'owner' ? 'Property Owner' : 'Traveler')),
+            e('p', { style: { fontSize: '13px', color: '#666' } }, 'Member since ' + new Date(user.created).toLocaleDateString())
+          ),
+          activeTab === 'properties' && e('div', null,
+            e('h2', null, 'My Properties'),
+            e('p', { style: { color: '#666' } }, 'You have not yet claimed any properties.')
+          ),
+          activeTab === 'proposals' && e('div', null,
+            e('h2', null, 'My Proposals'),
+            e('p', { style: { color: '#666' } }, 'You have no submitted proposals yet.')
+          )
+        ),
+        Footer({})
+      );
+    }
+
+    function Footer() {
+      return e('footer', { className: 'footer' },
+        e('p', null, '© 2026 AffittoDiretto.it - Direct booking platform for Italy'),
+        e('p', { style: { fontSize: '12px', marginTop: '8px' } }, 'No commission. Book directly with property owners.')
+      );
+    }
+
+    /* ---- MAIN APP ---- */
     function App() {
-      const [currentPage, setCurrentPage] = useState('home');
-      const [selectedPropertyId, setSelectedPropertyId] = useState(null);
+      const [page, setPage] = useState('home');
       const [listings, setListings] = useState([]);
-      const [provincesByRegion, setProvincesByRegion] = useState({});
+      const [loading, setLoading] = useState(true);
+      const [user, setUser] = useState(null);
 
       useEffect(() => {
         const parsed = parseListings();
         setListings(parsed);
-        setProvincesByRegion(buildProvincesByRegion(parsed));
-        if (window.location.hash === '#/admin') setCurrentPage('admin');
+        setLoading(false);
+        const stored = localStorage.getItem('ad_current_user');
+        if (stored) setUser(JSON.parse(stored));
+        window.scrollTo(0, 0);
       }, []);
 
-      useEffect(() => {
-        const onHash = () => {
-          if (window.location.hash === '#/admin') setCurrentPage('admin');
-        };
-        window.addEventListener('hashchange', onHash);
-        return () => window.removeEventListener('hashchange', onHash);
-      }, []);
+      const handleNavigate = (newPage) => {
+        setPage(newPage);
+        window.scrollTo(0, 0);
+      };
 
-      const handleNavigate = (page) => { setCurrentPage(page); setSelectedPropertyId(null); window.scrollTo(0, 0); };
-      const handlePropertyClick = (id) => { setSelectedPropertyId(id); setCurrentPage('detail'); window.scrollTo(0, 0); };
+      const handlePropertyClick = (propId) => {
+        const prop = listings.find(l => l.id === propId);
+        if (prop) {
+          sessionStorage.setItem('ad_current_property', JSON.stringify(prop));
+          handleNavigate('detail');
+        }
+      };
 
-      if (!listings.length) {
-        return e('div', { style: { padding: '48px', textAlign: 'center' } },
-          e('div', { className: 'spinner' }),
-          e('p', { style: { marginTop: '16px', color: '#666' } }, 'Loading 63,304 properties...')
-        );
-      }
+      if (loading) return e('div', { style: { padding: '40px', textAlign: 'center' } }, e('div', { className: 'spinner' }), e('p', { style: { marginTop: '20px' } }, 'Loading 63,000 properties...'));
 
-      if (currentPage === 'admin') {
-        return e(AdminPanel, { listings, onBack: () => handleNavigate('home') });
-      }
+      const currentProp = page === 'detail' ? JSON.parse(sessionStorage.getItem('ad_current_property') || 'null') : null;
 
       return e('div', null,
-        e(Nav, { onNavigate: handleNavigate, currentPage }),
-        currentPage === 'home' && e(HomePage, { listings, onNavigate: handleNavigate, onPropertyClick: handlePropertyClick }),
-        currentPage === 'search' && e(SearchPage, { listings, onPropertyClick: handlePropertyClick, provincesByRegion }),
-        currentPage === 'detail' && selectedPropertyId && e(PropertyDetail, { propertyId: selectedPropertyId, listings, onBack: () => handleNavigate('search') }),
-        currentPage === 'rfp' && e(RFPPage, { onBack: () => handleNavigate('home') }),
-        currentPage === 'claim' && e(ClaimPage, { listings, onBack: () => handleNavigate('home') }),
-        currentPage === 'login' && e(LoginPage, { onBack: () => handleNavigate('home') }),
-        e('footer', { style: { background: '#333', color: '#ccc', padding: '32px 24px', textAlign: 'center', marginTop: '48px' } },
-          e('div', { style: { fontWeight: '600', color: 'white', marginBottom: '8px' } }, 'AffittoDiretto.it'),
-          e('p', { style: { fontSize: '13px', margin: 0 } }, 'Book direct. Save on fees. Support local owners.')
-        )
+        Nav({ onNavigate: handleNavigate, currentPage: page, user }),
+        page === 'home' && HomePage({ listings, onNavigate: handleNavigate, onPropertyClick: handlePropertyClick }),
+        page === 'search' && SearchPage({ listings, onPropertyClick: handlePropertyClick, onNavigate: handleNavigate }),
+        page === 'map' && MapPage({ listings }),
+        page === 'detail' && currentProp && PropertyDetail({ prop: currentProp, onNavigate: handleNavigate, user }),
+        page === 'login' && LoginPage({ onNavigate: handleNavigate, user }),
+        page === 'dashboard' && user && Dashboard({ user, listings, onNavigate: handleNavigate })
       );
     }
 
-    ReactDOM.render(e(App), document.getElementById('root'));
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(e(App));
   </script>
 </body>
 </html>
