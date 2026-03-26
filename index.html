@@ -9,13 +9,8 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="data_public.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     :root {
       --primary-blue: #003580;
       --primary-blue-light: #0066d4;
@@ -29,46 +24,43 @@
       --error: #dc2626;
     }
 
-    html, body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      color: var(--text-dark);
-      background: white;
-      height: 100%;
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
-    #root {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      color: var(--text-dark);
+      background: #fff;
     }
 
-    /* ===== NAVIGATION ===== */
+    /* NAVBAR */
     .navbar {
-      background: white;
-      border-bottom: 1px solid var(--border-light);
-      padding: 0.75rem 2rem;
       position: sticky;
       top: 0;
-      z-index: 100;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      z-index: 1000;
+      background: #fff;
+      border-bottom: 1px solid var(--border-light);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 0.75rem 2rem;
     }
 
-    .navbar-content {
-      max-width: 1400px;
-      margin: 0 auto;
+    .navbar-container {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
     .navbar-logo {
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--primary-blue);
-      text-decoration: none;
       cursor: pointer;
+      text-decoration: none;
     }
 
     .navbar-links {
@@ -80,361 +72,32 @@
     .navbar-link {
       color: var(--text-dark);
       text-decoration: none;
-      font-size: 0.95rem;
       cursor: pointer;
-      border: none;
-      background: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      transition: background 0.2s;
+      font-size: 0.95rem;
+      padding: 0.5rem 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
     }
 
     .navbar-link:hover {
-      background: var(--bg-light);
+      color: var(--primary-blue);
+      border-bottom-color: var(--primary-blue);
     }
 
     .navbar-link.active {
       color: var(--primary-blue);
-      font-weight: 600;
-    }
-
-    .navbar-user {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .btn-logout {
-      background: var(--error);
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: background 0.2s;
-    }
-
-    .btn-logout:hover {
-      background: #b91c1c;
-    }
-
-    /* ===== HOME PAGE ===== */
-    .home-page {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .hero-section {
-      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
-      color: white;
-      padding: 3rem 2rem;
-      text-align: center;
-    }
-
-    .hero-content {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .hero-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .hero-subtitle {
-      font-size: 1.2rem;
-      font-weight: 300;
-      margin-bottom: 2rem;
-      opacity: 0.95;
-    }
-
-    .search-section {
-      max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 0 2rem;
-      margin-top: -2rem;
-      position: relative;
-      z-index: 10;
-      margin-bottom: 3rem;
-    }
-
-    .search-container {
-      background: white;
-      border-radius: 8px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: flex;
-      gap: 1rem;
-      align-items: flex-end;
-      flex-wrap: wrap;
-    }
-
-    .search-field {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .search-label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid var(--border-light);
-      border-radius: 4px;
-      font-size: 1rem;
-      transition: border-color 0.2s;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--primary-blue);
-      box-shadow: 0 0 0 3px rgba(0,53,128,0.1);
-    }
-
-    .search-autocomplete {
-      position: absolute;
-      top: 100%;
-      left: 1.5rem;
-      right: 1.5rem;
-      background: white;
-      border: 1px solid var(--border-light);
-      border-top: none;
-      border-radius: 0 0 8px 8px;
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 20;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .autocomplete-item {
-      padding: 0.75rem 1.5rem;
-      cursor: pointer;
-      border-bottom: 1px solid var(--border-light);
-      transition: background 0.2s;
-    }
-
-    .autocomplete-item:hover {
-      background: var(--bg-light);
-    }
-
-    .autocomplete-item.selected {
-      background: var(--bg-light);
-    }
-
-    .btn-search {
-      background: var(--secondary-orange);
-      color: white;
-      border: none;
-      padding: 0.75rem 2rem;
-      border-radius: 4px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-search:hover {
-      background: var(--secondary-orange-light);
-    }
-
-    .value-props {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      padding: 3rem 2rem;
-      background: var(--bg-light);
-      max-width: 1400px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .value-prop {
-      text-align: center;
-    }
-
-    .value-prop-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .value-prop-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--text-dark);
-    }
-
-    .value-prop-text {
-      color: var(--text-light);
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    .featured-section {
-      padding: 3rem 2rem;
-      max-width: 1400px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .section-title {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 2rem;
-      color: var(--text-dark);
-    }
-
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 3rem;
-    }
-
-    /* ===== PROPERTY CARD - HORIZONTAL ===== */
-    .property-card-horizontal {
-      display: grid;
-      grid-template-columns: 200px 1fr 180px;
-      gap: 1.5rem;
-      background: white;
-      border: 1px solid var(--border-light);
-      border-radius: 8px;
-      overflow: hidden;
-      transition: box-shadow 0.2s, transform 0.2s;
-      cursor: pointer;
-    }
-
-    .property-card-horizontal:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      transform: translateY(-2px);
-    }
-
-    .property-card-image {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      background: var(--bg-light);
-    }
-
-    .property-card-details {
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .property-card-header {
-      margin-bottom: 0.75rem;
-    }
-
-    .property-card-name {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 0.25rem;
-    }
-
-    .property-card-location {
-      font-size: 0.9rem;
-      color: var(--text-light);
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .property-card-rating {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-    }
-
-    .star {
-      color: var(--secondary-orange);
-      font-size: 0.9rem;
-    }
-
-    .rating-score {
-      font-weight: 600;
-      color: var(--primary-blue);
-    }
-
-    .property-card-desc {
-      font-size: 0.9rem;
-      color: var(--text-light);
-      line-height: 1.4;
-      margin: 0.75rem 0;
-    }
-
-    .property-card-amenities {
-      display: flex;
-      gap: 0.75rem;
-      margin: 0.75rem 0;
-      font-size: 0.85rem;
-      color: var(--text-light);
-    }
-
-    .amenity-tag {
-      background: var(--bg-light);
-      padding: 0.25rem 0.75rem;
-      border-radius: 4px;
-      white-space: nowrap;
-    }
-
-    .property-card-actions {
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      border-left: 1px solid var(--border-light);
-    }
-
-    .property-card-price {
-      text-align: center;
-    }
-
-    .property-card-price-label {
-      font-size: 0.8rem;
-      color: var(--text-light);
-      margin-bottom: 0.25rem;
-    }
-
-    .property-card-price-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary-blue);
-      margin-bottom: 0.5rem;
-    }
-
-    .property-card-price-unit {
-      font-size: 0.8rem;
-      color: var(--text-light);
+      border-bottom-color: var(--primary-blue);
     }
 
     .btn-primary {
       background: var(--primary-blue);
-      color: white;
+      color: #fff;
       border: none;
-      padding: 0.75rem 1.5rem;
+      padding: 0.6rem 1.2rem;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 600;
+      font-size: 0.95rem;
       transition: background 0.2s;
-      width: 100%;
-      text-align: center;
     }
 
     .btn-primary:hover {
@@ -442,133 +105,433 @@
     }
 
     .btn-secondary {
-      background: white;
+      background: transparent;
       color: var(--primary-blue);
       border: 1px solid var(--primary-blue);
-      padding: 0.75rem 1.5rem;
+      padding: 0.6rem 1.2rem;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 600;
-      transition: background 0.2s;
-      width: 100%;
-      text-align: center;
+      font-size: 0.95rem;
+      transition: all 0.2s;
     }
 
     .btn-secondary:hover {
-      background: var(--bg-light);
+      background: var(--primary-blue);
+      color: #fff;
     }
 
-    .btn-icon {
-      background: var(--bg-light);
-      color: var(--text-dark);
+    /* HERO SECTION */
+    .hero {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, #004ba8 100%);
+      color: #fff;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .hero-content {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      opacity: 0.95;
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 0.5rem;
+      background: #fff;
+      border-radius: 4px;
+      padding: 0.5rem;
+      max-width: 500px;
+      margin: 0 auto;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .search-bar input, .search-bar select {
+      flex: 1;
       border: none;
-      width: 44px;
-      height: 44px;
+      padding: 0.75rem;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .search-bar button {
+      padding: 0.75rem 1.5rem;
+      background: var(--secondary-orange);
+      color: #fff;
+      border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-weight: 600;
       transition: background 0.2s;
     }
 
-    .btn-icon:hover {
-      background: var(--border-light);
+    .search-bar button:hover {
+      background: #a94f1f;
     }
 
-    /* ===== SEARCH PAGE ===== */
-    .search-page {
+    /* VALUE PROPS */
+    .value-props {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .value-prop {
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .value-prop-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .value-prop h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary-blue);
+    }
+
+    .value-prop p {
+      font-size: 0.95rem;
+      color: var(--text-light);
+    }
+
+    /* FEATURED SECTION */
+    .featured-section {
+      max-width: 1400px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      color: var(--text-dark);
+    }
+
+    .property-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    /* PROPERTY CARD */
+    .property-card {
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+      transition: all 0.3s;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .property-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      transform: translateY(-4px);
+    }
+
+    .card-image {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      background: var(--bg-light);
+      overflow: hidden;
+    }
+
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sample-label {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      border-radius: 3px;
+    }
+
+    .verified-badge {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      background: var(--success);
+      color: #fff;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+
+    .card-content {
+      padding: 1rem;
+    }
+
+    .card-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: var(--text-dark);
+    }
+
+    .card-meta {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .card-stars {
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+      color: #ffc107;
+    }
+
+    .card-amenities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .amenity-chip {
+      background: var(--bg-light);
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      color: var(--text-dark);
+    }
+
+    /* HORIZONTAL CARD (Search Results) */
+    .horizontal-card {
+      display: flex;
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: all 0.3s;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+    }
+
+    .horizontal-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+
+    .h-card-image {
+      width: 280px;
+      height: 200px;
+      flex-shrink: 0;
+      background: var(--bg-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .h-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .h-card-content {
+      flex: 1;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .h-card-header {
+      margin-bottom: 1rem;
+    }
+
+    .h-card-name {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .h-card-meta {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-bottom: 0.3rem;
+    }
+
+    .h-card-stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .h-card-amenities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+
+    .h-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .h-card-button {
+      background: var(--primary-blue);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .h-card-button:hover {
+      background: var(--primary-blue-light);
+    }
+
+    /* SIDEBAR FILTERS */
+    .search-container {
       display: grid;
       grid-template-columns: 280px 1fr;
       gap: 2rem;
       max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
-      flex: 1;
-      width: 100%;
+      margin: 2rem auto;
+      padding: 0 2rem;
     }
 
     .filter-sidebar {
-      background: white;
+      background: #fff;
       border: 1px solid var(--border-light);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 1.5rem;
       height: fit-content;
       position: sticky;
-      top: 90px;
-    }
-
-    .filter-title {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 2px solid var(--primary-blue);
+      top: 80px;
     }
 
     .filter-group {
       margin-bottom: 1.5rem;
     }
 
-    .filter-group-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 0.75rem;
-    }
-
-    .filter-option {
-      display: flex;
-      align-items: center;
-      padding: 0.5rem 0;
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: var(--text-dark);
-    }
-
-    .filter-checkbox {
-      margin-right: 0.75rem;
-      width: 18px;
-      height: 18px;
-      accent-color: var(--primary-blue);
-      cursor: pointer;
-    }
-
-    .filter-count {
-      margin-left: auto;
-      color: var(--text-light);
-      font-size: 0.85rem;
+    .filter-group:last-child {
+      margin-bottom: 0;
     }
 
     .filter-label {
-      flex: 1;
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+    }
+
+    .filter-label .help-icon {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      background: var(--primary-blue);
+      color: #fff;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 18px;
+      font-size: 0.75rem;
+      margin-left: 0.3rem;
       cursor: pointer;
     }
 
-    .filter-range {
-      margin-top: 0.5rem;
-    }
-
-    .range-input {
+    .filter-input, .filter-select {
       width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      background: var(--border-light);
-      outline: none;
-      accent-color: var(--primary-blue);
-    }
-
-    .range-value {
-      margin-top: 0.5rem;
+      padding: 0.6rem;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
       font-size: 0.9rem;
-      color: var(--primary-blue);
-      font-weight: 600;
     }
 
+    .slider-container {
+      padding: 0.5rem 0;
+    }
+
+    .slider {
+      width: 100%;
+      height: 4px;
+      background: var(--border-light);
+      border-radius: 2px;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--primary-blue);
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: var(--primary-blue);
+      cursor: pointer;
+      border-radius: 50%;
+      border: none;
+    }
+
+    .slider-value {
+      display: block;
+      text-align: center;
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .amenities-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .amenity-toggle {
+      padding: 0.4rem 0.8rem;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .amenity-toggle.active {
+      background: var(--primary-blue);
+      color: #fff;
+      border-color: var(--primary-blue);
+    }
+
+    /* RESULTS AREA */
     .results-area {
       flex: 1;
     }
@@ -578,469 +541,320 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.5rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-light);
+      padding: 1rem;
+      background: var(--bg-light);
+      border-radius: 6px;
     }
 
     .results-count {
-      font-size: 1rem;
-      color: var(--text-dark);
-      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-light);
     }
 
-    .sort-controls {
+    .sort-buttons {
       display: flex;
       gap: 0.5rem;
     }
 
     .sort-btn {
-      background: white;
-      border: 1px solid var(--border-light);
       padding: 0.5rem 1rem;
+      background: #fff;
+      border: 1px solid var(--border-light);
       border-radius: 4px;
       cursor: pointer;
-      font-size: 0.9rem;
-      color: var(--text-dark);
+      font-size: 0.85rem;
       transition: all 0.2s;
     }
 
     .sort-btn.active {
       background: var(--primary-blue);
-      color: white;
+      color: #fff;
       border-color: var(--primary-blue);
     }
 
-    .results-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
+    /* PAGINATION */
     .pagination {
       display: flex;
       justify-content: center;
       gap: 0.5rem;
       margin-top: 2rem;
-      padding-top: 2rem;
+      padding-top: 1.5rem;
       border-top: 1px solid var(--border-light);
     }
 
-    .pagination-btn {
-      background: white;
+    .page-btn {
+      padding: 0.5rem 0.8rem;
       border: 1px solid var(--border-light);
-      padding: 0.5rem 0.75rem;
-      border-radius: 4px;
+      background: #fff;
       cursor: pointer;
-      transition: all 0.2s;
+      border-radius: 4px;
       font-size: 0.9rem;
+      transition: all 0.2s;
+      min-width: 40px;
     }
 
-    .pagination-btn:hover {
+    .page-btn.active {
+      background: var(--primary-blue);
+      color: #fff;
+      border-color: var(--primary-blue);
+    }
+
+    .page-btn:hover:not(.ellipsis) {
       border-color: var(--primary-blue);
       color: var(--primary-blue);
     }
 
-    .pagination-btn.active {
-      background: var(--primary-blue);
-      color: white;
-      border-color: var(--primary-blue);
+    .page-btn.ellipsis {
+      cursor: default;
+      border: none;
     }
 
-    /* ===== MAP PAGE ===== */
-    .map-page {
-      display: grid;
-      grid-template-columns: 350px 1fr;
-      gap: 0;
-      flex: 1;
-      height: calc(100vh - 70px);
-    }
-
+    /* MAP */
     .map-container {
-      height: 100%;
-      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .map-filter-bar {
+      background: #fff;
+      border-bottom: 1px solid var(--border-light);
+      padding: 1rem 2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .map-filter-bar select {
+      padding: 0.6rem;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .map-count {
+      margin-left: auto;
+      font-size: 0.9rem;
+      color: var(--text-light);
     }
 
     #map {
-      height: 100%;
-      width: 100%;
-    }
-
-    .map-filters {
-      background: white;
-      border-right: 1px solid var(--border-light);
-      overflow-y: auto;
-      padding: 1.5rem;
-    }
-
-    .map-filter-title {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      text-transform: uppercase;
-      margin-bottom: 1rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 2px solid var(--primary-blue);
-    }
-
-    /* ===== PROPERTY DETAIL PAGE ===== */
-    .property-detail-page {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 2rem;
       flex: 1;
     }
 
-    .detail-gallery {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 2rem;
+    .map-legend {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      font-size: 0.9rem;
+      z-index: 400;
     }
 
-    .detail-image-main {
-      grid-column: 1 / 3;
-      width: 100%;
-      height: 400px;
-      object-fit: cover;
-      border-radius: 8px;
-      background: var(--bg-light);
-    }
-
-    .detail-image {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border-radius: 8px;
-      background: var(--bg-light);
-    }
-
-    .detail-info {
-      background: white;
-      border: 1px solid var(--border-light);
-      border-radius: 8px;
-      padding: 2rem;
-    }
-
-    .detail-name {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 1rem;
-    }
-
-    .detail-location {
+    .legend-item {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      color: var(--text-light);
-      margin-bottom: 1rem;
-      font-size: 1rem;
+      margin-bottom: 0.5rem;
     }
 
-    .detail-rating {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-light);
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #333;
     }
 
-    .detail-description {
-      color: var(--text-light);
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-      font-size: 0.95rem;
-    }
-
-    .detail-amenities {
-      margin-bottom: 1.5rem;
-    }
-
-    .amenities-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: var(--text-dark);
-    }
-
-    .amenities-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-    }
-
-    .amenity-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.95rem;
-      color: var(--text-dark);
-      padding: 0.75rem;
+    /* PROPERTY DETAIL */
+    .detail-hero {
+      position: relative;
+      width: 100%;
+      height: 400px;
       background: var(--bg-light);
-      border-radius: 4px;
+      overflow: hidden;
     }
 
-    .amenity-icon {
-      font-size: 1.2rem;
+    .detail-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    .detail-sidebar {
-      position: sticky;
-      top: 90px;
-      height: fit-content;
-    }
-
-    .booking-card {
-      background: white;
-      border: 1px solid var(--border-light);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .booking-price {
-      font-size: 0.95rem;
-      color: var(--text-light);
-      margin-bottom: 0.5rem;
-    }
-
-    .booking-amount {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary-blue);
-      margin-bottom: 0.5rem;
-    }
-
-    .booking-unit {
-      font-size: 0.9rem;
-      color: var(--text-light);
-      margin-bottom: 1.5rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-light);
-    }
-
-    .booking-form {
+    .detail-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      justify-content: flex-end;
+      padding: 2rem;
+      color: #fff;
     }
 
-    .booking-input {
-      padding: 0.75rem;
+    .detail-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-meta {
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    .detail-container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    .detail-left {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-light);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-item {
+      padding: 1rem;
+      background: var(--bg-light);
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .info-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-blue);
+    }
+
+    .info-label {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-top: 0.3rem;
+    }
+
+    .address-section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .address-label {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-bottom: 0.3rem;
+    }
+
+    .address-text {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .amenities-section h3 {
+      margin-bottom: 1rem;
+      color: var(--text-dark);
+    }
+
+    .map-embed {
+      width: 100%;
+      height: 300px;
+      border-radius: 6px;
+      margin-top: 1rem;
+      border: 1px solid var(--border-light);
+    }
+
+    .detail-right {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-light);
+      height: fit-content;
+      position: sticky;
+      top: 100px;
+    }
+
+    .contact-section h3 {
+      margin-bottom: 1rem;
+      color: var(--text-dark);
+    }
+
+    .website-link {
+      display: block;
+      background: var(--primary-blue);
+      color: #fff;
+      padding: 0.8rem;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+      transition: background 0.2s;
+    }
+
+    .website-link:hover {
+      background: var(--primary-blue-light);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: var(--text-dark);
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 0.6rem;
       border: 1px solid var(--border-light);
       border-radius: 4px;
-      font-size: 0.95rem;
-    }
-
-    .booking-input:focus {
-      outline: none;
-      border-color: var(--primary-blue);
-      box-shadow: 0 0 0 3px rgba(0,53,128,0.1);
-    }
-
-    .booking-textarea {
-      padding: 0.75rem;
-      border: 1px solid var(--border-light);
-      border-radius: 4px;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-family: inherit;
+    }
+
+    .form-textarea {
       resize: vertical;
       min-height: 100px;
     }
 
-    .booking-textarea:focus {
-      outline: none;
-      border-color: var(--primary-blue);
-      box-shadow: 0 0 0 3px rgba(0,53,128,0.1);
-    }
-
-    .btn-book {
-      background: var(--secondary-orange);
-      color: white;
-      border: none;
-      padding: 1rem;
-      border-radius: 4px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-book:hover {
-      background: var(--secondary-orange-light);
-    }
-
-    /* ===== LOGIN PAGE ===== */
-    .login-page {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-light);
-      padding: 2rem;
-    }
-
-    .login-card {
-      background: white;
-      border: 1px solid var(--border-light);
-      border-radius: 8px;
-      padding: 2rem;
-      max-width: 400px;
+    .form-submit {
       width: 100%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .login-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .form-label {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text-dark);
-    }
-
-    .form-input {
-      padding: 0.75rem;
-      border: 1px solid var(--border-light);
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-
-    .form-input:focus {
-      outline: none;
-      border-color: var(--primary-blue);
-      box-shadow: 0 0 0 3px rgba(0,53,128,0.1);
-    }
-
-    .btn-login {
-      background: var(--primary-blue);
-      color: white;
+      padding: 0.8rem;
+      background: var(--secondary-orange);
+      color: #fff;
       border: none;
-      padding: 0.75rem;
       border-radius: 4px;
-      font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 0.5rem;
       transition: background 0.2s;
     }
 
-    .btn-login:hover {
-      background: var(--primary-blue-light);
+    .form-submit:hover {
+      background: #a94f1f;
     }
 
-    .login-links {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .login-link {
-      color: var(--primary-blue);
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      background: none;
-    }
-
-    .login-link:hover {
-      text-decoration: underline;
-    }
-
-    /* ===== DASHBOARD PAGE ===== */
-    .dashboard-page {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
-      flex: 1;
-    }
-
-    .dashboard-title {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 2rem;
-      color: var(--text-dark);
-    }
-
-    .dashboard-section {
-      margin-bottom: 3rem;
-    }
-
-    .dashboard-section-title {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      color: var(--text-dark);
-    }
-
-    /* ===== FOOTER ===== */
-    .footer {
-      background: #1a1a1a;
-      color: white;
-      padding: 3rem 2rem;
-      margin-top: 3rem;
-    }
-
-    .footer-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .footer-section-title {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: var(--secondary-orange);
-    }
-
-    .footer-link {
-      color: #ccc;
-      text-decoration: none;
-      display: block;
-      margin-bottom: 0.75rem;
-      font-size: 0.9rem;
-      transition: color 0.2s;
-    }
-
-    .footer-link:hover {
-      color: var(--secondary-orange);
-    }
-
-    .footer-bottom {
-      border-top: 1px solid #333;
-      padding-top: 2rem;
-      text-align: center;
-      color: #999;
-      font-size: 0.9rem;
-    }
-
-    /* ===== MODAL ===== */
+    /* MODAL */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -1049,816 +863,1219 @@
       bottom: 0;
       background: rgba(0,0,0,0.5);
       display: flex;
-      align-items: center;
       justify-content: center;
-      z-index: 1000;
+      align-items: center;
+      z-index: 2000;
     }
 
-    .modal-content {
-      background: white;
-      border-radius: 8px;
+    .modal {
+      background: #fff;
+      border-radius: 6px;
       padding: 2rem;
-      max-width: 600px;
+      max-width: 700px;
       width: 90%;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border-light);
-    }
-
-    .modal-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text-dark);
     }
 
     .modal-close {
-      background: none;
-      border: none;
+      float: right;
       font-size: 1.5rem;
       cursor: pointer;
       color: var(--text-light);
+      background: none;
+      border: none;
+      padding: 0;
     }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 1024px) {
-      .search-page {
-        grid-template-columns: 1fr;
-      }
-
-      .filter-sidebar {
-        position: static;
-      }
-
-      .property-detail-page {
-        grid-template-columns: 1fr;
-      }
-
-      .detail-sidebar {
-        position: static;
-      }
-
-      .map-page {
-        grid-template-columns: 1fr;
-      }
-
-      .map-filters {
-        display: none;
-      }
-
-      .property-card-horizontal {
-        grid-template-columns: 150px 1fr 140px;
-      }
-
-      .property-card-image {
-        height: 150px;
-      }
-
-      .hero-title {
-        font-size: 2rem;
-      }
+    .modal-close:hover {
+      color: var(--text-dark);
     }
 
-    @media (max-width: 768px) {
-      .navbar {
-        padding: 0.5rem 1rem;
-      }
-
-      .navbar-links {
-        gap: 1rem;
-        font-size: 0.85rem;
-      }
-
-      .search-container {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .search-field {
-        min-width: auto;
-      }
-
-      .btn-search {
-        width: 100%;
-      }
-
-      .hero-section {
-        padding: 2rem 1rem;
-      }
-
-      .hero-title {
-        font-size: 1.5rem;
-      }
-
-      .hero-subtitle {
-        font-size: 1rem;
-      }
-
-      .property-card-horizontal {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-
-      .property-card-image {
-        height: 200px;
-      }
-
-      .property-card-actions {
-        border-left: none;
-        border-top: 1px solid var(--border-light);
-      }
-
-      .cards-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .amenities-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .detail-gallery {
-        grid-template-columns: 1fr;
-      }
-
-      .detail-image-main {
-        grid-column: auto;
-        height: 250px;
-      }
-
-      .filter-sidebar {
-        padding: 1rem;
-      }
-
-      .search-page {
-        padding: 1rem;
-        gap: 1rem;
-      }
-
-      .results-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-      }
-
-      .sort-controls {
-        width: 100%;
-        flex-wrap: wrap;
-      }
-
-      .sort-btn {
-        flex: 1;
-        min-width: 100px;
-      }
+    .modal h2 {
+      margin-bottom: 1.5rem;
+      color: var(--primary-blue);
+      clear: both;
     }
 
-    .loading {
-      text-align: center;
+    .property-type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .type-card {
+      padding: 1rem;
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .type-card:hover {
+      border-color: var(--primary-blue);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .type-name {
+      font-weight: 600;
+      color: var(--primary-blue);
+      margin-bottom: 0.5rem;
+    }
+
+    .type-desc {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .type-tax {
+      font-size: 0.85rem;
+      color: var(--secondary-orange);
+      font-weight: 500;
+    }
+
+    /* LOGIN PAGE */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 70vh;
       padding: 2rem;
+      background: var(--bg-light);
+    }
+
+    .login-card {
+      background: #fff;
+      padding: 2.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 380px;
+      border: 1px solid var(--border-light);
+    }
+
+    .login-tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 0.75rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-light);
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      color: var(--primary-blue);
+      border-bottom-color: var(--primary-blue);
+    }
+
+    .user-type-select {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .type-option {
+      padding: 1rem;
+      border: 2px solid var(--border-light);
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .type-option.selected {
+      border-color: var(--primary-blue);
+      background: var(--bg-light);
+    }
+
+    /* DASHBOARD */
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    .dashboard-tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .dashboard-tab {
+      padding: 0.75rem 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-light);
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+
+    .dashboard-tab.active {
+      color: var(--primary-blue);
+      border-bottom-color: var(--primary-blue);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
       color: var(--text-light);
     }
 
-    .error {
-      background: #fee;
-      border: 1px solid #fcc;
-      color: var(--error);
-      padding: 1rem;
-      border-radius: 4px;
-      margin-bottom: 1rem;
+    .empty-state h3 {
+      margin-bottom: 0.5rem;
+      color: var(--text-dark);
     }
 
-    .success {
-      background: #efe;
-      border: 1px solid #cfc;
-      color: var(--success);
-      padding: 1rem;
-      border-radius: 4px;
+    /* FOOTER */
+    .footer {
+      background: var(--text-dark);
+      color: #fff;
+      padding: 3rem 2rem 1rem;
+      margin-top: 4rem;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto 2rem;
+    }
+
+    .footer-column h4 {
       margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .footer-link {
+      display: block;
+      color: #ccc;
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover {
+      color: #fff;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.85rem;
+      color: #999;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+
+      .value-props {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .search-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .filter-sidebar {
+        position: static;
+        top: auto;
+      }
+
+      .detail-container {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-right {
+        position: static;
+      }
+
+      .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .property-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+
+      .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .horizontal-card {
+        flex-direction: column;
+      }
+
+      .h-card-image {
+        width: 100%;
+        height: 200px;
+      }
     }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
-  <script type="text/babel">
-    const { useState, useEffect, useMemo, useRef } = React;
-    const e = React.createElement;
+  <script>
+    var { useState, useEffect, useMemo, useRef, useCallback } = React;
+    var e = React.createElement;
 
-    // ===== DATA PARSING & UTILITIES =====
-    var ROME_CAP_NEIGHBORHOODS = {
-      '00118': 'EUR', '00119': 'EUR', '00121': 'Ardeatino', '00122': 'Ardeatino',
-      '00131': 'Esquilino', '00132': 'Esquilino', '00133': 'Centocelle', '00134': 'Centocelle',
-      '00135': 'San Lorenzo', '00136': 'San Lorenzo', '00137': 'Tiburtino', '00138': 'Tiburtino',
-      '00139': 'Tiburtino', '00141': 'Prenestino', '00142': 'Prenestino', '00143': 'Tuscolano',
-      '00144': 'Tuscolano', '00145': 'Tuscolano', '00146': 'Testaccio', '00147': 'Testaccio',
-      '00148': 'Ostiense', '00149': 'Ostiense', '00151': 'Portuense', '00152': 'Gianicolense',
-      '00153': 'Trastevere', '00154': 'Trastevere', '00155': 'San Paolo', '00156': 'San Paolo',
-      '00157': 'Quadraro', '00158': 'Quadraro', '00159': 'Torpignattara', '00161': 'San Giovanni',
-      '00162': 'San Giovanni', '00163': 'Celio', '00164': 'Celio', '00165': 'Rione Monti',
-      '00166': 'Rione Monti', '00167': 'Rione Monti', '00168': 'Rione Monti', '00169': 'Rione Monti',
-      '00170': 'Rione Monti', '00171': 'Castro Pretorio', '00172': 'Castro Pretorio', '00173': 'Rione Monti',
-      '00174': 'Rione Monti', '00175': 'Rione Monti', '00176': 'Rione Monti', '00177': 'Tiburtino',
-      '00178': 'Prenestino', '00179': 'Prenestino', '00180': 'Trevi', '00181': 'Trevi',
-      '00182': 'Trevi', '00183': 'Trevi', '00184': 'Trevi', '00185': 'Esquilino', '00186': 'Esquilino'
+    /* ---- REGION DATA ---- */
+    var REGION_CENTERS = {
+      0: [41.9, 12.5, 9],
+      1: [45.0, 7.7, 8],
+      2: [41.0, 16.5, 8],
+      3: [45.4, 11.8, 8],
+      4: [44.3, 8.5, 9]
     };
-
-    var VENICE_CAP_SESTIERI = {
-      '30121': 'San Marco', '30122': 'San Marco', '30123': 'San Marco', '30124': 'San Marco',
-      '30125': 'Cannaregio', '30126': 'Cannaregio', '30127': 'Cannaregio', '30128': 'Cannaregio',
-      '30131': 'Castello', '30132': 'Castello', '30133': 'Castello', '30134': 'Castello',
-      '30135': 'San Polo', '30136': 'San Polo', '30137': 'San Polo', '30138': 'Santa Croce',
-      '30139': 'Santa Croce', '30140': 'Giudecca', '30141': 'Giudecca'
+    var REGION_PHOTOS = {
+      0: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&h=600&fit=crop',
+      1: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=600&fit=crop',
+      2: 'https://images.unsplash.com/photo-1534113414509-0eec2bfb493f?w=1200&h=600&fit=crop',
+      3: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1200&h=600&fit=crop',
+      4: 'https://images.unsplash.com/photo-1537631468332-b93e15cbc7e4?w=1200&h=600&fit=crop'
     };
-
-    var TORINO_CAP_NEIGHBORHOODS = {
-      '10121': 'Centro', '10122': 'Centro', '10123': 'Centro', '10124': 'Centro',
-      '10125': 'Vanchiglia', '10126': 'Vanchiglia', '10127': 'Barriera Milano', '10128': 'Barriera Milano',
-      '10129': 'Barriera Milano', '10131': 'San Salvario', '10132': 'San Salvario', '10133': 'Crocetta',
-      '10134': 'Crocetta', '10135': 'San Secondo', '10136': 'San Secondo', '10137': 'San Secondo',
-      '10138': 'San Secondo', '10139': 'San Secondo', '10141': 'Borgo Po', '10142': 'Borgo Po',
-      '10143': 'Borgo Po', '10144': 'Borgo Po', '10145': 'Borgo Po', '10146': 'Giardini Reali'
-    };
-
-    var BARI_CAP_NEIGHBORHOODS = {
-      '70121': 'Bari Vecchia', '70122': 'Bari Vecchia', '70123': 'Bari Vecchia', '70124': 'Bari Vecchia',
-      '70125': 'Libertà', '70126': 'Libertà', '70127': 'Libertà', '70128': 'Libertà',
-      '70129': 'Japigia', '70131': 'Japigia', '70132': 'Japigia', '70133': 'Poggiofranco',
-      '70134': 'Poggiofranco', '70135': 'Poggiofranco'
-    };
-
-    var GENOVA_CAP_NEIGHBORHOODS = {
-      '16121': 'Centro', '16122': 'Centro', '16123': 'Centro', '16124': 'Centro',
-      '16125': 'Porto Antico', '16126': 'Porto Antico', '16127': 'Porto Antico', '16128': 'Porto Antico',
-      '16129': 'Albaro', '16131': 'Albaro', '16132': 'Albaro', '16133': 'Marassi',
-      '16134': 'Marassi', '16135': 'Marassi', '16136': 'Nervi', '16137': 'Nervi'
-    };
-
-    var ROME_STREET_NEIGHBORHOODS = {
-      'Via Veneto': 'Trevi', 'Trevi': 'Trevi', 'Spanish Steps': 'Trevi',
-      'Colosseo': 'Celio', 'Foro': 'Celio', 'Pantheon': 'Rione Monti',
-      'Campo dei Fiori': 'Regola', 'Piazza Navona': 'Parione', 'Via della Pace': 'Parione',
-      'Castel Sant\'Angelo': 'Ponte', 'Trastevere': 'Trastevere', 'Ponte Sisto': 'Trastevere',
-      'Vatican': 'Vaticano', 'San Pietro': 'Vaticano', 'Gianicolo': 'Gianicolense'
-    };
-
-    var VENICE_STREET_NEIGHBORHOODS = {
-      'Basilica': 'San Marco', 'Piazza San Marco': 'San Marco', 'Doge\'s Palace': 'San Marco',
-      'Rialto': 'San Polo', 'Rialto Bridge': 'San Polo', 'Academia': 'Dorsoduro',
-      'Giudecca': 'Giudecca', 'Arsenal': 'Castello', 'San Giorgio': 'San Giorgio'
+    var PROPERTY_PHOTOS = {
+      0: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=250&fit=crop',
+      1: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&h=250&fit=crop',
+      2: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=400&h=250&fit=crop',
+      3: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=250&fit=crop',
+      4: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=250&fit=crop',
+      5: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=250&fit=crop',
+      6: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop',
+      7: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=250&fit=crop'
     };
 
     var PROPERTY_TYPE_INFO = {
-      'Apartment': { icon: '🏢', description: 'Furnished or unfurnished residential unit', tax: '4%' },
-      'House': { icon: '🏠', description: 'Single or multi-family residential property', tax: '4%' },
-      'Villa': { icon: '🏰', description: 'Luxury residential property with grounds', tax: '4%' },
-      'Studio': { icon: '📦', description: 'Small single-room residential unit', tax: '4%' },
-      'Penthouse': { icon: '🌆', description: 'Premium top-floor residential unit', tax: '4%' }
+      'Affittacamere': { desc: 'Private rooms in a residential home, sometimes with breakfast.', tax: '€1-3.50/person/night' },
+      'Agriturismo': { desc: 'Working farm accommodation with local food and rural experience.', tax: '€1-2/person/night' },
+      'Altro': { desc: 'Other accommodation types (apartments, villas, etc.).', tax: 'Varies by municipality' },
+      'B&B': { desc: 'Small guesthouse with breakfast included in the rate.', tax: '€2-5/person/night' },
+      'Campeggio': { desc: 'Campgrounds and holiday parks with pitches or mobile homes.', tax: '€0.50-1.50/person/night' },
+      'Hotel': { desc: 'Full-service accommodation with daily housekeeping and amenities.', tax: '€1-7/person/night (varies by star rating)' },
+      'Residence': { desc: 'Self-catering serviced apartments, usually with kitchenette.', tax: '€1-3/person/night' },
+      'Villaggio Turistico': { desc: 'Resort complexes with shared pools, restaurants, and entertainment.', tax: '€1-3/person/night' }
+    };
+
+    var ROME_CAP_NEIGHBORHOODS = {
+      '00186': 'Centro Storico', '00187': 'Trevi / Via Veneto', '00184': 'Monti / Esquilino',
+      '00185': 'Esquilino / Termini', '00153': 'Trastevere / Testaccio', '00193': 'Prati / Vaticano',
+      '00192': 'Flaminio / Parioli', '00196': 'Parioli', '00197': 'Parioli / Salario'
+    };
+
+    var VENICE_CAP_SESTIERI = {
+      '30121': 'Cannaregio', '30122': 'Castello', '30123': 'Dorsoduro',
+      '30124': 'San Marco', '30125': 'San Polo', '30126': 'Santa Croce'
     };
 
     var AMENITY_LABELS = {
-      1: 'WiFi', 2: 'Kitchen', 4: 'AC', 8: 'Heating', 16: 'TV', 32: 'Washer',
-      64: 'Dryer', 128: 'Pool', 256: 'Parking', 512: 'Balcony', 1024: 'Elevator',
-      2048: 'Gym', 4096: 'Garden'
+      ac: 'A/C', pool: 'Pool', paidParking: 'Paid Parking',
+      freeParking: 'Free Parking', restaurant: 'Restaurant',
+      elevator: 'Elevator', garage: 'Garage', pets: 'Pets Allowed',
+      disability: 'Accessible', sauna: 'Sauna', tennis: 'Tennis',
+      bikeRental: 'Bike Rental', indoorPool: 'Indoor Pool', gym: 'Gym',
+      shuttle: 'Shuttle'
     };
+
+    function getNeighborhood(prop) {
+      if (prop.comune === 'VENEZIA' || prop.comune === 'Venezia') {
+        if (VENICE_CAP_SESTIERI[prop.cap]) return VENICE_CAP_SESTIERI[prop.cap];
+        return 'Venezia';
+      }
+      if (prop.comune === 'Roma' || prop.comune === 'ROMA') {
+        if (ROME_CAP_NEIGHBORHOODS[prop.cap]) return ROME_CAP_NEIGHBORHOODS[prop.cap];
+        return 'Roma (altri)';
+      }
+      return prop.comune;
+    }
 
     function parseListings() {
       if (!window.RAW_DATA) return [];
-      return window.RAW_DATA.slice(0, 50).map(item => ({
-        id: item.id,
-        name: item.name,
-        type: item.type || 'Apartment',
-        bedrooms: parseInt(item.bedrooms) || 1,
-        city: item.city,
-        neighborhood: item.neighborhood,
-        rating: parseFloat(item.rating) || 0,
-        price: parseInt(item.price) || 50,
-        image: getCardImage(item),
-        description: item.description || 'Beautiful property',
-        amenities: decodeAmenities(item.amenities),
-        languages: decodeLanguages(item.languages),
-        cap: item.cap
-      }));
-    }
-
-    function decodeAmenities(bitmask) {
-      var amenities = [];
-      for (var bit in AMENITY_LABELS) {
-        if (bitmask & parseInt(bit)) {
-          amenities.push(AMENITY_LABELS[bit]);
-        }
-      }
-      return amenities.slice(0, 4);
-    }
-
-    function decodeLanguages(bitmask) {
-      var langs = [];
-      if (bitmask & 1) langs.push('IT');
-      if (bitmask & 2) langs.push('EN');
-      if (bitmask & 4) langs.push('DE');
-      if (bitmask & 8) langs.push('FR');
-      if (bitmask & 16) langs.push('ES');
-      return langs;
+      var CLAIMED_IDS = new Set(['IT000001','IT000005','IT000010','IT000020','IT000050','IT000100','IT000200','IT000500','IT001000','IT002000','IT003000','IT005000','IT010000','IT015000']);
+      var listings = window.RAW_DATA.map(function(d) {
+        var amenBits = d[16] || 0;
+        var propId = d[0];
+        return {
+          id: propId,
+          region: window.REGIONS[d[1]],
+          regionCode: d[1],
+          provincia: window.PROVINCES[d[2]],
+          comune: d[3],
+          type: window.PROPERTY_TYPES[d[4]],
+          typeCode: d[4],
+          name: d[5],
+          street: d[6],
+          number: d[7],
+          cap: d[8],
+          lat: d[9],
+          lon: d[10],
+          stars: d[11] || 0,
+          beds: d[12] || 0,
+          rooms: d[13] || 0,
+          baths: d[14] || 0,
+          website: d[15] || '',
+          amenities: {
+            ac: !!(amenBits & 2), pool: !!(amenBits & 4),
+            paidParking: !!(amenBits & 8), freeParking: !!(amenBits & 16),
+            restaurant: !!(amenBits & 32),
+            elevator: !!(amenBits & 128), garage: !!(amenBits & 256),
+            pets: !!(amenBits & 1024),
+            disability: !!(amenBits & 2048), sauna: !!(amenBits & 4096),
+            tennis: !!(amenBits & 8192), bikeRental: !!(amenBits & 16384),
+            indoorPool: !!(amenBits & 32768), gym: !!(amenBits & 131072),
+            shuttle: !!(amenBits & 2097152)
+          },
+          claimed: CLAIMED_IDS.has(propId),
+          verified: CLAIMED_IDS.has(propId)
+        };
+      });
+      return listings.map(function(p) {
+        return Object.assign({}, p, { neighborhood: getNeighborhood(p) });
+      }).sort(function(a, b) {
+        if (a.claimed && !b.claimed) return -1;
+        if (!a.claimed && b.claimed) return 1;
+        return 0;
+      });
     }
 
     function ensureUrl(url) {
-      if (!url) return 'https://via.placeholder.com/200x200?text=Property';
-      if (url.startsWith('http')) return url;
+      if (!url) return '';
+      if (url.startsWith('http://') || url.startsWith('https://')) return url;
       return 'https://' + url;
     }
 
-    function getCardImage(item) {
-      if (item.image) return ensureUrl(item.image);
-      var seed = Math.abs(parseInt(item.id) % 1000);
-      return 'https://picsum.photos/200/200?random=' + seed;
+    function getCardImage(prop) {
+      return PROPERTY_PHOTOS[prop.typeCode] || PROPERTY_PHOTOS[7];
     }
 
-    function renderStars(rating) {
-      var stars = [];
-      for (var i = 0; i < 5; i++) {
-        stars.push(e('span', { key: i, className: 'star' }, i < Math.floor(rating) ? '★' : '☆'));
-      }
-      return stars;
+    function getHeroImage(prop) {
+      return REGION_PHOTOS[prop.regionCode] || REGION_PHOTOS[0];
     }
 
-    function smartPagination(page, total) {
+    function buildCommunesByAllRegions(listings) {
+      var allCommunes = new Set();
+      listings.forEach(function(l) { allCommunes.add(l.comune); });
+      return Array.from(allCommunes).sort();
+    }
+
+    function buildNeighborhoodsByComune(listings) {
+      var map = {};
+      listings.forEach(function(l) {
+        var key = l.comune;
+        if (!map[key]) map[key] = new Set();
+        map[key].add(l.neighborhood);
+      });
+      Object.keys(map).forEach(function(k) { map[k] = Array.from(map[k]).sort(); });
+      return map;
+    }
+
+    function getTopAmenities(prop, limit) {
+      if (!limit) limit = 3;
+      var amenities = Object.entries(prop.amenities).filter(function(a) { return a[1]; }).map(function(a) { return AMENITY_LABELS[a[0]]; });
+      return amenities.slice(0, limit);
+    }
+
+    function renderStars(stars) {
+      return String.fromCharCode(9733).repeat(stars) + String.fromCharCode(9734).repeat(5 - stars);
+    }
+
+    function smartPagination(current, total) {
       var pages = [];
-      var pageSize = 5;
-      var startPage = Math.max(1, page - 2);
-      var endPage = Math.min(total, page + 2);
-
-      if (startPage > 1) {
+      var maxShow = 7;
+      if (total <= maxShow) {
+        for (var i = 1; i <= total; i++) pages.push(i);
+      } else {
         pages.push(1);
-        if (startPage > 2) pages.push('...');
-      }
-
-      for (var i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
-
-      if (endPage < total) {
-        if (endPage < total - 1) pages.push('...');
+        var start = Math.max(2, current - 2);
+        var end = Math.min(total - 1, current + 2);
+        if (start > 2) pages.push('...');
+        for (var i = start; i <= end; i++) pages.push(i);
+        if (end < total - 1) pages.push('...');
         pages.push(total);
       }
-
       return pages;
     }
 
-    // ===== COMPONENTS =====
-    function Nav({ currentPage, setCurrentPage, user, setUser }) {
+    /* ---- COMPONENTS ---- */
+
+    function Nav(props) {
+      var isActive = function(page) {
+        return props.currentPage === page ? 'active' : '';
+      };
+      var logout = function() {
+        localStorage.removeItem('ad_current_user');
+        props.setUser(null);
+        props.onNavigate('home');
+      };
       return e('nav', { className: 'navbar' },
-        e('div', { className: 'navbar-content' },
-          e('div', { className: 'navbar-logo', onClick: function() { setCurrentPage('home'); } }, 'AffittoDiretto.it'),
+        e('div', { className: 'navbar-container' },
+          e('div', { className: 'navbar-logo', onClick: function() { props.onNavigate('home'); } }, 'AffittoDiretto.it'),
           e('div', { className: 'navbar-links' },
-            e('button', { className: 'navbar-link' + (currentPage === 'home' ? ' active' : ''), onClick: function() { setCurrentPage('home'); } }, 'Home'),
-            e('button', { className: 'navbar-link' + (currentPage === 'search' ? ' active' : ''), onClick: function() { setCurrentPage('search'); } }, 'Search'),
-            e('button', { className: 'navbar-link' + (currentPage === 'map' ? ' active' : ''), onClick: function() { setCurrentPage('map'); } }, 'Map'),
-            user && e('button', { className: 'navbar-link' + (currentPage === 'dashboard' ? ' active' : ''), onClick: function() { setCurrentPage('dashboard'); } }, 'Dashboard'),
-            !user && e('button', { className: 'navbar-link', onClick: function() { setCurrentPage('login'); } }, 'Login')
-          ),
-          user && e('div', { className: 'navbar-user' },
-            e('span', null, 'Welcome, ' + user.email),
-            e('button', { className: 'btn-logout', onClick: function() { localStorage.removeItem('user'); setUser(null); setCurrentPage('home'); } }, 'Logout')
+            e('a', { className: 'navbar-link ' + isActive('home'), onClick: function() { props.onNavigate('home'); } }, 'Home'),
+            e('a', { className: 'navbar-link ' + isActive('search'), onClick: function() { props.onNavigate('search'); } }, 'Search'),
+            e('a', { className: 'navbar-link ' + isActive('map'), onClick: function() { props.onNavigate('map'); } }, 'Map'),
+            props.user && e('a', { className: 'navbar-link ' + isActive('dashboard'), onClick: function() { props.onNavigate('dashboard'); } }, 'Dashboard'),
+            props.user ? e('button', { className: 'btn-primary', onClick: logout }, 'Logout (' + props.user.name + ')') : e('button', { className: 'btn-primary', onClick: function() { props.onNavigate('login'); } }, 'Login')
           )
         )
       );
     }
 
-    function SearchBar({ onSearch }) {
-      var [city, setCity] = useState('');
-      var [showDropdown, setShowDropdown] = useState(false);
-      var cities = useMemo(function() {
-        return window.REGIONS ? Object.keys(window.REGIONS).slice(0, 20) : ['Rome', 'Venice', 'Milan', 'Florence'];
-      }, []);
-
-      var filteredCities = useMemo(function() {
-        return city ? cities.filter(function(c) { return c.toLowerCase().includes(city.toLowerCase()); }) : cities.slice(0, 5);
-      }, [city]);
-
-      return e('div', { className: 'search-section' },
-        e('div', { className: 'search-container' },
-          e('div', { className: 'search-field', style: { flex: 1, position: 'relative' } },
-            e('label', { className: 'search-label' }, 'Where are you going?'),
-            e('input', { className: 'search-input', placeholder: 'City name...', value: city, onChange: function(ev) { setCity(ev.target.value); setShowDropdown(true); }, onFocus: function() { setShowDropdown(true); } }),
-            showDropdown && e('div', { className: 'search-autocomplete' },
-              filteredCities.map(function(c) {
-                return e('div', { key: c, className: 'autocomplete-item', onClick: function() { setCity(c); setShowDropdown(false); } }, c);
-              })
-            )
-          ),
-          e('button', { className: 'btn-search', onClick: function() { onSearch(city); } }, 'Search')
-        )
-      );
-    }
-
-    function PropertyCardHorizontal({ property, onClick }) {
-      return e('div', { className: 'property-card-horizontal', onClick: onClick },
-        e('img', { src: property.image, className: 'property-card-image', alt: property.name }),
-        e('div', { className: 'property-card-details' },
-          e('div', null,
-            e('div', { className: 'property-card-name' }, property.name),
-            e('div', { className: 'property-card-location' }, '📍 ' + (property.neighborhood || property.city)),
-            e('div', { className: 'property-card-rating' },
-              ...renderStars(property.rating),
-              e('span', { className: 'rating-score' }, property.rating.toFixed(1))
-            ),
-            e('div', { className: 'property-card-desc' }, property.description.substring(0, 80) + '...')
-          ),
-          e('div', null,
-            e('div', { className: 'property-card-amenities' },
-              property.amenities.slice(0, 2).map(function(a) {
-                return e('div', { key: a, className: 'amenity-tag' }, a);
-              })
-            )
-          )
-        ),
-        e('div', { className: 'property-card-actions' },
-          e('div', { className: 'property-card-price' },
-            e('div', { className: 'property-card-price-label' }, 'Starting at'),
-            e('div', { className: 'property-card-price-value' }, '€' + property.price),
-            e('div', { className: 'property-card-price-unit' }, 'per night')
-          ),
-          e('button', { className: 'btn-primary', onClick: function(ev) { ev.stopPropagation(); onClick(); } }, 'View Details')
-        )
-      );
-    }
-
-    function HomePage({ setCurrentPage, setSelectedCity }) {
-      return e('div', { className: 'home-page' },
-        e('section', { className: 'hero-section' },
-          e('div', { className: 'hero-content' },
-            e('h1', { className: 'hero-title' }, 'Book Direct in Italy'),
-            e('p', { className: 'hero-subtitle' }, 'Find your perfect Italian stay, straight from property owners')
-          ),
-          e(SearchBar, { onSearch: function(city) { setSelectedCity(city); setCurrentPage('search'); } })
-        ),
-        e('section', { className: 'value-props' },
-          e('div', { className: 'value-prop' },
-            e('div', { className: 'value-prop-icon' }, '💰'),
-            e('div', { className: 'value-prop-title' }, 'Best Price'),
-            e('div', { className: 'value-prop-text' }, 'Direct bookings = lower commissions = better rates')
-          ),
-          e('div', { className: 'value-prop' },
-            e('div', { className: 'value-prop-icon' }, '🔗'),
-            e('div', { className: 'value-prop-title' }, 'Direct Connection'),
-            e('div', { className: 'value-prop-text' }, 'Connect directly with property owners')
-          ),
-          e('div', { className: 'value-prop' },
-            e('div', { className: 'value-prop-icon' }, '🏆'),
-            e('div', { className: 'value-prop-title' }, 'Quality Assured'),
-            e('div', { className: 'value-prop-text' }, 'All properties verified and rated by guests')
-          )
-        ),
-        e('section', { className: 'featured-section' },
-          e('h2', { className: 'section-title' }, 'Featured Properties'),
-          e('div', { className: 'cards-grid' },
-            parseListings().slice(0, 6).map(function(property) {
-              return e(PropertyCardHorizontal, { key: property.id, property: property, onClick: function() { setCurrentPage('detail:' + property.id); } });
-            })
-          )
-        )
-      );
-    }
-
-    function SearchPage({ selectedCity, setCurrentPage }) {
-      var [filters, setFilters] = useState({ city: selectedCity || '', neighborhood: '', minRating: 0, propertyType: '', minBeds: 0, amenities: [] });
-      var [sortBy, setSortBy] = useState('relevant');
-      var [page, setPage] = useState(1);
-      var listings = useMemo(parseListings, []);
-
-      var filtered = useMemo(function() {
-        return listings.filter(function(p) {
-          var cityMatch = !filters.city || p.city.toLowerCase().includes(filters.city.toLowerCase());
-          var neighborhoodMatch = !filters.neighborhood || (p.neighborhood && p.neighborhood.toLowerCase().includes(filters.neighborhood.toLowerCase()));
-          var ratingMatch = p.rating >= filters.minRating;
-          var typeMatch = !filters.propertyType || p.type === filters.propertyType;
-          var bedsMatch = p.bedrooms >= filters.minBeds;
-          var amenitiesMatch = filters.amenities.length === 0 || filters.amenities.some(function(a) { return p.amenities.includes(a); });
-          return cityMatch && neighborhoodMatch && ratingMatch && typeMatch && bedsMatch && amenitiesMatch;
-        });
-      }, [listings, filters]);
-
-      var sorted = useMemo(function() {
-        var result = [...filtered];
-        if (sortBy === 'name') result.sort(function(a, b) { return a.name.localeCompare(b.name); });
-        else if (sortBy === 'rating') result.sort(function(a, b) { return b.rating - a.rating; });
-        return result;
-      }, [filtered, sortBy]);
-
-      var pageSize = 10;
-      var totalPages = Math.ceil(sorted.length / pageSize);
-      var paginatedResults = useMemo(function() {
-        return sorted.slice((page - 1) * pageSize, page * pageSize);
-      }, [sorted, page]);
-
-      var filterCounts = useMemo(function() {
-        var cities = {};
-        var neighborhoods = {};
-        var types = {};
-        var amenities = {};
-        listings.forEach(function(p) {
-          cities[p.city] = (cities[p.city] || 0) + 1;
-          if (p.neighborhood) neighborhoods[p.neighborhood] = (neighborhoods[p.neighborhood] || 0) + 1;
-          types[p.type] = (types[p.type] || 0) + 1;
-          p.amenities.forEach(function(a) { amenities[a] = (amenities[a] || 0) + 1; });
-        });
-        return { cities, neighborhoods, types, amenities };
-      }, [listings]);
-
-      return e('div', { className: 'search-page' },
-        e('div', { className: 'filter-sidebar' },
-          e('div', { className: 'filter-title' }, 'Filters'),
-          e('div', { className: 'filter-group' },
-            e('div', { className: 'filter-group-title' }, 'Cities'),
-            Object.keys(filterCounts.cities).map(function(city) {
-              return e('label', { key: city, className: 'filter-option' },
-                e('input', { type: 'checkbox', className: 'filter-checkbox', checked: filters.city === city, onChange: function(ev) { setFilters({ ...filters, city: ev.target.checked ? city : '' }); setPage(1); } }),
-                e('span', { className: 'filter-label' }, city),
-                e('span', { className: 'filter-count' }, filterCounts.cities[city])
-              );
-            })
-          ),
-          e('div', { className: 'filter-group' },
-            e('div', { className: 'filter-group-title' }, 'Property Type'),
-            Object.keys(filterCounts.types).map(function(type) {
-              return e('label', { key: type, className: 'filter-option' },
-                e('input', { type: 'checkbox', className: 'filter-checkbox', checked: filters.propertyType === type, onChange: function(ev) { setFilters({ ...filters, propertyType: ev.target.checked ? type : '' }); setPage(1); } }),
-                e('span', { className: 'filter-label' }, type),
-                e('span', { className: 'filter-count' }, filterCounts.types[type])
-              );
-            })
-          ),
-          e('div', { className: 'filter-group' },
-            e('div', { className: 'filter-group-title' }, 'Rating'),
-            e('label', { className: 'filter-option' },
-              e('input', { type: 'range', className: 'range-input', min: '0', max: '5', step: '0.5', value: filters.minRating, onChange: function(ev) { setFilters({ ...filters, minRating: parseFloat(ev.target.value) }); setPage(1); } }),
-              e('div', { className: 'range-value' }, filters.minRating.toFixed(1) + '★ and up')
-            )
-          ),
-          e('div', { className: 'filter-group' },
-            e('div', { className: 'filter-group-title' }, 'Minimum Bedrooms'),
-            e('label', { className: 'filter-option' },
-              e('input', { type: 'range', className: 'range-input', min: '0', max: '5', step: '1', value: filters.minBeds, onChange: function(ev) { setFilters({ ...filters, minBeds: parseInt(ev.target.value) }); setPage(1); } }),
-              e('div', { className: 'range-value' }, filters.minBeds + ' beds')
-            )
-          ),
-          e('div', { className: 'filter-group' },
-            e('div', { className: 'filter-group-title' }, 'Top Amenities'),
-            Object.keys(filterCounts.amenities).slice(0, 5).map(function(amenity) {
-              return e('label', { key: amenity, className: 'filter-option' },
-                e('input', { type: 'checkbox', className: 'filter-checkbox', checked: filters.amenities.includes(amenity), onChange: function(ev) { var newAmenities = ev.target.checked ? [...filters.amenities, amenity] : filters.amenities.filter(function(a) { return a !== amenity; }); setFilters({ ...filters, amenities: newAmenities }); setPage(1); } }),
-                e('span', { className: 'filter-label' }, amenity),
-                e('span', { className: 'filter-count' }, filterCounts.amenities[amenity])
-              );
-            })
-          )
-        ),
-        e('div', { className: 'results-area' },
-          e('div', { className: 'results-header' },
-            e('div', { className: 'results-count' }, sorted.length + ' properties found'),
-            e('div', { className: 'sort-controls' },
-              e('button', { className: 'sort-btn' + (sortBy === 'relevant' ? ' active' : ''), onClick: function() { setSortBy('relevant'); setPage(1); } }, 'Most Relevant'),
-              e('button', { className: 'sort-btn' + (sortBy === 'name' ? ' active' : ''), onClick: function() { setSortBy('name'); setPage(1); } }, 'Name A-Z'),
-              e('button', { className: 'sort-btn' + (sortBy === 'rating' ? ' active' : ''), onClick: function() { setSortBy('rating'); setPage(1); } }, 'Top Rated')
-            )
-          ),
-          e('div', { className: 'results-grid' },
-            paginatedResults.length > 0 ? paginatedResults.map(function(property) {
-              return e(PropertyCardHorizontal, { key: property.id, property: property, onClick: function() { setCurrentPage('detail:' + property.id); } });
-            }) : e('div', { className: 'loading' }, 'No properties match your filters.')
-          ),
-          sorted.length > 0 && e('div', { className: 'pagination' },
-            smartPagination(page, totalPages).map(function(p, i) {
-              return e('button', { key: i, className: 'pagination-btn' + (p === page ? ' active' : ''), onClick: function() { if (typeof p === 'number') setPage(p); }, disabled: p === '...' }, p);
-            })
-          )
-        )
-      );
-    }
-
-    function MapPage({ setCurrentPage }) {
-      var mapRef = useRef(null);
-      var mapInstance = useRef(null);
-      var listings = useMemo(parseListings, []);
-
-      useEffect(function() {
-        if (!mapRef.current || mapInstance.current) return;
-        mapInstance.current = L.map(mapRef.current).setView([41.9, 12.5], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance.current);
-        listings.forEach(function(p) {
-          var coords = p.city === 'Rome' ? [41.9, 12.5] : p.city === 'Venice' ? [45.4, 12.3] : [45.5, 9.2];
-          if (mapInstance.current) {
-            L.marker(coords).bindPopup(p.name).addTo(mapInstance.current);
-          }
-        });
-      }, []);
-
-      return e('div', { className: 'map-page' },
-        e('div', { className: 'map-filters' },
-          e('div', { className: 'map-filter-title' }, 'Properties Map'),
-          e('div', { className: 'filter-group', style: { marginTop: '1rem' } },
-            e('div', null, 'Total: ' + listings.length + ' properties'),
-            listings.slice(0, 5).map(function(p) {
-              return e('div', { key: p.id, style: { padding: '0.5rem 0', cursor: 'pointer', color: '#003580' }, onClick: function() { setCurrentPage('detail:' + p.id); } }, p.name);
-            })
-          )
-        ),
-        e('div', { className: 'map-container', ref: mapRef })
-      );
-    }
-
-    function PropertyDetailPage({ propertyId, setCurrentPage }) {
-      var listings = useMemo(parseListings, []);
-      var property = listings.find(function(p) { return p.id == propertyId; });
-      var [proposal, setProposal] = useState({ name: '', email: '', dates: '', message: '' });
-      var [submitted, setSubmitted] = useState(false);
-
-      if (!property) {
-        return e('div', { className: 'detail-info' }, e('div', { className: 'loading' }, 'Property not found'));
-      }
-
-      var handleSubmit = function() {
-        if (proposal.name && proposal.email && proposal.dates) {
-          setSubmitted(true);
-          setTimeout(function() { setCurrentPage('home'); }, 2000);
+    function HomePage(props) {
+      var handleSearch = function() {
+        if (props.searchCity) {
+          props.onNavigate('search', { city: props.searchCity });
         }
       };
-
-      return e('div', { className: 'property-detail-page' },
-        e('div', null,
-          e('div', { className: 'detail-gallery' },
-            e('img', { src: property.image, className: 'detail-image-main', alt: property.name }),
-            e('img', { src: property.image, className: 'detail-image', alt: property.name }),
-            e('img', { src: property.image, className: 'detail-image', alt: property.name }),
-            e('img', { src: property.image, className: 'detail-image', alt: property.name })
+      return e('div', null,
+        e('div', { className: 'hero' },
+          e('div', { className: 'hero-content' },
+            e('h1', null, 'Book Direct in Italy'),
+            e('p', null, 'Discover authentic accommodations across Italy, direct from owners.'),
+            e('div', { className: 'search-bar' },
+              e('input', { type: 'text', placeholder: 'City or region...', value: props.searchCity, onChange: function(ev) { props.setSearchCity(ev.target.value); } }),
+              e('button', { onClick: handleSearch }, 'Search')
+            )
+          )
+        ),
+        e('div', { className: 'value-props' },
+          e('div', { className: 'value-prop' },
+            e('div', { className: 'value-prop-icon' }, '💰'),
+            e('h3', null, 'Best Price Guarantee'),
+            e('p', null, 'Book direct without intermediaries and get better rates.')
           ),
-          e('div', { className: 'detail-info' },
-            e('h1', { className: 'detail-name' }, property.name),
-            e('div', { className: 'detail-location' }, '📍 ' + (property.neighborhood || property.city)),
-            e('div', { className: 'detail-rating' },
-              ...renderStars(property.rating),
-              e('span', { className: 'rating-score' }, property.rating.toFixed(1), ' (42 reviews)')
+          e('div', { className: 'value-prop' },
+            e('div', { className: 'value-prop-icon' }, '🤝'),
+            e('h3', null, 'Direct Connection'),
+            e('p', null, 'Communicate directly with property owners.')
+          ),
+          e('div', { className: 'value-prop' },
+            e('div', { className: 'value-prop-icon' }, '✔'),
+            e('h3', null, 'Quality Assured'),
+            e('p', null, 'All properties verified for authentic Italian hospitality.')
+          )
+        ),
+        e('div', { className: 'featured-section' },
+          e('h2', { className: 'section-title' }, 'Featured Properties'),
+          e('div', { className: 'property-grid' },
+            props.listings.slice(0, 8).map(function(prop) {
+              return e(PropertyCard, { key: prop.id, prop: prop, onNavigate: props.onNavigate });
+            })
+          )
+        )
+      );
+    }
+
+    function PropertyCard(props) {
+      return e('div', { className: 'property-card', onClick: function() { sessionStorage.setItem('ad_current_property', props.prop.id); props.onNavigate('detail'); } },
+        e('div', { className: 'card-image' },
+          e('img', { src: getCardImage(props.prop), alt: props.prop.name }),
+          props.prop.verified && e('div', { className: 'verified-badge' }, 'VERIFIED'),
+          e('div', { className: 'sample-label' }, 'Sample Photo')
+        ),
+        e('div', { className: 'card-content' },
+          e('div', { className: 'card-name' }, props.prop.name),
+          e('div', { className: 'card-meta' }, props.prop.type + ' • ' + props.prop.neighborhood),
+          e('div', { className: 'card-stars' }, renderStars(props.prop.stars)),
+          e('div', { className: 'card-meta' }, props.prop.beds + ' beds • ' + props.prop.rooms + ' rooms'),
+          e('div', { className: 'card-amenities' },
+            getTopAmenities(props.prop).map(function(amen, idx) {
+              return e('div', { key: idx, className: 'amenity-chip' }, amen);
+            })
+          )
+        )
+      );
+    }
+
+    function PropertyTypeInfoModal(props) {
+      return e('div', { className: 'modal-overlay', onClick: function() { props.onClose(); } },
+        e('div', { className: 'modal', onClick: function(ev) { ev.stopPropagation(); } },
+          e('button', { className: 'modal-close', onClick: function() { props.onClose(); } }, '✕'),
+          e('h2', null, 'Property Types & Taxes'),
+          e('div', { className: 'property-type-grid' },
+            Object.entries(PROPERTY_TYPE_INFO).map(function(entry) {
+              var type = entry[0];
+              var info = entry[1];
+              return e('div', { key: type, className: 'type-card' },
+                e('div', { className: 'type-name' }, type),
+                e('div', { className: 'type-desc' }, info.desc),
+                e('div', { className: 'type-tax' }, 'Tax: ' + info.tax)
+              );
+            })
+          )
+        )
+      );
+    }
+
+    function SearchPage(props) {
+      var stateCity = useState(props.initialCity || '');
+      var city = stateCity[0];
+      var setCity = stateCity[1];
+
+      var stateNeighborhood = useState('');
+      var neighborhood = stateNeighborhood[0];
+      var setNeighborhood = stateNeighborhood[1];
+
+      var stateType = useState('');
+      var selectedType = stateType[0];
+      var setSelectedType = stateType[1];
+
+      var stateStars = useState(0);
+      var minStars = stateStars[0];
+      var setMinStars = stateStars[1];
+
+      var stateBeds = useState(0);
+      var minBeds = stateBeds[0];
+      var setMinBeds = stateBeds[1];
+
+      var stateAmenities = useState(new Set());
+      var selectedAmenities = stateAmenities[0];
+      var setSelectedAmenities = stateAmenities[1];
+
+      var stateSort = useState('relevant');
+      var sortBy = stateSort[0];
+      var setSortBy = stateSort[1];
+
+      var statePage = useState(1);
+      var currentPage = statePage[0];
+      var setCurrentPage = statePage[1];
+
+      var stateShowModal = useState(false);
+      var showModal = stateShowModal[0];
+      var setShowModal = stateShowModal[1];
+
+      var allCommunes = useMemo(function() { return buildCommunesByAllRegions(props.listings); }, [props.listings]);
+      var neighborhoodsByComune = useMemo(function() { return buildNeighborhoodsByComune(props.listings); }, [props.listings]);
+
+      var filteredListings = useMemo(function() {
+        var result = props.listings.filter(function(l) {
+          if (city && l.comune !== city) return false;
+          if (neighborhood && l.neighborhood !== neighborhood) return false;
+          if (selectedType && l.type !== selectedType) return false;
+          if (l.stars < minStars) return false;
+          if (l.beds < minBeds) return false;
+          for (var amen of selectedAmenities) {
+            if (!l.amenities[amen]) return false;
+          }
+          return true;
+        });
+        if (sortBy === 'name') {
+          result.sort(function(a, b) { return a.name.localeCompare(b.name); });
+        } else if (sortBy === 'rated') {
+          result.sort(function(a, b) { return b.stars - a.stars; });
+        }
+        return result;
+      }, [props.listings, city, neighborhood, selectedType, minStars, minBeds, selectedAmenities, sortBy]);
+
+      var itemsPerPage = 10;
+      var totalPages = Math.ceil(filteredListings.length / itemsPerPage);
+      var paginatedListings = useMemo(function() {
+        var start = (currentPage - 1) * itemsPerPage;
+        return filteredListings.slice(start, start + itemsPerPage);
+      }, [filteredListings, currentPage]);
+
+      var handleAmenityToggle = function(amen) {
+        var newSet = new Set(selectedAmenities);
+        if (newSet.has(amen)) {
+          newSet.delete(amen);
+        } else {
+          newSet.add(amen);
+        }
+        setSelectedAmenities(newSet);
+      };
+
+      return e('div', null,
+        showModal && e(PropertyTypeInfoModal, { onClose: function() { setShowModal(false); } }),
+        e('div', { className: 'search-container' },
+          e('div', { className: 'filter-sidebar' },
+            e('div', { className: 'filter-group' },
+              e('label', { className: 'filter-label' }, 'City'),
+              e('select', { className: 'filter-select', value: city, onChange: function(ev) { setCity(ev.target.value); setNeighborhood(''); setCurrentPage(1); } },
+                e('option', { value: '' }, 'All cities'),
+                allCommunes.map(function(c) { return e('option', { key: c, value: c }, c); })
+              )
             ),
-            e('div', { className: 'detail-description' }, property.description),
-            e('div', { className: 'detail-amenities' },
-              e('h3', { className: 'amenities-title' }, 'Amenities'),
-              e('div', { className: 'amenities-grid' },
-                property.amenities.map(function(a) {
-                  return e('div', { key: a, className: 'amenity-item' },
-                    e('span', { className: 'amenity-icon' }, '✓'),
-                    a
-                  );
+            city && e('div', { className: 'filter-group' },
+              e('label', { className: 'filter-label' }, 'Neighborhood'),
+              e('select', { className: 'filter-select', value: neighborhood, onChange: function(ev) { setNeighborhood(ev.target.value); setCurrentPage(1); } },
+                e('option', { value: '' }, 'All neighborhoods'),
+                (neighborhoodsByComune[city] || []).map(function(n) { return e('option', { key: n, value: n }, n); })
+              )
+            ),
+            e('div', { className: 'filter-group' },
+              e('label', { className: 'filter-label' },
+                'Property Type ',
+                e('span', { className: 'help-icon', onClick: function() { setShowModal(true); } }, '?')
+              ),
+              e('select', { className: 'filter-select', value: selectedType, onChange: function(ev) { setSelectedType(ev.target.value); setCurrentPage(1); } },
+                e('option', { value: '' }, 'All types'),
+                ['Affittacamere', 'Agriturismo', 'Altro', 'B&B', 'Campeggio', 'Hotel', 'Residence', 'Villaggio Turistico'].map(function(t) { return e('option', { key: t, value: t }, t); })
+              )
+            ),
+            e('div', { className: 'filter-group' },
+              e('label', { className: 'filter-label' }, 'Min Stars: ' + minStars),
+              e('div', { className: 'slider-container' },
+                e('input', { type: 'range', min: '0', max: '5', value: minStars, className: 'slider', onChange: function(ev) { setMinStars(parseInt(ev.target.value)); setCurrentPage(1); } })
+              )
+            ),
+            e('div', { className: 'filter-group' },
+              e('label', { className: 'filter-label' }, 'Min Beds: ' + minBeds),
+              e('div', { className: 'slider-container' },
+                e('input', { type: 'range', min: '0', max: '10', value: minBeds, className: 'slider', onChange: function(ev) { setMinBeds(parseInt(ev.target.value)); setCurrentPage(1); } })
+              )
+            ),
+            e('div', { className: 'filter-group' },
+              e('label', { className: 'filter-label' }, 'Amenities'),
+              e('div', { className: 'amenities-chips' },
+                ['pool', 'pets', 'ac', 'gym', 'restaurant', 'shuttle'].map(function(amen) {
+                  return e('button', {
+                    key: amen,
+                    className: 'amenity-toggle' + (selectedAmenities.has(amen) ? ' active' : ''),
+                    onClick: function() { handleAmenityToggle(amen); }
+                  }, AMENITY_LABELS[amen]);
                 })
               )
             )
-          )
-        ),
-        e('div', { className: 'detail-sidebar' },
-          e('div', { className: 'booking-card' },
-            e('div', { className: 'booking-price' }, 'Starting price'),
-            e('div', { className: 'booking-amount' }, '€' + property.price),
-            e('div', { className: 'booking-unit' }, 'per night'
-            ),
-            submitted && e('div', { className: 'success' }, 'Proposal sent successfully!')
           ),
-          e('div', { className: 'booking-card' },
-            e('h3', { style: { marginBottom: '1rem', color: '#003580', fontWeight: '600' } }, 'Send Proposal'),
-            e('div', { className: 'booking-form' },
-              e('input', { className: 'booking-input', placeholder: 'Your name', value: proposal.name, onChange: function(ev) { setProposal({ ...proposal, name: ev.target.value }); } }),
-              e('input', { className: 'booking-input', placeholder: 'Your email', type: 'email', value: proposal.email, onChange: function(ev) { setProposal({ ...proposal, email: ev.target.value }); } }),
-              e('input', { className: 'booking-input', placeholder: 'Check-in to check-out dates', value: proposal.dates, onChange: function(ev) { setProposal({ ...proposal, dates: ev.target.value }); } }),
-              e('textarea', { className: 'booking-textarea', placeholder: 'Message to property owner...', value: proposal.message, onChange: function(ev) { setProposal({ ...proposal, message: ev.target.value }); } }),
-              e('button', { className: 'btn-book', onClick: handleSubmit }, 'Send Proposal')
+          e('div', { className: 'results-area' },
+            e('div', { className: 'results-header' },
+              e('div', { className: 'results-count' }, filteredListings.length + ' properties found'),
+              e('div', { className: 'sort-buttons' },
+                e('button', { className: 'sort-btn' + (sortBy === 'relevant' ? ' active' : ''), onClick: function() { setSortBy('relevant'); } }, 'Relevant'),
+                e('button', { className: 'sort-btn' + (sortBy === 'name' ? ' active' : ''), onClick: function() { setSortBy('name'); } }, 'Name'),
+                e('button', { className: 'sort-btn' + (sortBy === 'rated' ? ' active' : ''), onClick: function() { setSortBy('rated'); } }, 'Top Rated')
+              )
+            ),
+            paginatedListings.map(function(prop) {
+              return e(HorizontalPropertyCard, { key: prop.id, prop: prop, onNavigate: props.onNavigate });
+            }),
+            filteredListings.length === 0 && e('div', { className: 'empty-state' }, e('h3', null, 'No properties found'), e('p', null, 'Try adjusting your filters.')),
+            totalPages > 1 && e('div', { className: 'pagination' },
+              smartPagination(currentPage, totalPages).map(function(page, idx) {
+                if (page === '...') {
+                  return e('div', { key: idx, className: 'page-btn ellipsis' }, '...');
+                }
+                return e('button', { key: page, className: 'page-btn' + (page === currentPage ? ' active' : ''), onClick: function() { setCurrentPage(page); } }, page);
+              })
             )
           )
         )
       );
     }
 
-    function LoginPage({ setCurrentPage, setUser }) {
-      var [email, setEmail] = useState('');
-      var [password, setPassword] = useState('');
-      var [error, setError] = useState('');
+    function HorizontalPropertyCard(props) {
+      return e('div', { className: 'horizontal-card', onClick: function() { sessionStorage.setItem('ad_current_property', props.prop.id); props.onNavigate('detail'); } },
+        e('div', { className: 'h-card-image' },
+          e('img', { src: getCardImage(props.prop), alt: props.prop.name }),
+          props.prop.verified && e('div', { className: 'verified-badge' }, 'VERIFIED'),
+          e('div', { className: 'sample-label' }, 'Sample Photo')
+        ),
+        e('div', { className: 'h-card-content' },
+          e('div', { className: 'h-card-header' },
+            e('div', { className: 'h-card-name' }, props.prop.name),
+            e('div', { className: 'h-card-meta' }, props.prop.neighborhood + ', ' + props.prop.region),
+            e('div', { className: 'h-card-meta' }, renderStars(props.prop.stars)),
+            e('div', { className: 'h-card-meta' }, props.prop.type),
+            e('div', { className: 'h-card-amenities' },
+              getTopAmenities(props.prop, 5).map(function(amen, idx) {
+                return e('div', { key: idx, className: 'amenity-chip' }, amen);
+              })
+            )
+          ),
+          e('div', { className: 'h-card-footer' },
+            e('div', { className: 'h-card-stats' },
+              e('span', null, props.prop.beds + ' beds'),
+              e('span', null, props.prop.rooms + ' rooms'),
+              e('span', null, props.prop.baths + ' baths')
+            ),
+            e('button', { className: 'h-card-button' }, 'View Details')
+          )
+        )
+      );
+    }
+
+    function MapPage(props) {
+      var stateCity = useState('');
+      var city = stateCity[0];
+      var setCity = stateCity[1];
+
+      var stateNeighborhood = useState('');
+      var neighborhood = stateNeighborhood[0];
+      var setNeighborhood = stateNeighborhood[1];
+
+      var mapRef = useRef(null);
+      var mapInstanceRef = useRef(null);
+      var markersRef = useRef([]);
+
+      var allCommunes = useMemo(function() { return buildCommunesByAllRegions(props.listings); }, [props.listings]);
+      var neighborhoodsByComune = useMemo(function() { return buildNeighborhoodsByComune(props.listings); }, [props.listings]);
+
+      var filteredListings = useMemo(function() {
+        var result = props.listings.filter(function(l) {
+          if (city && l.comune !== city) return false;
+          if (neighborhood && l.neighborhood !== neighborhood) return false;
+          return l.lat && l.lon;
+        });
+        return result;
+      }, [props.listings, city, neighborhood]);
+
+      useEffect(function() {
+        if (!mapRef.current) return;
+
+        if (!mapInstanceRef.current) {
+          mapInstanceRef.current = L.map(mapRef.current).setView([42.8, 12.5], 6);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+          }).addTo(mapInstanceRef.current);
+        }
+
+        markersRef.current.forEach(function(marker) { mapInstanceRef.current.removeLayer(marker); });
+        markersRef.current = [];
+
+        filteredListings.slice(0, 1000).forEach(function(prop) {
+          var color = prop.verified ? '#0d7377' : (prop.website ? '#0066d4' : '#dc2626');
+          var marker = L.circleMarker([prop.lat, prop.lon], {
+            radius: 6,
+            fillColor: color,
+            color: '#333',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.8
+          }).addTo(mapInstanceRef.current).bindPopup(prop.name);
+          markersRef.current.push(marker);
+        });
+      }, [filteredListings]);
+
+      return e('div', { className: 'map-container' },
+        e('div', { className: 'map-filter-bar' },
+          e('select', { value: city, onChange: function(ev) { setCity(ev.target.value); setNeighborhood(''); } },
+            e('option', { value: '' }, 'All cities'),
+            allCommunes.map(function(c) { return e('option', { key: c, value: c }, c); })
+          ),
+          city && e('select', { value: neighborhood, onChange: function(ev) { setNeighborhood(ev.target.value); } },
+            e('option', { value: '' }, 'All neighborhoods'),
+            (neighborhoodsByComune[city] || []).map(function(n) { return e('option', { key: n, value: n }, n); })
+          ),
+          e('div', { className: 'map-count' }, filteredListings.length + ' of ' + props.listings.length + ' properties have location data')
+        ),
+        e('div', { ref: mapRef, id: 'map' }),
+        e('div', { className: 'map-legend' },
+          e('div', { className: 'legend-item' },
+            e('div', { className: 'legend-color', style: { backgroundColor: '#0d7377' } }),
+            'Verified'
+          ),
+          e('div', { className: 'legend-item' },
+            e('div', { className: 'legend-color', style: { backgroundColor: '#0066d4' } }),
+            'Has Website'
+          ),
+          e('div', { className: 'legend-item' },
+            e('div', { className: 'legend-color', style: { backgroundColor: '#dc2626' } }),
+            'No Website'
+          )
+        )
+      );
+    }
+
+    function PropertyDetail(props) {
+      var prop = props.currentProperty;
+      if (!prop) {
+        return e('div', { style: { padding: '2rem', textAlign: 'center' } }, 'Loading...');
+      }
+
+      var stateForm = useState({ name: '', email: '', checkIn: '', checkOut: '', guests: 1, message: '' });
+      var form = stateForm[0];
+      var setForm = stateForm[1];
+
+      var handleFormChange = function(field, value) {
+        setForm(Object.assign({}, form, { [field]: value }));
+      };
+
+      var handleSubmit = function() {
+        var proposals = JSON.parse(localStorage.getItem('ad_proposals') || '[]');
+        proposals.push(Object.assign({}, form, { propertyId: prop.id, propertyName: prop.name, date: new Date().toISOString() }));
+        localStorage.setItem('ad_proposals', JSON.stringify(proposals));
+        alert('Proposal sent! The property owner will review your request.');
+        setForm({ name: '', email: '', checkIn: '', checkOut: '', guests: 1, message: '' });
+      };
+
+      return e('div', null,
+        e('div', { className: 'detail-hero' },
+          e('img', { src: getHeroImage(prop), alt: prop.name }),
+          e('div', { className: 'detail-overlay' },
+            e('div', { className: 'detail-title' }, prop.name),
+            prop.verified && e('div', { className: 'verified-badge' }, 'VERIFIED'),
+            e('div', { className: 'detail-meta' }, prop.type + ' • ' + prop.neighborhood + ', ' + prop.region)
+          )
+        ),
+        e('div', { className: 'detail-container' },
+          e('div', { className: 'detail-left' },
+            e('div', { className: 'info-grid' },
+              e('div', { className: 'info-item' },
+                e('div', { className: 'info-value' }, renderStars(prop.stars)),
+                e('div', { className: 'info-label' }, 'Rating')
+              ),
+              e('div', { className: 'info-item' },
+                e('div', { className: 'info-value' }, prop.beds),
+                e('div', { className: 'info-label' }, 'Beds')
+              ),
+              e('div', { className: 'info-item' },
+                e('div', { className: 'info-value' }, prop.rooms),
+                e('div', { className: 'info-label' }, 'Rooms')
+              ),
+              e('div', { className: 'info-item' },
+                e('div', { className: 'info-value' }, prop.baths),
+                e('div', { className: 'info-label' }, 'Bathrooms')
+              )
+            ),
+            e('div', { className: 'address-section' },
+              e('div', { className: 'address-label' }, 'Address'),
+              e('div', { className: 'address-text' }, prop.street + ' ' + prop.number + ', ' + prop.cap + ' ' + prop.comune)
+            ),
+            e('div', { className: 'amenities-section' },
+              e('h3', null, 'Amenities'),
+              e('div', { className: 'card-amenities' },
+                Object.entries(prop.amenities).filter(function(a) { return a[1]; }).map(function(a) {
+                  return e('div', { key: a[0], className: 'amenity-chip' }, AMENITY_LABELS[a[0]]);
+                })
+              )
+            ),
+            prop.lat && prop.lon && e(MapEmbed, { lat: prop.lat, lon: prop.lon })
+          ),
+          e('div', { className: 'detail-right' },
+            e('div', { className: 'contact-section' },
+              e('h3', null, 'Contact & Book'),
+              prop.website && e('a', { href: ensureUrl(prop.website), target: '_blank', rel: 'noopener noreferrer', className: 'website-link' }, 'Visit Website'),
+              e('form', { onSubmit: function(ev) { ev.preventDefault(); handleSubmit(); } },
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Your Name'),
+                  e('input', { className: 'form-input', type: 'text', value: form.name, onChange: function(ev) { handleFormChange('name', ev.target.value); }, required: true })
+                ),
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Email'),
+                  e('input', { className: 'form-input', type: 'email', value: form.email, onChange: function(ev) { handleFormChange('email', ev.target.value); }, required: true })
+                ),
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Check-in'),
+                  e('input', { className: 'form-input', type: 'date', value: form.checkIn, onChange: function(ev) { handleFormChange('checkIn', ev.target.value); }, required: true })
+                ),
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Check-out'),
+                  e('input', { className: 'form-input', type: 'date', value: form.checkOut, onChange: function(ev) { handleFormChange('checkOut', ev.target.value); }, required: true })
+                ),
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Guests'),
+                  e('input', { className: 'form-input', type: 'number', min: '1', value: form.guests, onChange: function(ev) { handleFormChange('guests', ev.target.value); }, required: true })
+                ),
+                e('div', { className: 'form-group' },
+                  e('label', { className: 'form-label' }, 'Message'),
+                  e('textarea', { className: 'form-textarea', value: form.message, onChange: function(ev) { handleFormChange('message', ev.target.value); } })
+                ),
+                e('button', { className: 'form-submit', type: 'submit' }, 'Send Proposal')
+              )
+            )
+          )
+        )
+      );
+    }
+
+    function MapEmbed(props) {
+      var mapRef = useRef(null);
+      useEffect(function() {
+        if (!mapRef.current) return;
+        var map = L.map(mapRef.current).setView([props.lat, props.lon], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.circleMarker([props.lat, props.lon], { radius: 8, fillColor: '#0066d4', color: '#333', weight: 2, opacity: 1, fillOpacity: 0.8 }).addTo(map);
+      }, [props.lat, props.lon]);
+      return e('div', { ref: mapRef, className: 'map-embed' });
+    }
+
+    function LoginPage(props) {
+      var stateTab = useState('login');
+      var tab = stateTab[0];
+      var setTab = stateTab[1];
+
+      var stateUserType = useState('Traveler');
+      var userType = stateUserType[0];
+      var setUserType = stateUserType[1];
+
+      var stateLoginEmail = useState('');
+      var loginEmail = stateLoginEmail[0];
+      var setLoginEmail = stateLoginEmail[1];
+
+      var stateLoginPassword = useState('');
+      var loginPassword = stateLoginPassword[0];
+      var setLoginPassword = stateLoginPassword[1];
+
+      var stateSignupName = useState('');
+      var signupName = stateSignupName[0];
+      var setSignupName = stateSignupName[1];
+
+      var stateSignupEmail = useState('');
+      var signupEmail = stateSignupEmail[0];
+      var setSignupEmail = stateSignupEmail[1];
+
+      var stateSignupPassword = useState('');
+      var signupPassword = stateSignupPassword[0];
+      var setSignupPassword = stateSignupPassword[1];
 
       var handleLogin = function() {
-        if (email && password) {
-          var user = { email: email, password: password };
-          localStorage.setItem('user', JSON.stringify(user));
-          setUser(user);
-          setCurrentPage('home');
+        var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
+        var user = users.find(function(u) { return u.email === loginEmail && u.password === loginPassword; });
+        if (user) {
+          localStorage.setItem('ad_current_user', JSON.stringify(user));
+          props.setUser(user);
+          props.onNavigate('home');
         } else {
-          setError('Please fill in all fields');
+          alert('Invalid credentials');
         }
       };
 
-      return e('div', { className: 'login-page' },
+      var handleSignup = function() {
+        var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
+        if (users.find(function(u) { return u.email === signupEmail; })) {
+          alert('Email already exists');
+          return;
+        }
+        var newUser = { id: Date.now(), name: signupName, email: signupEmail, password: signupPassword, type: userType };
+        users.push(newUser);
+        localStorage.setItem('ad_users', JSON.stringify(users));
+        localStorage.setItem('ad_current_user', JSON.stringify(newUser));
+        props.setUser(newUser);
+        props.onNavigate('home');
+      };
+
+      return e('div', { className: 'login-container' },
         e('div', { className: 'login-card' },
-          e('h1', { className: 'login-title' }, 'Sign In'),
-          error && e('div', { className: 'error' }, error),
-          e('div', { className: 'login-form' },
+          e('div', { className: 'login-tabs' },
+            e('button', { className: 'tab-btn' + (tab === 'login' ? ' active' : ''), onClick: function() { setTab('login'); } }, 'Login'),
+            e('button', { className: 'tab-btn' + (tab === 'signup' ? ' active' : ''), onClick: function() { setTab('signup'); } }, 'Sign Up')
+          ),
+          tab === 'login' && e('div', null,
             e('div', { className: 'form-group' },
               e('label', { className: 'form-label' }, 'Email'),
-              e('input', { className: 'form-input', type: 'email', placeholder: 'your@email.com', value: email, onChange: function(ev) { setEmail(ev.target.value); setError(''); } })
+              e('input', { className: 'form-input', type: 'email', value: loginEmail, onChange: function(ev) { setLoginEmail(ev.target.value); } })
             ),
             e('div', { className: 'form-group' },
               e('label', { className: 'form-label' }, 'Password'),
-              e('input', { className: 'form-input', type: 'password', placeholder: '••••••••', value: password, onChange: function(ev) { setPassword(ev.target.value); setError(''); } })
+              e('input', { className: 'form-input', type: 'password', value: loginPassword, onChange: function(ev) { setLoginPassword(ev.target.value); } })
             ),
-            e('button', { className: 'btn-login', onClick: handleLogin }, 'Sign In'),
-            e('div', { className: 'login-links' },
-              e('button', { className: 'login-link', onClick: function() { alert('Not implemented'); } }, 'Forgot password?'),
-              e('button', { className: 'login-link', onClick: function() { alert('Not implemented'); } }, 'Create account')
-            )
+            e('button', { className: 'btn-primary', style: { width: '100%' }, onClick: handleLogin }, 'Login')
+          ),
+          tab === 'signup' && e('div', null,
+            e('label', { className: 'form-label' }, 'I am a...'),
+            e('div', { className: 'user-type-select' },
+              e('div', { className: 'type-option' + (userType === 'Traveler' ? ' selected' : ''), onClick: function() { setUserType('Traveler'); } }, 'Traveler'),
+              e('div', { className: 'type-option' + (userType === 'Property Owner' ? ' selected' : ''), onClick: function() { setUserType('Property Owner'); } }, 'Property Owner')
+            ),
+            e('div', { className: 'form-group' },
+              e('label', { className: 'form-label' }, 'Full Name'),
+              e('input', { className: 'form-input', type: 'text', value: signupName, onChange: function(ev) { setSignupName(ev.target.value); } })
+            ),
+            e('div', { className: 'form-group' },
+              e('label', { className: 'form-label' }, 'Email'),
+              e('input', { className: 'form-input', type: 'email', value: signupEmail, onChange: function(ev) { setSignupEmail(ev.target.value); } })
+            ),
+            e('div', { className: 'form-group' },
+              e('label', { className: 'form-label' }, 'Password'),
+              e('input', { className: 'form-input', type: 'password', value: signupPassword, onChange: function(ev) { setSignupPassword(ev.target.value); } })
+            ),
+            e('button', { className: 'btn-primary', style: { width: '100%' }, onClick: handleSignup }, 'Sign Up')
           )
         )
       );
     }
 
-    function DashboardPage() {
-      var listings = useMemo(parseListings, []);
-      return e('div', { className: 'dashboard-page' },
-        e('h1', { className: 'dashboard-title' }, 'Your Properties'),
-        e('div', { className: 'dashboard-section' },
-          e('h2', { className: 'dashboard-section-title' }, 'Active Listings'),
-          e('div', { className: 'results-grid' },
-            listings.slice(0, 5).map(function(property) {
-              return e(PropertyCardHorizontal, { key: property.id, property: property, onClick: function() {} });
-            })
-          )
-        )
-      );
-    }
+    function Dashboard(props) {
+      var stateTab = useState('profile');
+      var tab = stateTab[0];
+      var setTab = stateTab[1];
 
-    function Footer() {
-      return e('footer', { className: 'footer' },
-        e('div', { className: 'footer-content' },
-          e('div', null,
-            e('h4', { className: 'footer-section-title' }, 'About'),
-            e('a', { className: 'footer-link', href: '#' }, 'About Us'),
-            e('a', { className: 'footer-link', href: '#' }, 'Careers'),
-            e('a', { className: 'footer-link', href: '#' }, 'Press')
-          ),
-          e('div', null,
-            e('h4', { className: 'footer-section-title' }, 'Support'),
-            e('a', { className: 'footer-link', href: '#' }, 'Help Center'),
-            e('a', { className: 'footer-link', href: '#' }, 'Contact Us'),
-            e('a', { className: 'footer-link', href: '#' }, 'Safety')
-          ),
-          e('div', null,
-            e('h4', { className: 'footer-section-title' }, 'Legal'),
-            e('a', { className: 'footer-link', href: '#' }, 'Terms & Conditions'),
-            e('a', { className: 'footer-link', href: '#' }, 'Privacy Policy'),
-            e('a', { className: 'footer-link', href: '#' }, 'Cookie Policy')
-          ),
-          e('div', null,
-            e('h4', { className: 'footer-section-title' }, 'Connect'),
-            e('a', { className: 'footer-link', href: '#' }, 'Facebook'),
-            e('a', { className: 'footer-link', href: '#' }, 'Instagram'),
-            e('a', { className: 'footer-link', href: '#' }, 'Twitter')
-          )
-        ),
-        e('div', { className: 'footer-bottom' }, '© 2024 AffittoDiretto.it. All rights reserved.')
-      );
-    }
-
-    function App() {
-      var [currentPage, setCurrentPage] = useState('home');
-      var [selectedCity, setSelectedCity] = useState('');
-      var [user, setUser] = useState(null);
+      var stateProposals = useState([]);
+      var proposals = stateProposals[0];
+      var setProposals = stateProposals[1];
 
       useEffect(function() {
-        var storedUser = localStorage.getItem('user');
-        if (storedUser) setUser(JSON.parse(storedUser));
+        var data = JSON.parse(localStorage.getItem('ad_proposals') || '[]');
+        setProposals(data);
       }, []);
 
-      var renderPage = function() {
-        if (currentPage === 'home') return e(HomePage, { setCurrentPage: setCurrentPage, setSelectedCity: setSelectedCity });
-        if (currentPage === 'search') return e(SearchPage, { selectedCity: selectedCity, setCurrentPage: setCurrentPage });
-        if (currentPage === 'map') return e(MapPage, { setCurrentPage: setCurrentPage });
-        if (currentPage === 'login') return e(LoginPage, { setCurrentPage: setCurrentPage, setUser: setUser });
-        if (currentPage === 'dashboard') return e(DashboardPage);
-        if (currentPage.startsWith('detail:')) {
-          var propertyId = currentPage.split(':')[1];
-          return e(PropertyDetailPage, { propertyId: propertyId, setCurrentPage: setCurrentPage });
-        }
-        return e('div', { className: 'loading' }, 'Page not found');
-      };
-
-      return e(React.Fragment, null,
-        e(Nav, { currentPage: currentPage, setCurrentPage: setCurrentPage, user: user, setUser: setUser }),
-        e('main', { style: { flex: 1 } }, renderPage()),
-        e(Footer)
+      return e('div', { className: 'dashboard-container' },
+        e('h1', { style: { marginBottom: '2rem' } }, 'My Dashboard'),
+        e('div', { className: 'dashboard-tabs' },
+          e('button', { className: 'dashboard-tab' + (tab === 'profile' ? ' active' : ''), onClick: function() { setTab('profile'); } }, 'Profile'),
+          props.user.type === 'Property Owner' && e('button', { className: 'dashboard-tab' + (tab === 'properties' ? ' active' : ''), onClick: function() { setTab('properties'); } }, 'My Properties'),
+          e('button', { className: 'dashboard-tab' + (tab === 'proposals' ? ' active' : ''), onClick: function() { setTab('proposals'); } }, 'Proposals')
+        ),
+        tab === 'profile' && e('div', null,
+          e('div', { style: { background: '#fff', padding: '2rem', borderRadius: '6px', border: '1px solid #ddd' } },
+            e('h3', null, 'Profile Information'),
+            e('p', null, 'Name: ' + props.user.name),
+            e('p', null, 'Email: ' + props.user.email),
+            e('p', null, 'Type: ' + props.user.type)
+          )
+        ),
+        props.user.type === 'Property Owner' && tab === 'properties' && e('div', null,
+          e('div', { className: 'empty-state' },
+            e('h3', null, 'No Properties Listed'),
+            e('p', null, 'Start by adding your first property to get bookings.')
+          )
+        ),
+        tab === 'proposals' && e('div', null,
+          proposals.length > 0 ? e('div', null,
+            proposals.map(function(prop, idx) {
+              return e('div', { key: idx, style: { background: '#fff', padding: '1.5rem', borderRadius: '6px', border: '1px solid #ddd', marginBottom: '1rem' } },
+                e('h4', null, prop.propertyName),
+                e('p', null, 'From: ' + prop.name + ' (' + prop.email + ')'),
+                e('p', null, 'Check-in: ' + prop.checkIn + ', Check-out: ' + prop.checkOut),
+                e('p', null, 'Guests: ' + prop.guests),
+                prop.message && e('p', null, 'Message: ' + prop.message)
+              );
+            })
+          ) : e('div', { className: 'empty-state' },
+            e('h3', null, 'No Proposals Yet'),
+            e('p', null, 'When someone sends a proposal, it will appear here.')
+          )
+        )
       );
     }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(e(App));
+    function Footer(props) {
+      return e('footer', { className: 'footer' },
+        e('div', { className: 'footer-content' },
+          e('div', { className: 'footer-column' },
+            e('h4', null, 'About'),
+            e('a', { href: '#', className: 'footer-link' }, 'About Us'),
+            e('a', { href: '#', className: 'footer-link' }, 'Press'),
+            e('a', { href: '#', className: 'footer-link' }, 'Blog')
+          ),
+          e('div', { className: 'footer-column' },
+            e('h4', null, 'Support'),
+            e('a', { href: '#', className: 'footer-link' }, 'Help Center'),
+            e('a', { href: '#', className: 'footer-link' }, 'Contact Us'),
+            e('a', { href: '#', className: 'footer-link' }, 'Report a Bug')
+          ),
+          e('div', { className: 'footer-column' },
+            e('h4', null, 'Legal'),
+            e('a', { href: '#', className: 'footer-link' }, 'Privacy Policy'),
+            e('a', { href: '#', className: 'footer-link' }, 'Terms of Service'),
+            e('a', { href: '#', className: 'footer-link' }, 'Cookies')
+          ),
+          e('div', { className: 'footer-column' },
+            e('h4', null, 'Connect'),
+            e('a', { href: '#', className: 'footer-link' }, 'Facebook'),
+            e('a', { href: '#', className: 'footer-link' }, 'Twitter'),
+            e('a', { href: '#', className: 'footer-link' }, 'Instagram')
+          )
+        ),
+        e('div', { className: 'footer-bottom' }, '© 2026 AffittoDiretto.it. All rights reserved.')
+      );
+    }
+
+    function App(props) {
+      var stateListings = useState([]);
+      var listings = stateListings[0];
+      var setListings = stateListings[1];
+
+      var stateLoading = useState(true);
+      var loading = stateLoading[0];
+      var setLoading = stateLoading[1];
+
+      var statePage = useState('home');
+      var currentPage = statePage[0];
+      var setCurrentPage = statePage[1];
+
+      var statePageState = useState({});
+      var pageState = statePageState[0];
+      var setPageState = statePageState[1];
+
+      var stateUser = useState(null);
+      var user = stateUser[0];
+      var setUser = stateUser[1];
+
+      var stateSearchCity = useState('');
+      var searchCity = stateSearchCity[0];
+      var setSearchCity = stateSearchCity[1];
+
+      useEffect(function() {
+        var parsed = parseListings();
+        setListings(parsed);
+        setLoading(false);
+        var savedUser = localStorage.getItem('ad_current_user');
+        if (savedUser) setUser(JSON.parse(savedUser));
+      }, []);
+
+      var handleNavigate = function(page, state) {
+        setCurrentPage(page);
+        if (state) setPageState(state);
+      };
+
+      var currentProperty = useMemo(function() {
+        var id = sessionStorage.getItem('ad_current_property');
+        return listings.find(function(l) { return l.id === id; });
+      }, [listings]);
+
+      if (loading) {
+        return e('div', { style: { padding: '2rem', textAlign: 'center', fontSize: '1.2rem' } }, 'Loading properties...');
+      }
+
+      var page = null;
+      switch (currentPage) {
+        case 'home':
+          page = e(HomePage, { listings: listings, searchCity: searchCity, setSearchCity: setSearchCity, onNavigate: handleNavigate });
+          break;
+        case 'search':
+          page = e(SearchPage, { listings: listings, initialCity: pageState.city || '', onNavigate: handleNavigate });
+          break;
+        case 'map':
+          page = e(MapPage, { listings: listings, onNavigate: handleNavigate });
+          break;
+        case 'detail':
+          page = e(PropertyDetail, { currentProperty: currentProperty, onNavigate: handleNavigate });
+          break;
+        case 'login':
+          page = e(LoginPage, { setUser: setUser, onNavigate: handleNavigate });
+          break;
+        case 'dashboard':
+          page = user ? e(Dashboard, { user: user, onNavigate: handleNavigate }) : e('div', null, 'Not logged in');
+          break;
+        default:
+          page = e(HomePage, { listings: listings, searchCity: searchCity, setSearchCity: setSearchCity, onNavigate: handleNavigate });
+      }
+
+      return e('div', null,
+        e(Nav, { currentPage: currentPage, user: user, setUser: setUser, onNavigate: handleNavigate }),
+        page,
+        e(Footer, {})
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(e(App, {}));
   </script>
 </body>
 </html>
