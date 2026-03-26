@@ -55,7 +55,7 @@
     .property-card-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
     .property-card-type { font-size: 12px; opacity: 0.9; }
     .property-card-info { padding: 16px; }
-    .price { font-size: 24px; font-weight: 700; color: var(--orange); margin-bottom: 8px; }
+    .sample-photo-label { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.6); color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
     .stars { color: #ffc107; font-size: 14px; margin-bottom: 8px; }
     .amenities-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
     .amenity-chip { font-size: 11px; padding: 4px 8px; background: #f0f0f0; border-radius: 12px; color: #666; }
@@ -88,43 +88,38 @@
     .footer { background: #333; color: #ccc; padding: 32px 24px; text-align: center; font-size: 13px; margin-top: 32px; }
     .footer a { color: var(--orange); text-decoration: none; }
     .search-filters { background: white; padding: 24px; border-radius: 8px; margin-bottom: 24px; }
-    .filter-group { margin-bottom: 20px; }
-    .filter-group label { display: block; font-weight: 600; margin-bottom: 12px; font-size: 14px; }
+    .filter-group { margin-bottom: 16px; }
+    .filter-group label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+    .filter-row { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+    .filter-col { flex: 1; min-width: 120px; }
     textarea { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; width: 100%; box-sizing: border-box; font-family: system-ui; }
     textarea:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(196,101,42,0.1); }
+    .help-icon { display: inline-block; width: 20px; height: 20px; background: var(--orange); color: white; border-radius: 50%; text-align: center; line-height: 20px; font-weight: bold; cursor: pointer; font-size: 12px; margin-left: 4px; }
+    .chips-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   </style>
 </head>
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState, useEffect, useMemo, useRef, useCallback } = React;
-    const e = React.createElement;
+    var { useState, useEffect, useMemo, useRef, useCallback } = React;
+    var e = React.createElement;
 
-    /* ---- PRICING MATRIX ---- */
-    const PRICE_MATRIX = {
-      0: { 0: 180, 1: 95, 2: 70, 3: 110, 4: 45, 5: 120, 6: 80, 7: 85 },
-      1: { 0: 130, 1: 75, 2: 55, 3: 90, 4: 35, 5: 95, 6: 60, 7: 65 },
-      2: { 0: 110, 1: 65, 2: 50, 3: 80, 4: 30, 5: 85, 6: 55, 7: 60 },
-      3: { 0: 170, 1: 90, 2: 65, 3: 100, 4: 40, 5: 110, 6: 70, 7: 80 },
-      4: { 0: 160, 1: 85, 2: 60, 3: 95, 4: 40, 5: 100, 6: 65, 7: 75 }
-    };
-
-    const STAR_MULTIPLIERS = { 0: 0.7, 1: 0.7, 2: 0.85, 3: 1.0, 4: 1.3, 5: 1.8 };
-    const REGION_CENTERS = {
+    /* ---- REGION DATA ---- */
+    var REGION_CENTERS = {
       0: [41.9, 12.5, 9],
       1: [45.0, 7.7, 8],
       2: [41.0, 16.5, 8],
       3: [45.4, 11.8, 8],
       4: [44.3, 8.5, 9]
     };
-    const REGION_PHOTOS = {
+    var REGION_PHOTOS = {
       0: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&h=600&fit=crop',
       1: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=600&fit=crop',
       2: 'https://images.unsplash.com/photo-1534113414509-0eec2bfb493f?w=1200&h=600&fit=crop',
       3: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1200&h=600&fit=crop',
       4: 'https://images.unsplash.com/photo-1537631468332-b93e15cbc7e4?w=1200&h=600&fit=crop'
     };
-    const PROPERTY_PHOTOS = {
+    var PROPERTY_PHOTOS = {
       0: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=250&fit=crop',
       1: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&h=250&fit=crop',
       2: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=400&h=250&fit=crop',
@@ -135,8 +130,20 @@
       7: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=250&fit=crop'
     };
 
+    /* ---- PROPERTY TYPE INFO ---- */
+    var PROPERTY_TYPE_INFO = {
+      'Affittacamere': { desc: 'Private rooms in a residential home, sometimes with breakfast.', tax: '€1-3.50/person/night' },
+      'Agriturismo': { desc: 'Working farm accommodation with local food and rural experience.', tax: '€1-2/person/night' },
+      'Altro': { desc: 'Other accommodation types (apartments, villas, etc.).', tax: 'Varies by municipality' },
+      'B&B': { desc: 'Small guesthouse with breakfast included in the rate.', tax: '€2-5/person/night' },
+      'Campeggio': { desc: 'Campgrounds and holiday parks with pitches or mobile homes.', tax: '€0.50-1.50/person/night' },
+      'Hotel': { desc: 'Full-service accommodation with daily housekeeping and amenities.', tax: '€1-7/person/night (varies by star rating)' },
+      'Residence': { desc: 'Self-catering serviced apartments, usually with kitchenette.', tax: '€1-3/person/night' },
+      'Villaggio Turistico': { desc: 'Resort complexes with shared pools, restaurants, and entertainment.', tax: '€1-3/person/night' }
+    };
+
     /* ---- NEIGHBORHOOD MAPPING ---- */
-    const ROME_CAP_NEIGHBORHOODS = {
+    var ROME_CAP_NEIGHBORHOODS = {
       '00186': 'Centro Storico', '00187': 'Trevi / Via Veneto', '00184': 'Monti / Esquilino',
       '00185': 'Esquilino / Termini', '00153': 'Trastevere / Testaccio', '00193': 'Prati / Vaticano',
       '00192': 'Flaminio / Parioli', '00196': 'Parioli', '00197': 'Parioli / Salario',
@@ -157,21 +164,61 @@
       '00161': 'Nomentano', '00162': 'Bologna / Tiburtina', '00164': 'Aurelio / Boccea',
       '00165': 'Aurelio / Gregorio VII', '00166': 'Aurelio / Pineta Sacchetti',
       '00167': 'Balduina / Medaglie d\'Oro', '00168': 'Primavalle', '00169': 'Casilino',
-      '00171': 'Centocelle', '00172': 'Don Bosco / Cinecitt\u00e0', '00173': 'Appio Latino / Quarto Miglio',
+      '00171': 'Centocelle', '00172': 'Don Bosco / Cinecittà', '00173': 'Appio Latino / Quarto Miglio',
       '00174': 'Romanina', '00175': 'Appio Tuscolano', '00176': 'Pigneto / Torpignattara',
       '00177': 'Tuscolano', '00178': 'Capannelle', '00179': 'Statuario / Capannelle',
       '00181': 'Appio / Re di Roma', '00182': 'San Giovanni / Appio',
       '00183': 'Celio / Colosseo', '00188': 'Flaminio', '00189': 'Acqua Acetosa',
       '00191': 'Della Vittoria', '00194': 'Prati', '00195': 'Della Vittoria / Monte Mario'
     };
-    const VENICE_CAP_SESTIERI = {
+
+    var VENICE_CAP_SESTIERI = {
       '30121': 'Cannaregio', '30122': 'Castello', '30123': 'Dorsoduro',
       '30124': 'San Marco', '30125': 'San Polo', '30126': 'Santa Croce',
       '30100': 'Venezia Centro', '30131': 'Mestre / Marghera', '30170': 'Mestre / Marghera',
       '30171': 'Mestre', '30172': 'Mestre', '30173': 'Favaro Veneto', '30174': 'Zelarino',
       '30175': 'Marghera', '30176': 'Chirignago'
     };
-    const ROME_STREET_NEIGHBORHOODS = {
+
+    var TORINO_CAP_NEIGHBORHOODS = {
+      '10121': 'Centro', '10122': 'Centro', '10123': 'San Salvario', '10124': 'Centro / Porta Nuova',
+      '10125': 'Crocetta', '10126': 'San Salvario', '10127': 'Vanchiglia / Aurora',
+      '10128': 'Borgo Po', '10129': 'Nizza / Lingotto', '10130': 'Lingotto',
+      '10131': 'Mirafiori Nord', '10132': 'Mirafiori Sud', '10133': 'Santa Rita',
+      '10134': 'Cenisia', '10135': 'Pozzo Strada', '10136': 'Lucento',
+      '10137': 'Madonna di Campagna', '10138': 'Barriera di Milano', '10139': 'Rebaudengo',
+      '10140': 'Falchera', '10141': 'Vallette', '10142': 'Parella',
+      '10143': 'Collegno', '10144': 'San Donato', '10145': 'Campidoglio',
+      '10146': 'Cit Turin', '10147': 'Borgo San Paolo', '10148': 'Barca / Bertolla',
+      '10149': 'Madonna del Pilone', '10150': 'Sassi / Superga', '10151': 'Barriera / Regio Parco',
+      '10152': 'Aurora / Rossini', '10153': 'Vanchiglia', '10154': 'Borgo Dora',
+      '10155': 'Campidoglio / San Donato', '10156': 'Borgo Vittoria'
+    };
+
+    var BARI_CAP_NEIGHBORHOODS = {
+      '70121': 'Bari Vecchia / Centro', '70122': 'Murat / Madonnella',
+      '70123': 'Liberta / San Pasquale', '70124': 'Carrassi / San Pasquale',
+      '70125': 'Picone / Poggiofranco', '70126': 'Japigia / Torre a Mare'
+    };
+
+    var GENOVA_CAP_NEIGHBORHOODS = {
+      '16121': 'Centro Storico', '16122': 'Porto Antico / Molo', '16123': 'Castelletto',
+      '16124': 'San Vincenzo', '16125': 'Marassi', '16126': 'Staglieno',
+      '16127': 'San Fruttuoso', '16128': 'Albaro', '16129': 'Foce',
+      '16131': 'Sturla', '16132': 'Quinto / Nervi', '16133': 'Nervi',
+      '16134': 'Quarto', '16135': 'Voltri', '16136': 'Pegli',
+      '16137': 'Pra', '16138': 'Sestri Ponente', '16139': 'Cornigliano',
+      '16141': 'Sampierdarena', '16142': 'San Pier d\'Arena', '16143': 'Rivarolo',
+      '16144': 'Certosa', '16145': 'Pontedecimo', '16146': 'Bolzaneto',
+      '16147': 'Begato', '16148': 'Molassana', '16149': 'Struppa',
+      '16151': 'Castelletto', '16152': 'San Teodoro', '16153': 'Oregina',
+      '16154': 'Maddalena', '16155': 'Lagaccio', '16156': 'San Nicola',
+      '16157': 'Principe', '16158': 'Dinegro', '16159': 'San Benigno',
+      '16161': 'Crevari', '16162': 'Vesima', '16163': 'Arenzano',
+      '16164': 'Cogoleto', '16165': 'Varazze', '16166': 'Celle Ligure', '16167': 'Albisola'
+    };
+
+    var ROME_STREET_NEIGHBORHOODS = {
       'trastevere': 'Trastevere', 'monti': 'Monti', 'prati': 'Prati', 'testaccio': 'Testaccio',
       'san lorenzo': 'San Lorenzo', 'pigneto': 'Pigneto', 'flaminio': 'Flaminio',
       'parioli': 'Parioli', 'aventino': 'Aventino', 'garbatella': 'Garbatella',
@@ -188,7 +235,8 @@
       'laurentina': 'Laurentino', 'portuense': 'Portuense', 'aurelia': 'Aurelio',
       'cassia': 'Cassia', 'salaria': 'Salario', 'campitelli': 'Centro Storico'
     };
-    const VENICE_STREET_NEIGHBORHOODS = {
+
+    var VENICE_STREET_NEIGHBORHOODS = {
       'dorsoduro': 'Dorsoduro', 'cannaregio': 'Cannaregio', 'castello': 'Castello',
       'san marco': 'San Marco', 'san polo': 'San Polo', 'santa croce': 'Santa Croce',
       'giudecca': 'Giudecca', 'murano': 'Murano', 'burano': 'Burano', 'lido': 'Lido',
@@ -200,66 +248,60 @@
       // Venice: use CAP then address
       if (prop.comune === 'VENEZIA' || prop.comune === 'Venezia') {
         if (VENICE_CAP_SESTIERI[prop.cap]) return VENICE_CAP_SESTIERI[prop.cap];
-        const addr = ((prop.street || '') + ' ' + (prop.number || '')).toLowerCase();
-        for (const [key, hood] of Object.entries(VENICE_STREET_NEIGHBORHOODS)) {
-          if (addr.includes(key)) return hood;
+        var addr = ((prop.street || '') + ' ' + (prop.number || '')).toLowerCase();
+        for (var key in VENICE_STREET_NEIGHBORHOODS) {
+          if (addr.includes(key)) return VENICE_STREET_NEIGHBORHOODS[key];
         }
         return 'Venezia';
       }
       // Rome: use CAP then street name matching
       if (prop.comune === 'Roma' || prop.comune === 'ROMA') {
         if (ROME_CAP_NEIGHBORHOODS[prop.cap]) return ROME_CAP_NEIGHBORHOODS[prop.cap];
-        const addr = ((prop.street || '') + ' ' + (prop.number || '')).toLowerCase();
-        for (const [key, hood] of Object.entries(ROME_STREET_NEIGHBORHOODS)) {
-          if (addr.includes(key)) return hood;
+        var addr = ((prop.street || '') + ' ' + (prop.number || '')).toLowerCase();
+        for (var key in ROME_STREET_NEIGHBORHOODS) {
+          if (addr.includes(key)) return ROME_STREET_NEIGHBORHOODS[key];
         }
         return 'Roma (altri)';
+      }
+      // Torino (TORINO)
+      if (prop.comune === 'TORINO' || prop.comune === 'Torino') {
+        if (TORINO_CAP_NEIGHBORHOODS[prop.cap]) return TORINO_CAP_NEIGHBORHOODS[prop.cap];
+        return 'Torino';
+      }
+      // Bari (BARI)
+      if (prop.comune === 'BARI' || prop.comune === 'Bari') {
+        if (BARI_CAP_NEIGHBORHOODS[prop.cap]) return BARI_CAP_NEIGHBORHOODS[prop.cap];
+        return 'Bari';
+      }
+      // Genova (GENOVA)
+      if (prop.comune === 'GENOVA' || prop.comune === 'Genova') {
+        if (GENOVA_CAP_NEIGHBORHOODS[prop.cap]) return GENOVA_CAP_NEIGHBORHOODS[prop.cap];
+        return 'Genova';
       }
       // Other: just use comune as neighborhood
       return prop.comune;
     }
 
-    const AMENITY_LABELS = {
-      wifi: 'WiFi', ac: 'A/C', pool: 'Pool', paidParking: 'Paid Parking',
-      freeParking: 'Free Parking', restaurant: 'Restaurant', bar: 'Bar',
-      elevator: 'Elevator', garage: 'Garage', tv: 'TV', pets: 'Pets Allowed',
+    var AMENITY_LABELS = {
+      ac: 'A/C', pool: 'Pool', paidParking: 'Paid Parking',
+      freeParking: 'Free Parking', restaurant: 'Restaurant',
+      elevator: 'Elevator', garage: 'Garage', pets: 'Pets Allowed',
       disability: 'Accessible', sauna: 'Sauna', tennis: 'Tennis',
       bikeRental: 'Bike Rental', indoorPool: 'Indoor Pool', gym: 'Gym',
-      conference: 'Conference', park: 'Park/Garden', laundry: 'Laundry', shuttle: 'Shuttle'
+      shuttle: 'Shuttle'
     };
-
-    function hashCode(str) {
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-      }
-      return Math.abs(hash);
-    }
-
-    function calculatePrice(prop) {
-      let base = PRICE_MATRIX[prop.regionCode][prop.typeCode] || 80;
-      const starMult = STAR_MULTIPLIERS[prop.stars] || 1;
-      let price = base * starMult;
-      if (prop.beds > 100) price *= 1.2;
-      else if (prop.beds > 20) price *= 1.1;
-      const variation = 0.9 + ((hashCode(prop.id) % 20) / 100);
-      price *= variation;
-      return Math.round(price);
-    }
 
     function parseListings() {
       if (!window.RAW_DATA) return [];
-      const CLAIMED_IDS = new Set([
+      var CLAIMED_IDS = new Set([
         'IT000001','IT000005','IT000010','IT000020','IT000050',
         'IT000100','IT000200','IT000500','IT001000','IT002000',
         'IT003000','IT005000','IT010000','IT015000'
       ]);
-      return window.RAW_DATA.map(d => {
-        const amenBits = d[16] || 0;
-        const langBits = d[17] || 0;
-        const propId = d[0];
+      var listings = window.RAW_DATA.map(function(d) {
+        var amenBits = d[16] || 0;
+        var langBits = d[17] || 0;
+        var propId = d[0];
         return {
           id: propId,
           region: window.REGIONS[d[1]],
@@ -281,16 +323,15 @@
           baths: d[14] || 0,
           website: d[15] || '',
           amenities: {
-            wifi: !!(amenBits & 1), ac: !!(amenBits & 2), pool: !!(amenBits & 4),
+            ac: !!(amenBits & 2), pool: !!(amenBits & 4),
             paidParking: !!(amenBits & 8), freeParking: !!(amenBits & 16),
-            restaurant: !!(amenBits & 32), bar: !!(amenBits & 64),
+            restaurant: !!(amenBits & 32),
             elevator: !!(amenBits & 128), garage: !!(amenBits & 256),
-            tv: !!(amenBits & 512), pets: !!(amenBits & 1024),
+            pets: !!(amenBits & 1024),
             disability: !!(amenBits & 2048), sauna: !!(amenBits & 4096),
             tennis: !!(amenBits & 8192), bikeRental: !!(amenBits & 16384),
             indoorPool: !!(amenBits & 32768), gym: !!(amenBits & 131072),
-            conference: !!(amenBits & 262144), park: !!(amenBits & 524288),
-            laundry: !!(amenBits & 1048576), shuttle: !!(amenBits & 2097152)
+            shuttle: !!(amenBits & 2097152)
           },
           languages: {
             en: !!(langBits & 1), fr: !!(langBits & 2), de: !!(langBits & 4),
@@ -299,7 +340,14 @@
           claimed: CLAIMED_IDS.has(propId),
           verified: CLAIMED_IDS.has(propId)
         };
-      }).map(p => ({ ...p, price: calculatePrice(p), neighborhood: getNeighborhood(p) }));
+      });
+      return listings.map(function(p) {
+        return Object.assign({}, p, { neighborhood: getNeighborhood(p) });
+      }).sort(function(a, b) {
+        if (a.claimed && !b.claimed) return -1;
+        if (!a.claimed && b.claimed) return 1;
+        return 0;
+      });
     }
 
     function ensureUrl(url) {
@@ -309,42 +357,45 @@
     }
 
     function getCardImage(prop) {
-      if (prop.website) {
-        return 'https://image.thum.io/get/width/400/' + ensureUrl(prop.website);
-      }
       return PROPERTY_PHOTOS[prop.typeCode] || PROPERTY_PHOTOS[7];
     }
 
     function getHeroImage(prop) {
-      if (prop.website) {
-        return 'https://image.thum.io/get/width/1200/' + ensureUrl(prop.website);
-      }
       return REGION_PHOTOS[prop.regionCode] || REGION_PHOTOS[0];
     }
 
-    function buildComunesByRegion(listings) {
-      const map = {};
-      listings.forEach(l => {
+    function buildCommunesByRegion(listings) {
+      var map = {};
+      listings.forEach(function(l) {
         if (!map[l.regionCode]) map[l.regionCode] = new Set();
         map[l.regionCode].add(l.comune);
       });
-      Object.keys(map).forEach(k => { map[k] = Array.from(map[k]).sort(); });
+      Object.keys(map).forEach(function(k) { map[k] = Array.from(map[k]).sort(); });
       return map;
+    }
+
+    function buildCommunesByAllRegions(listings) {
+      var allCommunes = new Set();
+      listings.forEach(function(l) {
+        allCommunes.add(l.comune);
+      });
+      return Array.from(allCommunes).sort();
     }
 
     function buildNeighborhoodsByComune(listings) {
-      const map = {};
-      listings.forEach(l => {
-        const key = l.regionCode + ':' + l.comune;
+      var map = {};
+      listings.forEach(function(l) {
+        var key = l.comune;
         if (!map[key]) map[key] = new Set();
         map[key].add(l.neighborhood);
       });
-      Object.keys(map).forEach(k => { map[k] = Array.from(map[k]).sort(); });
+      Object.keys(map).forEach(function(k) { map[k] = Array.from(map[k]).sort(); });
       return map;
     }
 
-    function getTopAmenities(prop, limit = 3) {
-      const amenities = Object.entries(prop.amenities).filter(([,v]) => v).map(([k]) => AMENITY_LABELS[k]);
+    function getTopAmenities(prop, limit) {
+      if (!limit) limit = 3;
+      var amenities = Object.entries(prop.amenities).filter(function(a) { return a[1]; }).map(function(a) { return AMENITY_LABELS[a[0]]; });
       return amenities.slice(0, limit);
     }
 
@@ -353,16 +404,16 @@
     }
 
     function smartPagination(current, total) {
-      const pages = [];
-      const maxShow = 7;
+      var pages = [];
+      var maxShow = 7;
       if (total <= maxShow) {
-        for (let i = 1; i <= total; i++) pages.push(i);
+        for (var i = 1; i <= total; i++) pages.push(i);
       } else {
         pages.push(1);
-        const start = Math.max(2, current - 2);
-        const end = Math.min(total - 1, current + 2);
+        var start = Math.max(2, current - 2);
+        var end = Math.min(total - 1, current + 2);
         if (start > 2) pages.push('...');
-        for (let i = start; i <= end; i++) pages.push(i);
+        for (var i = start; i <= end; i++) pages.push(i);
         if (end < total - 1) pages.push('...');
         pages.push(total);
       }
@@ -370,32 +421,39 @@
     }
 
     /* ---- NAV ---- */
-    function Nav({ onNavigate, currentPage, user, setUser }) {
+    function Nav(props) {
+      var onNavigate = props.onNavigate;
+      var currentPage = props.currentPage;
+      var user = props.user;
+      var setUser = props.setUser;
       return e('nav', { className: 'nav' },
-        e('div', { className: 'nav-logo', onClick: () => onNavigate('home') }, 'AffittoDiretto.it'),
+        e('div', { className: 'nav-logo', onClick: function() { onNavigate('home'); } }, 'AffittoDiretto.it'),
         e('div', { className: 'nav-links' },
-          e('a', { className: 'nav-link' + (currentPage === 'search' ? ' active' : ''), onClick: () => onNavigate('search') }, 'Search'),
-          e('a', { className: 'nav-link' + (currentPage === 'map' ? ' active' : ''), onClick: () => onNavigate('map') }, 'Map'),
+          e('a', { className: 'nav-link' + (currentPage === 'search' ? ' active' : ''), onClick: function() { onNavigate('search'); } }, 'Search'),
+          e('a', { className: 'nav-link' + (currentPage === 'map' ? ' active' : ''), onClick: function() { onNavigate('map'); } }, 'Map'),
           user ? [
-            e('a', { className: 'nav-link' + (currentPage === 'dashboard' ? ' active' : ''), onClick: () => onNavigate('dashboard'), key: 'd' }, 'Dashboard'),
-            e('a', { className: 'nav-link', onClick: () => { localStorage.removeItem('ad_current_user'); if (setUser) setUser(null); onNavigate('home'); }, key: 'l' }, 'Logout (' + user.name + ')')
-          ] : e('a', { className: 'nav-link' + (currentPage === 'login' ? ' active' : ''), onClick: () => onNavigate('login') }, 'Login/Sign Up')
+            e('a', { className: 'nav-link' + (currentPage === 'dashboard' ? ' active' : ''), onClick: function() { onNavigate('dashboard'); }, key: 'd' }, 'Dashboard'),
+            e('a', { className: 'nav-link', onClick: function() { localStorage.removeItem('ad_current_user'); if (setUser) setUser(null); onNavigate('home'); }, key: 'l' }, 'Logout (' + user.name + ')')
+          ] : e('a', { className: 'nav-link' + (currentPage === 'login' ? ' active' : ''), onClick: function() { onNavigate('login'); } }, 'Login/Sign Up')
         )
       );
     }
 
     /* ---- HOME ---- */
-    function HomePage({ listings, onNavigate, onPropertyClick }) {
-      const featuredListings = useMemo(() => {
-        const claimed = listings.filter(l => l.claimed).slice(0, 4);
-        const random = listings.filter(l => !l.claimed).sort(() => Math.random() - 0.5).slice(0, 4);
-        return [...claimed, ...random].slice(0, 8);
+    function HomePage(props) {
+      var listings = props.listings;
+      var onNavigate = props.onNavigate;
+      var onPropertyClick = props.onPropertyClick;
+      var featuredListings = useMemo(function() {
+        var claimed = listings.filter(function(l) { return l.claimed; }).slice(0, 4);
+        var random = listings.filter(function(l) { return !l.claimed; }).sort(function() { return Math.random() - 0.5; }).slice(0, 4);
+        return claimed.concat(random).slice(0, 8);
       }, [listings]);
       return e('div', null,
         e('div', { className: 'hero' },
           e('h1', { className: 'hero-title' }, 'Book Direct in Italy'),
           e('p', { className: 'hero-subtitle' }, 'Connect directly with property owners. No middleman fees.'),
-          e('button', { className: 'btn btn-secondary', onClick: () => onNavigate('search'), style: { fontSize: '16px', padding: '14px 32px' } }, 'Search Properties')
+          e('button', { className: 'btn btn-secondary', onClick: function() { onNavigate('search'); }, style: { fontSize: '16px', padding: '14px 32px' } }, 'Search Properties')
         ),
         e('div', { className: 'stats-bar' },
           e('div', { className: 'stat' }, e('div', { className: 'stat-number' }, '63,304'), e('div', { className: 'stat-label' }, 'Properties')),
@@ -406,188 +464,221 @@
         e('div', { style: { padding: '32px 24px' } },
           e('h2', { style: { fontSize: '28px', fontWeight: '700', marginBottom: '24px' } }, 'Featured Properties'),
           e('div', { className: 'property-grid' },
-            featuredListings.map(listing =>
-              e(PropertyCard, { key: listing.id, prop: listing, onPropertyClick })
-            )
+            featuredListings.map(function(listing) {
+              return e(PropertyCard, { key: listing.id, prop: listing, onPropertyClick: onPropertyClick });
+            })
           )
         ),
         e(Footer)
       );
     }
 
-    function PropertyCard({ prop, onPropertyClick }) {
-      const topAmenities = getTopAmenities(prop);
-      const cardImg = getCardImage(prop);
-      const statusColor = prop.claimed ? '#2a6847' : (prop.website ? '#1e5f8c' : '#c0392b');
-      const statusLabel = prop.claimed ? 'Claimed' : (prop.website ? 'Unclaimed' : 'No Contact');
-      return e('div', { className: 'card property-card', onClick: () => onPropertyClick(prop.id) },
+    function PropertyCard(props) {
+      var prop = props.prop;
+      var onPropertyClick = props.onPropertyClick;
+      var topAmenities = getTopAmenities(prop);
+      var cardImg = getCardImage(prop);
+      return e('div', { className: 'card property-card', onClick: function() { onPropertyClick(prop.id); } },
         e('div', { className: 'property-card-image', style: { backgroundImage: 'url(' + cardImg + ')' } },
+          e('div', { className: 'sample-photo-label' }, 'Sample Photo'),
           e('div', { className: 'property-card-overlay' },
             e('div', null,
               e('div', { className: 'property-card-name' }, prop.name),
-              e('div', { className: 'property-card-type' }, prop.type + ' \u2022 ' + prop.neighborhood)
+              e('div', { className: 'property-card-type' }, prop.type + ' • ' + prop.neighborhood)
             )
           ),
-          e('div', { style: { position: 'absolute', top: '8px', right: '8px', display: 'flex', gap: '4px' } },
-            e('span', { style: { background: statusColor, color: 'white', padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: '600' } }, statusLabel),
-            prop.website && e('span', { style: { background: 'rgba(0,0,0,0.6)', color: 'white', padding: '4px 10px', borderRadius: '12px', fontSize: '11px' } }, 'Preview')
+          prop.claimed && e('div', { style: { position: 'absolute', top: '8px', right: '8px' } },
+            e('span', { style: { background: '#2a6847', color: 'white', padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: '600' } }, 'Verified')
           )
         ),
         e('div', { className: 'property-card-info' },
-          e('div', { className: 'price' }, '\u20AC' + prop.price + '/night'),
           prop.stars > 0 && e('div', { className: 'stars', title: prop.stars + ' stars' }, renderStars(prop.stars)),
           e('div', { style: { fontSize: '13px', color: '#666', marginBottom: '8px' } },
-            prop.beds + ' beds \u2022 ' + prop.rooms + ' rooms'
+            prop.beds + ' beds • ' + prop.rooms + ' rooms'
           ),
           e('div', { className: 'amenities-chips' },
-            topAmenities.map((a, i) => e('span', { className: 'amenity-chip', key: i }, a))
+            topAmenities.map(function(a, i) { return e('span', { className: 'amenity-chip', key: i }, a); })
           )
         )
       );
     }
 
+    /* ---- PROPERTY TYPE INFO MODAL ---- */
+    function PropertyTypeInfoModal(props) {
+      var isOpen = props.isOpen;
+      var onClose = props.onClose;
+      return e('div', { className: 'modal' + (isOpen ? ' active' : ''), onClick: onClose },
+        e('div', { className: 'modal-content', onClick: function(e) { e.stopPropagation(); } },
+          e('h2', null, 'Property Types & Taxes'),
+          e('p', { style: { fontSize: '13px', color: '#666', marginBottom: '16px' } }, 'Italian cities impose small daily tourist taxes on accommodations. Taxes vary by property type and location.'),
+          Object.entries(PROPERTY_TYPE_INFO).map(function(entry) {
+            var typeCode = entry[0];
+            var info = entry[1];
+            return e('div', { key: typeCode, style: { marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #eee' } },
+              e('strong', null, typeCode),
+              e('p', { style: { margin: '4px 0', fontSize: '13px' } }, info.desc),
+              e('div', { style: { fontSize: '12px', color: '#e65100', fontWeight: '600' } }, 'Tax: ' + info.tax)
+            );
+          }),
+          e('button', { className: 'btn btn-primary', onClick: onClose, style: { width: '100%', marginTop: '16px' } }, 'Close')
+        )
+      );
+    }
+
     /* ---- SEARCH PAGE ---- */
-    function SearchPage({ listings, onPropertyClick, onNavigate }) {
-      const [selectedRegion, setSelectedRegion] = useState(null);
-      const [selectedProvince, setSelectedProvince] = useState(null);
-      const [selectedComune, setSelectedComune] = useState(null);
-      const [selectedNeighborhood, setSelectedNeighborhood] = useState(null);
-      const [selectedTypes, setSelectedTypes] = useState(new Set());
-      const [selectedAmenities, setSelectedAmenities] = useState(new Set());
-      const [maxPrice, setMaxPrice] = useState(500);
-      const [minBeds, setMinBeds] = useState(0);
-      const [minStars, setMinStars] = useState(0);
-      const [page, setPage] = useState(1);
+    function SearchPage(props) {
+      var listings = props.listings;
+      var onPropertyClick = props.onPropertyClick;
+      var onNavigate = props.onNavigate;
 
-      const comunesByRegion = useMemo(() => buildComunesByRegion(listings), [listings]);
-      const neighborhoodsByComune = useMemo(() => buildNeighborhoodsByComune(listings), [listings]);
+      var state = {
+        selectedCity: useState(null),
+        selectedNeighborhood: useState(null),
+        selectedTypes: useState(new Set()),
+        selectedAmenities: useState(new Set()),
+        minBeds: useState(0),
+        minStars: useState(0),
+        page: useState(1),
+        showTypeInfo: useState(false)
+      };
 
-      const availableNeighborhoods = useMemo(() => {
-        if (selectedRegion === null || !selectedComune) return [];
-        const key = selectedRegion + ':' + selectedComune;
-        return neighborhoodsByComune[key] || [];
-      }, [selectedRegion, selectedComune, neighborhoodsByComune]);
+      var selectedCity = state.selectedCity[0];
+      var setSelectedCity = state.selectedCity[1];
+      var selectedNeighborhood = state.selectedNeighborhood[0];
+      var setSelectedNeighborhood = state.selectedNeighborhood[1];
+      var selectedTypes = state.selectedTypes[0];
+      var setSelectedTypes = state.selectedTypes[1];
+      var selectedAmenities = state.selectedAmenities[0];
+      var setSelectedAmenities = state.selectedAmenities[1];
+      var minBeds = state.minBeds[0];
+      var setMinBeds = state.minBeds[1];
+      var minStars = state.minStars[0];
+      var setMinStars = state.minStars[1];
+      var page = state.page[0];
+      var setPage = state.page[1];
+      var showTypeInfo = state.showTypeInfo[0];
+      var setShowTypeInfo = state.showTypeInfo[1];
 
-      const filtered = useMemo(() => {
-        return listings.filter(l => {
-          if (selectedRegion !== null && l.regionCode !== selectedRegion) return false;
-          if (selectedProvince !== null && l.provinciaCode !== selectedProvince) return false;
-          if (selectedComune && l.comune !== selectedComune) return false;
+      var allCommunesSorted = useMemo(function() { return buildCommunesByAllRegions(listings); }, [listings]);
+      var neighborhoodsByComune = useMemo(function() { return buildNeighborhoodsByComune(listings); }, [listings]);
+
+      var availableNeighborhoods = useMemo(function() {
+        if (!selectedCity) return [];
+        return neighborhoodsByComune[selectedCity] || [];
+      }, [selectedCity, neighborhoodsByComune]);
+
+      var filtered = useMemo(function() {
+        return listings.filter(function(l) {
+          if (selectedCity && l.comune !== selectedCity) return false;
           if (selectedNeighborhood && l.neighborhood !== selectedNeighborhood) return false;
           if (selectedTypes.size > 0 && !selectedTypes.has(l.typeCode)) return false;
           if (selectedAmenities.size > 0) {
-            for (let amen of selectedAmenities) {
-              const [key] = Object.entries(AMENITY_LABELS).find(([, v]) => v === amen) || [];
+            for (var amen of selectedAmenities) {
+              var entry = Object.entries(AMENITY_LABELS).find(function(e) { return e[1] === amen; });
+              var key = entry ? entry[0] : null;
               if (!key || !l.amenities[key]) return false;
             }
           }
-          if (l.price > maxPrice) return false;
           if (l.beds < minBeds) return false;
           if (l.stars < minStars) return false;
           return true;
         });
-      }, [listings, selectedRegion, selectedProvince, selectedComune, selectedNeighborhood, selectedTypes, selectedAmenities, maxPrice, minBeds, minStars]);
+      }, [listings, selectedCity, selectedNeighborhood, selectedTypes, selectedAmenities, minBeds, minStars]);
 
-      const pageSize = 12;
-      const totalPages = Math.ceil(filtered.length / pageSize);
-      const paged = filtered.slice((page - 1) * pageSize, page * pageSize);
+      var pageSize = 12;
+      var totalPages = Math.ceil(filtered.length / pageSize);
+      var paged = filtered.slice((page - 1) * pageSize, page * pageSize);
 
-      const handleRegionChange = (e) => {
-        const val = e.target.value ? parseInt(e.target.value) : null;
-        setSelectedRegion(val);
-        setSelectedProvince(null);
-        setSelectedComune(null);
-        setSelectedNeighborhood(null);
-        setPage(1);
+      var handleTypeChange = function(e) {
+        var val = e.target.value ? parseInt(e.target.value) : null;
+        if (val !== null) {
+          var newSet = new Set(selectedTypes);
+          if (newSet.has(val)) newSet.delete(val);
+          else newSet.add(val);
+          setSelectedTypes(newSet);
+          setPage(1);
+        }
       };
 
-      const handleProvinceChange = (e) => {
-        const val = e.target.value ? parseInt(e.target.value) : null;
-        setSelectedProvince(val);
-        setSelectedComune(null);
-        setSelectedNeighborhood(null);
-        setPage(1);
-      };
-
-      const toggleType = (typeCode) => {
-        const newSet = new Set(selectedTypes);
-        if (newSet.has(typeCode)) newSet.delete(typeCode);
-        else newSet.add(typeCode);
-        setSelectedTypes(newSet);
-        setPage(1);
-      };
-
-      const toggleAmenity = (label) => {
-        const newSet = new Set(selectedAmenities);
+      var toggleAmenity = function(label) {
+        var newSet = new Set(selectedAmenities);
         if (newSet.has(label)) newSet.delete(label);
         else newSet.add(label);
         setSelectedAmenities(newSet);
         setPage(1);
       };
 
-      const availableProvinces = selectedRegion !== null ?
-        Array.from(new Set(listings.filter(l => l.regionCode === selectedRegion).map(l => l.provinciaCode))).sort() : [];
-
       return e('div', null,
+        e(PropertyTypeInfoModal, { isOpen: showTypeInfo, onClose: function() { setShowTypeInfo(false); } }),
         e('div', { style: { padding: '24px', background: '#f9f9f9' } },
           e('h1', { style: { fontSize: '32px', fontWeight: '700', marginBottom: '24px' } }, 'Search Properties'),
           e('div', { className: 'search-filters' },
             e('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '20px' } },
               e('div', { className: 'filter-group' },
-                e('label', null, 'Region'),
-                e('select', { value: selectedRegion ?? '', onChange: handleRegionChange },
-                  e('option', { value: '' }, '-- Any Region --'),
-                  Object.entries(window.REGIONS).map(([code, name]) => e('option', { key: code, value: code }, name))
-                )
-              ),
-              e('div', { className: 'filter-group' },
-                e('label', null, 'Province'),
-                e('select', { value: selectedProvince ?? '', onChange: handleProvinceChange, disabled: selectedRegion === null },
-                  e('option', { value: '' }, '-- Any Province --'),
-                  availableProvinces.map(code => e('option', { key: code, value: code }, window.PROVINCES[code]))
-                )
-              ),
-              e('div', { className: 'filter-group' },
                 e('label', null, 'City'),
-                e('select', { value: selectedComune || '', onChange: (e) => { setSelectedComune(e.target.value || null); setSelectedNeighborhood(null); setPage(1); }, disabled: selectedRegion === null },
-                  e('option', { value: '' }, '-- Any City --'),
-                  selectedRegion !== null && comunesByRegion[selectedRegion] && comunesByRegion[selectedRegion].map(c => e('option', { key: c, value: c }, c))
+                e('select', { value: selectedCity || '', onChange: function(e) { setSelectedCity(e.target.value || null); setSelectedNeighborhood(null); setPage(1); } },
+                  e('option', { value: '' }, '-- All Cities --'),
+                  allCommunesSorted.map(function(c) { return e('option', { key: c, value: c }, c); })
+                )
+              ),
+              selectedCity && e('div', { className: 'filter-group' },
+                e('label', null, 'Neighborhood'),
+                e('select', { value: selectedNeighborhood || '', onChange: function(e) { setSelectedNeighborhood(e.target.value || null); setPage(1); }, disabled: availableNeighborhoods.length <= 1 },
+                  e('option', { value: '' }, '-- All Neighborhoods --'),
+                  availableNeighborhoods.map(function(n) { return e('option', { key: n, value: n }, n); })
                 )
               ),
               e('div', { className: 'filter-group' },
-                e('label', null, 'Neighborhood'),
-                e('select', { value: selectedNeighborhood || '', onChange: (e) => { setSelectedNeighborhood(e.target.value || null); setPage(1); }, disabled: !selectedComune || availableNeighborhoods.length <= 1 },
-                  e('option', { value: '' }, '-- Any Neighborhood --'),
-                  availableNeighborhoods.map(n => e('option', { key: n, value: n }, n))
-                )
+                e('label', null, 'Min Stars: ' + minStars),
+                e('input', { type: 'range', min: 0, max: 5, value: minStars, onChange: function(e) { setMinStars(parseInt(e.target.value)); setPage(1); }, style: { width: '100%' } })
+              ),
+              e('div', { className: 'filter-group' },
+                e('label', null, 'Min Beds: ' + minBeds),
+                e('input', { type: 'range', min: 0, max: 10, value: minBeds, onChange: function(e) { setMinBeds(parseInt(e.target.value)); setPage(1); }, style: { width: '100%' } })
               )
             ),
             e('div', { style: { marginBottom: '20px' } },
-              e('label', null, 'Property Types'),
-              e('div', null,
-                Object.entries(window.PROPERTY_TYPES).map(([code, name]) =>
-                  e('span', { key: code, className: 'chip' + (selectedTypes.has(parseInt(code)) ? ' active' : ''), onClick: () => toggleType(parseInt(code)) }, name)
+              e('label', null, 'Property Types ', e('span', { className: 'help-icon', onClick: function() { setShowTypeInfo(true); }, title: 'Learn about property types and taxes' }, '?')),
+              e('div', { style: { marginBottom: '8px' } },
+                e('select', { value: '', onChange: handleTypeChange },
+                  e('option', { value: '' }, '-- Add Type --'),
+                  Object.entries(window.PROPERTY_TYPES).map(function(entry) { return e('option', { key: entry[0], value: entry[0] }, entry[1]); })
                 )
+              ),
+              e('div', { className: 'chips-container' },
+                Array.from(selectedTypes).map(function(typeCode) {
+                  return e('span', { key: typeCode, className: 'chip active' },
+                    window.PROPERTY_TYPES[typeCode],
+                    e('span', { style: { marginLeft: '6px', cursor: 'pointer', fontWeight: 'bold' }, onClick: function() {
+                      var newSet = new Set(selectedTypes);
+                      newSet.delete(typeCode);
+                      setSelectedTypes(newSet);
+                      setPage(1);
+                    } }, '×')
+                  );
+                })
               )
             ),
             e('div', { style: { marginBottom: '20px' } },
-              e('label', null, 'Min Stars: ' + minStars),
-              e('input', { type: 'range', min: 0, max: 5, value: minStars, onChange: (e) => { setMinStars(parseInt(e.target.value)); setPage(1); }, style: { width: '100%' } })
-            ),
-            e('div', { style: { marginBottom: '20px' } },
-              e('label', null, 'Max Price: €' + maxPrice + '/night'),
-              e('input', { type: 'range', min: 20, max: 500, step: 10, value: maxPrice, onChange: (e) => { setMaxPrice(parseInt(e.target.value)); setPage(1); }, style: { width: '100%' } })
-            ),
-            e('div', { style: { marginBottom: '20px' } },
-              e('label', null, 'Min Beds: ' + minBeds),
-              e('input', { type: 'range', min: 0, max: 10, value: minBeds, onChange: (e) => { setMinBeds(parseInt(e.target.value)); setPage(1); }, style: { width: '100%' } })
-            ),
-            e('div', null,
               e('label', null, 'Amenities (all must be present)'),
-              e('div', null,
-                Object.values(AMENITY_LABELS).map(label =>
-                  e('span', { key: label, className: 'chip' + (selectedAmenities.has(label) ? ' active' : ''), onClick: () => toggleAmenity(label) }, label)
+              e('div', { style: { marginBottom: '8px' } },
+                e('select', { value: '', onChange: function(e) {
+                  if (e.target.value) {
+                    toggleAmenity(e.target.value);
+                    e.target.value = '';
+                  }
+                } },
+                  e('option', { value: '' }, '-- Add Amenity --'),
+                  Object.values(AMENITY_LABELS).map(function(label) { return e('option', { key: label, value: label }, label); })
                 )
+              ),
+              e('div', { className: 'chips-container' },
+                Array.from(selectedAmenities).map(function(label) {
+                  return e('span', { key: label, className: 'chip active' },
+                    label,
+                    e('span', { style: { marginLeft: '6px', cursor: 'pointer', fontWeight: 'bold' }, onClick: function() { toggleAmenity(label); } }, '×')
+                  );
+                })
               )
             )
           ),
@@ -596,46 +687,52 @@
           )
         ),
         e('div', { className: 'property-grid' },
-          paged.map(p => e(PropertyCard, { key: p.id, prop: p, onPropertyClick }))
+          paged.map(function(p) { return e(PropertyCard, { key: p.id, prop: p, onPropertyClick: onPropertyClick }); })
         ),
         e('div', { className: 'pagination' },
-          page > 1 && e('button', { onClick: () => setPage(page - 1) }, '← Prev'),
-          smartPagination(page, totalPages).map((p, i) => {
+          page > 1 && e('button', { onClick: function() { setPage(page - 1); } }, '← Prev'),
+          smartPagination(page, totalPages).map(function(p, i) {
             if (p === '...') return e('span', { key: i }, '...');
-            return e('button', { key: i, onClick: () => setPage(p), className: p === page ? 'active' : '' }, p);
+            return e('button', { key: i, onClick: function() { setPage(p); }, className: p === page ? 'active' : '' }, p);
           }),
-          page < totalPages && e('button', { onClick: () => setPage(page + 1) }, 'Next →')
+          page < totalPages && e('button', { onClick: function() { setPage(page + 1); } }, 'Next →')
         ),
         e(Footer)
       );
     }
 
     /* ---- MAP PAGE ---- */
-    function MapPage({ listings }) {
-      const mapRef = useRef(null);
-      const mapInstanceRef = useRef(null);
-      const markersRef = useRef([]);
-      const [selectedRegion, setSelectedRegion] = useState(null);
-      const [selectedComune, setSelectedComune] = useState(null);
-      const [selectedNeighborhood, setSelectedNeighborhood] = useState(null);
+    function MapPage(props) {
+      var listings = props.listings;
+      var mapRef = useRef(null);
+      var mapInstanceRef = useRef(null);
+      var markersRef = useRef([]);
+      var selectedCityState = useState(null);
+      var selectedNeighborhoodState = useState(null);
 
-      const comunesByRegion = useMemo(() => buildComunesByRegion(listings), [listings]);
-      const neighborhoodsByComune = useMemo(() => buildNeighborhoodsByComune(listings), [listings]);
-      const availableNeighborhoods = useMemo(() => {
-        if (selectedRegion === null || !selectedComune) return [];
-        return neighborhoodsByComune[selectedRegion + ':' + selectedComune] || [];
-      }, [selectedRegion, selectedComune, neighborhoodsByComune]);
+      var selectedCity = selectedCityState[0];
+      var setSelectedCity = selectedCityState[1];
+      var selectedNeighborhood = selectedNeighborhoodState[0];
+      var setSelectedNeighborhood = selectedNeighborhoodState[1];
 
-      const filteredAll = useMemo(() => {
-        let res = listings;
-        if (selectedRegion !== null) res = res.filter(l => l.regionCode === selectedRegion);
-        if (selectedComune) res = res.filter(l => l.comune === selectedComune);
-        if (selectedNeighborhood) res = res.filter(l => l.neighborhood === selectedNeighborhood);
+      var allCommunesSorted = useMemo(function() { return buildCommunesByAllRegions(listings); }, [listings]);
+      var neighborhoodsByComune = useMemo(function() { return buildNeighborhoodsByComune(listings); }, [listings]);
+      var availableNeighborhoods = useMemo(function() {
+        if (!selectedCity) return [];
+        return neighborhoodsByComune[selectedCity] || [];
+      }, [selectedCity, neighborhoodsByComune]);
+
+      var filteredAll = useMemo(function() {
+        var res = listings;
+        if (selectedCity) res = res.filter(function(l) { return l.comune === selectedCity; });
+        if (selectedNeighborhood) res = res.filter(function(l) { return l.neighborhood === selectedNeighborhood; });
         return res;
-      }, [listings, selectedRegion, selectedComune, selectedNeighborhood]);
-      const filtered = useMemo(() => filteredAll.slice(0, 1000), [filteredAll]);
+      }, [listings, selectedCity, selectedNeighborhood]);
 
-      useEffect(() => {
+      var filtered = useMemo(function() { return filteredAll.slice(0, 1000); }, [filteredAll]);
+      var withCoordinates = useMemo(function() { return filtered.filter(function(p) { return p.lat && p.lon; }); }, [filtered]);
+
+      useEffect(function() {
         if (!mapRef.current) return;
         if (!mapInstanceRef.current) {
           mapInstanceRef.current = L.map(mapRef.current).setView([42.5, 12.5], 6);
@@ -645,14 +742,13 @@
           }).addTo(mapInstanceRef.current);
         }
 
-        markersRef.current.forEach(m => mapInstanceRef.current.removeLayer(m));
+        markersRef.current.forEach(function(m) { mapInstanceRef.current.removeLayer(m); });
         markersRef.current = [];
 
-        const map = mapInstanceRef.current;
-        filtered.forEach(prop => {
-          if (!prop.lat || !prop.lon) return;
-          const color = prop.claimed ? '#2a6847' : (prop.website ? '#1e5f8c' : '#c0392b');
-          const circle = L.circleMarker([prop.lat, prop.lon], {
+        var map = mapInstanceRef.current;
+        withCoordinates.forEach(function(prop) {
+          var color = prop.claimed ? '#2a6847' : (prop.website ? '#1e5f8c' : '#c0392b');
+          var circle = L.circleMarker([prop.lat, prop.lon], {
             radius: 6,
             fillColor: color,
             color: color,
@@ -663,15 +759,10 @@
           circle.addTo(map);
           markersRef.current.push(circle);
         });
+      }, [withCoordinates]);
 
-        if (selectedRegion !== null && REGION_CENTERS[selectedRegion]) {
-          const [lat, lon, zoom] = REGION_CENTERS[selectedRegion];
-          map.setView([lat, lon], zoom);
-        }
-      }, [filtered, selectedRegion]);
-
-      useEffect(() => {
-        return () => {
+      useEffect(function() {
+        return function() {
           if (mapInstanceRef.current) {
             mapInstanceRef.current.remove();
             mapInstanceRef.current = null;
@@ -679,77 +770,80 @@
         };
       }, []);
 
-      const availableProvinces = selectedRegion !== null ?
-        Array.from(new Set(listings.filter(l => l.regionCode === selectedRegion).map(l => l.provinciaCode))).sort() : [];
-
       return e('div', null,
         e('div', { style: { padding: '24px', background: '#f9f9f9' } },
           e('h1', { style: { fontSize: '32px', fontWeight: '700', marginBottom: '24px' } }, 'Browse on Map'),
           e('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' } },
             e('div', { className: 'filter-group' },
-              e('label', null, 'Region'),
-              e('select', { value: selectedRegion ?? '', onChange: (e) => { setSelectedRegion(e.target.value ? parseInt(e.target.value) : null); setSelectedComune(null); setSelectedNeighborhood(null); } },
-                e('option', { value: '' }, '-- Any Region --'),
-                Object.entries(window.REGIONS).map(([code, name]) => e('option', { key: code, value: code }, name))
-              )
-            ),
-            e('div', { className: 'filter-group' },
               e('label', null, 'City'),
-              e('select', { value: selectedComune || '', onChange: (e) => { setSelectedComune(e.target.value || null); setSelectedNeighborhood(null); }, disabled: selectedRegion === null },
-                e('option', { value: '' }, '-- Any City --'),
-                selectedRegion !== null && comunesByRegion[selectedRegion] && comunesByRegion[selectedRegion].map(c => e('option', { key: c, value: c }, c))
+              e('select', { value: selectedCity || '', onChange: function(e) { setSelectedCity(e.target.value || null); setSelectedNeighborhood(null); } },
+                e('option', { value: '' }, '-- All Cities --'),
+                allCommunesSorted.map(function(c) { return e('option', { key: c, value: c }, c); })
               )
             ),
-            e('div', { className: 'filter-group' },
+            selectedCity && e('div', { className: 'filter-group' },
               e('label', null, 'Neighborhood'),
-              e('select', { value: selectedNeighborhood || '', onChange: (e) => setSelectedNeighborhood(e.target.value || null), disabled: !selectedComune || availableNeighborhoods.length <= 1 },
-                e('option', { value: '' }, '-- Any Neighborhood --'),
-                availableNeighborhoods.map(n => e('option', { key: n, value: n }, n))
+              e('select', { value: selectedNeighborhood || '', onChange: function(e) { setSelectedNeighborhood(e.target.value || null); }, disabled: availableNeighborhoods.length <= 1 },
+                e('option', { value: '' }, '-- All Neighborhoods --'),
+                availableNeighborhoods.map(function(n) { return e('option', { key: n, value: n }, n); })
               )
             )
           ),
           e('div', { style: { fontSize: '14px', color: '#666', marginTop: '16px' } },
-            (filteredAll.length > 1000 ? 'Showing 1,000 of ' + filteredAll.length.toLocaleString() + ' matching properties' : 'Showing ' + filteredAll.length.toLocaleString() + ' properties')
+            withCoordinates.length + ' of ' + filteredAll.length.toLocaleString() + ' properties have location data'
+          ),
+          withCoordinates.length < filteredAll.length && e('div', { style: { fontSize: '13px', color: '#e65100', marginTop: '8px', fontWeight: '600' } },
+            'Some properties don\'t have GPS coordinates and cannot be shown on the map.'
           )
         ),
         e('div', { ref: mapRef, className: 'map-container', style: { height: 'calc(100vh - 300px)', margin: '24px' } }),
         e('div', { className: 'map-legend' },
           e('div', { style: { fontWeight: '600', marginBottom: '12px' } }, 'Legend'),
-          e('div', { className: 'legend-item' }, e('div', { className: 'legend-dot', style: { background: '#2a6847' } }), 'Claimed'),
+          e('div', { className: 'legend-item' }, e('div', { className: 'legend-dot', style: { background: '#2a6847' } }), 'Verified'),
           e('div', { className: 'legend-item' }, e('div', { className: 'legend-dot', style: { background: '#1e5f8c' } }), 'Has Website'),
-          e('div', { className: 'legend-item' }, e('div', { className: 'legend-dot', style: { background: '#c0392b' } }), 'No Contact Info')
+          e('div', { className: 'legend-item' }, e('div', { className: 'legend-dot', style: { background: '#c0392b' } }), 'No Website')
         ),
         e(Footer)
       );
     }
 
     /* ---- PROPERTY DETAIL ---- */
-    function PropertyDetail({ prop, onNavigate, user }) {
-      const [showProposal, setShowProposal] = useState(false);
-      const [proposalData, setProposalData] = useState({ name: user?.name || '', email: user?.email || '', checkIn: '', checkOut: '', guests: 1, message: '' });
-      const [submitted, setSubmitted] = useState(false);
+    function PropertyDetail(props) {
+      var prop = props.prop;
+      var onNavigate = props.onNavigate;
+      var user = props.user;
 
-      const handleProposalSubmit = () => {
+      var showProposalState = useState(false);
+      var proposalDataState = useState({ name: user?.name || '', email: user?.email || '', checkIn: '', checkOut: '', guests: 1, message: '' });
+      var submittedState = useState(false);
+
+      var showProposal = showProposalState[0];
+      var setShowProposal = showProposalState[1];
+      var proposalData = proposalDataState[0];
+      var setProposalData = proposalDataState[1];
+      var submitted = submittedState[0];
+      var setSubmitted = submittedState[1];
+
+      var handleProposalSubmit = function() {
         if (!proposalData.name || !proposalData.email || !proposalData.checkIn || !proposalData.checkOut) {
           alert('Please fill all fields');
           return;
         }
-        let proposals = JSON.parse(localStorage.getItem('ad_proposals') || '[]');
-        proposals.push({ propertyId: prop.id, ...proposalData, submitted: new Date().toISOString() });
+        var proposals = JSON.parse(localStorage.getItem('ad_proposals') || '[]');
+        proposals.push(Object.assign({ propertyId: prop.id, submitted: new Date().toISOString() }, proposalData));
         localStorage.setItem('ad_proposals', JSON.stringify(proposals));
         setSubmitted(true);
       };
 
-      const heroImg = getHeroImage(prop);
-      const statusColor = prop.claimed ? '#2a6847' : (prop.website ? '#1e5f8c' : '#c0392b');
-      const statusLabel = prop.claimed ? 'Verified Owner' : (prop.website ? 'Unclaimed' : 'No Contact Info');
+      var heroImg = getHeroImage(prop);
 
       return e('div', null,
         e('div', { style: { backgroundImage: 'url(' + heroImg + ')', backgroundSize: 'cover', backgroundPosition: 'center', height: '400px', position: 'relative', display: 'flex', alignItems: 'flex-end', padding: '32px', color: 'white' } },
+          e('div', { className: 'sample-photo-label', style: { zIndex: 2 } }, 'Sample Photo'),
           e('div', { style: { background: 'rgba(0,0,0,0.6)', padding: '24px', borderRadius: '8px', maxWidth: '600px' } },
             e('h1', { style: { fontSize: '36px', fontWeight: '700', margin: '0 0 8px 0' } }, prop.name),
-            e('p', { style: { margin: '0 0 8px 0', fontSize: '16px' } }, prop.type + ' \u2022 ' + prop.neighborhood + ', ' + prop.region),
-            e('span', { style: { background: statusColor, color: 'white', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600' } }, statusLabel)
+            e('p', { style: { margin: '0 0 8px 0', fontSize: '16px' } }, prop.type + ' • ' + prop.neighborhood + ', ' + prop.region),
+            prop.claimed && e('span', { style: { background: '#2a6847', color: 'white', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600' } }, 'Verified Owner')
           )
         ),
         e('div', { style: { maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' } },
@@ -758,12 +852,11 @@
               e('div', { style: { marginBottom: '32px' } },
                 e('h2', null, 'Property Details'),
                 e('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px', marginTop: '16px' } },
-                  e('div', null, e('strong', null, 'Price'), e('div', { className: 'price' }, '€' + prop.price + '/night')),
                   e('div', null, e('strong', null, 'Rating'), e('div', { className: 'stars', title: prop.stars + ' stars' }, renderStars(prop.stars))),
                   e('div', null, e('strong', null, 'Beds'), e('div', { style: { fontSize: '20px', fontWeight: '700', color: 'var(--orange)' } }, prop.beds)),
                   e('div', null, e('strong', null, 'Rooms'), e('div', { style: { fontSize: '20px', fontWeight: '700', color: 'var(--orange)' } }, prop.rooms)),
                   e('div', null, e('strong', null, 'Bathrooms'), e('div', { style: { fontSize: '20px', fontWeight: '700', color: 'var(--orange)' } }, prop.baths)),
-                  e('div', null, e('strong', null, 'Status'), e('div', { style: { fontSize: '14px' } }, prop.claimed ? e('span', { className: 'badge badge-success' }, '✓ Verified') : 'Unverified'))
+                  prop.claimed && e('div', null, e('strong', null, 'Status'), e('div', { style: { fontSize: '14px' } }, e('span', { className: 'badge badge-success' }, '✓ Verified')))
                 )
               ),
               e('div', { style: { marginBottom: '32px' } },
@@ -775,9 +868,9 @@
               e('div', { style: { marginBottom: '32px' } },
                 e('h2', null, 'Amenities'),
                 e('div', { className: 'amenities-chips' },
-                  Object.entries(prop.amenities).filter(([,v]) => v).map(([k, ]) =>
-                    e('span', { className: 'amenity-chip', key: k }, AMENITY_LABELS[k])
-                  )
+                  Object.entries(prop.amenities).filter(function(a) { return a[1]; }).map(function(a) {
+                    return e('span', { className: 'amenity-chip', key: a[0] }, AMENITY_LABELS[a[0]]);
+                  })
                 )
               ),
               prop.lat && prop.lon && e('div', { style: { marginBottom: '32px' } },
@@ -789,10 +882,12 @@
             ),
             e('div', null,
               e('div', { className: 'contact-section' },
-                prop.website && e('div', { style: { marginBottom: '16px' } },
-                  e('a', { href: ensureUrl(prop.website), target: '_blank', rel: 'noopener noreferrer', className: 'btn btn-primary', style: { width: '100%', textAlign: 'center', textDecoration: 'none' } }, 'Visit Website')
-                ),
-                e('h3', null, 'Send Proposal'),
+                e('h3', null, 'Rates & Contact'),
+                prop.website ? e('div', null,
+                  e('p', { style: { fontSize: '13px', color: '#666', marginBottom: '16px' } }, 'Check the property website for current rates and availability.'),
+                  e('a', { href: ensureUrl(prop.website), target: '_blank', rel: 'noopener noreferrer', className: 'btn btn-primary', style: { width: '100%', textAlign: 'center', textDecoration: 'none', display: 'block', marginBottom: '16px' } }, 'Visit Website')
+                ) : e('p', { style: { fontSize: '13px', color: '#666', marginBottom: '16px' } }, 'Contact the property directly for rates and availability.'),
+                e('h3', { style: { marginTop: '20px' } }, 'Send Proposal'),
                 submitted ? e('div', { style: { padding: '16px', background: '#e8f5e9', borderRadius: '8px', color: '#2a6847' } },
                   e('strong', null, 'Proposal Sent!'),
                   e('p', { style: { marginTop: '8px', fontSize: '13px' } },
@@ -800,24 +895,24 @@
                   )
                 ) : e('div', null,
                   e('div', { style: { marginBottom: '12px' } },
-                    e('input', { type: 'text', className: 'input', placeholder: 'Name', value: proposalData.name, onChange: (e) => setProposalData({...proposalData, name: e.target.value }) })
+                    e('input', { type: 'text', className: 'input', placeholder: 'Name', value: proposalData.name, onChange: function(e) { setProposalData(Object.assign({}, proposalData, { name: e.target.value })); } })
                   ),
                   e('div', { style: { marginBottom: '12px' } },
-                    e('input', { type: 'email', className: 'input', placeholder: 'Email', value: proposalData.email, onChange: (e) => setProposalData({...proposalData, email: e.target.value }) })
+                    e('input', { type: 'email', className: 'input', placeholder: 'Email', value: proposalData.email, onChange: function(e) { setProposalData(Object.assign({}, proposalData, { email: e.target.value })); } })
                   ),
                   e('div', { style: { marginBottom: '12px' } },
                     e('label', { style: { fontSize: '12px', fontWeight: '600' } }, 'Check-In'),
-                    e('input', { type: 'date', className: 'input', value: proposalData.checkIn, onChange: (e) => setProposalData({...proposalData, checkIn: e.target.value }) })
+                    e('input', { type: 'date', className: 'input', value: proposalData.checkIn, onChange: function(e) { setProposalData(Object.assign({}, proposalData, { checkIn: e.target.value })); } })
                   ),
                   e('div', { style: { marginBottom: '12px' } },
                     e('label', { style: { fontSize: '12px', fontWeight: '600' } }, 'Check-Out'),
-                    e('input', { type: 'date', className: 'input', value: proposalData.checkOut, onChange: (e) => setProposalData({...proposalData, checkOut: e.target.value }) })
+                    e('input', { type: 'date', className: 'input', value: proposalData.checkOut, onChange: function(e) { setProposalData(Object.assign({}, proposalData, { checkOut: e.target.value })); } })
                   ),
                   e('div', { style: { marginBottom: '12px' } },
-                    e('input', { type: 'number', className: 'input', placeholder: 'Guests', min: 1, value: proposalData.guests, onChange: (e) => setProposalData({...proposalData, guests: parseInt(e.target.value) }) })
+                    e('input', { type: 'number', className: 'input', placeholder: 'Guests', min: 1, value: proposalData.guests, onChange: function(e) { setProposalData(Object.assign({}, proposalData, { guests: parseInt(e.target.value) })); } })
                   ),
                   e('div', { style: { marginBottom: '12px' } },
-                    e('textarea', { className: 'input', placeholder: 'Message (optional)', rows: 4, value: proposalData.message, onChange: (e) => setProposalData({...proposalData, message: e.target.value }) })
+                    e('textarea', { className: 'input', placeholder: 'Message (optional)', rows: 4, value: proposalData.message, onChange: function(e) { setProposalData(Object.assign({}, proposalData, { message: e.target.value })); } })
                   ),
                   e('button', { className: 'btn btn-primary', style: { width: '100%' }, onClick: handleProposalSubmit }, 'Send Proposal')
                 )
@@ -829,41 +924,58 @@
       );
     }
 
-    function MapEmbed({ lat, lon }) {
-      const mapRef = useRef(null);
-      useEffect(() => {
+    function MapEmbed(props) {
+      var lat = props.lat;
+      var lon = props.lon;
+      var mapRef = useRef(null);
+      useEffect(function() {
         if (!mapRef.current) return;
-        const map = L.map(mapRef.current).setView([lat, lon], 13);
+        var map = L.map(mapRef.current).setView([lat, lon], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
         L.circleMarker([lat, lon], { radius: 8, color: 'var(--orange)', fillColor: 'var(--orange)', fillOpacity: 0.7 }).addTo(map);
-        return () => map.remove();
+        return function() { map.remove(); };
       }, [lat, lon]);
       return e('div', { ref: mapRef, style: { width: '100%', height: '100%' } });
     }
 
     /* ---- LOGIN/SIGNUP ---- */
-    function LoginPage({ onNavigate, user, setUser }) {
-      const [mode, setMode] = useState('login');
-      const [email, setEmail] = useState('');
-      const [password, setPassword] = useState('');
-      const [name, setName] = useState('');
-      const [userType, setUserType] = useState('tourist');
+    function LoginPage(props) {
+      var onNavigate = props.onNavigate;
+      var user = props.user;
+      var setUser = props.setUser;
 
-      const handleSubmit = () => {
+      var modeState = useState('login');
+      var emailState = useState('');
+      var passwordState = useState('');
+      var nameState = useState('');
+      var userTypeState = useState('tourist');
+
+      var mode = modeState[0];
+      var setMode = modeState[1];
+      var email = emailState[0];
+      var setEmail = emailState[1];
+      var password = passwordState[0];
+      var setPassword = passwordState[1];
+      var name = nameState[0];
+      var setName = nameState[1];
+      var userType = userTypeState[0];
+      var setUserType = userTypeState[1];
+
+      var handleSubmit = function() {
         if (!email || !password || (mode === 'signup' && !name)) {
           alert('Please fill all fields');
           return;
         }
-        let users = JSON.parse(localStorage.getItem('ad_users') || '[]');
+        var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
         if (mode === 'login') {
-          const found = users.find(u => u.email === email && u.password === password);
+          var found = users.find(function(u) { return u.email === email && u.password === password; });
           if (!found) { alert('Invalid credentials'); return; }
           localStorage.setItem('ad_current_user', JSON.stringify(found));
           if (setUser) setUser(found);
           onNavigate('home');
         } else {
-          if (users.some(u => u.email === email)) { alert('Email already registered'); return; }
-          const newUser = { id: 'user_' + Date.now(), name, email, password, userType, created: new Date().toISOString() };
+          if (users.some(function(u) { return u.email === email; })) { alert('Email already registered'); return; }
+          var newUser = { id: 'user_' + Date.now(), name: name, email: email, password: password, userType: userType, created: new Date().toISOString() };
           users.push(newUser);
           localStorage.setItem('ad_users', JSON.stringify(users));
           localStorage.setItem('ad_current_user', JSON.stringify(newUser));
@@ -876,23 +988,23 @@
         e('div', { className: 'card', style: { padding: '32px' } },
           e('h1', { style: { textAlign: 'center', marginBottom: '24px' } }, mode === 'login' ? 'Login' : 'Sign Up'),
           e('div', { style: { marginBottom: '20px', display: 'flex', gap: '12px', justifyContent: 'center' } },
-            e('button', { className: 'btn' + (mode === 'login' ? ' btn-primary' : ' btn-secondary'), onClick: () => setMode('login') }, 'Login'),
-            e('button', { className: 'btn' + (mode === 'signup' ? ' btn-primary' : ' btn-secondary'), onClick: () => setMode('signup') }, 'Sign Up')
+            e('button', { className: 'btn' + (mode === 'login' ? ' btn-primary' : ' btn-secondary'), onClick: function() { setMode('login'); } }, 'Login'),
+            e('button', { className: 'btn' + (mode === 'signup' ? ' btn-primary' : ' btn-secondary'), onClick: function() { setMode('signup'); } }, 'Sign Up')
           ),
           mode === 'signup' && e('div', { style: { marginBottom: '12px' } },
             e('label', { style: { display: 'block', marginBottom: '8px', fontWeight: '600' } }, 'I am a...'),
-            e('select', { value: userType, onChange: (e) => setUserType(e.target.value), className: 'input' },
+            e('select', { value: userType, onChange: function(e) { setUserType(e.target.value); }, className: 'input' },
               e('option', { value: 'tourist' }, 'Traveler/Guest'),
               e('option', { value: 'owner' }, 'Property Owner')
             )
           ),
-          mode === 'signup' && e('input', { type: 'text', className: 'input', placeholder: 'Full Name', value: name, onChange: (e) => setName(e.target.value), style: { marginBottom: '12px' } }),
-          e('input', { type: 'email', className: 'input', placeholder: 'Email', value: email, onChange: (e) => setEmail(e.target.value), style: { marginBottom: '12px' } }),
-          e('input', { type: 'password', className: 'input', placeholder: 'Password', value: password, onChange: (e) => setPassword(e.target.value), style: { marginBottom: '12px' } }),
+          mode === 'signup' && e('input', { type: 'text', className: 'input', placeholder: 'Full Name', value: name, onChange: function(e) { setName(e.target.value); }, style: { marginBottom: '12px' } }),
+          e('input', { type: 'email', className: 'input', placeholder: 'Email', value: email, onChange: function(e) { setEmail(e.target.value); }, style: { marginBottom: '12px' } }),
+          e('input', { type: 'password', className: 'input', placeholder: 'Password', value: password, onChange: function(e) { setPassword(e.target.value); }, style: { marginBottom: '12px' } }),
           e('button', { className: 'btn btn-primary', onClick: handleSubmit, style: { width: '100%', marginBottom: '12px' } }, mode === 'login' ? 'Login' : 'Create Account'),
           e('div', { style: { textAlign: 'center', fontSize: '13px', color: '#666' } },
             mode === 'login' ? 'No account? ' : 'Have account? ',
-            e('a', { onClick: () => { setMode(mode === 'login' ? 'signup' : 'login'); setEmail(''); setPassword(''); setName(''); }, style: { color: 'var(--orange)', cursor: 'pointer', textDecoration: 'none' } }, mode === 'login' ? 'Sign up' : 'Login')
+            e('a', { onClick: function() { setMode(mode === 'login' ? 'signup' : 'login'); setEmail(''); setPassword(''); setName(''); }, style: { color: 'var(--orange)', cursor: 'pointer', textDecoration: 'none' } }, mode === 'login' ? 'Sign up' : 'Login')
           )
         ),
         e(Footer)
@@ -900,15 +1012,21 @@
     }
 
     /* ---- DASHBOARD ---- */
-    function Dashboard({ user, listings, onNavigate }) {
-      const [activeTab, setActiveTab] = useState('profile');
+    function Dashboard(props) {
+      var user = props.user;
+      var listings = props.listings;
+      var onNavigate = props.onNavigate;
+
+      var activeTabState = useState('profile');
+      var activeTab = activeTabState[0];
+      var setActiveTab = activeTabState[1];
 
       return e('div', { style: { maxWidth: '1000px', margin: '0 auto', padding: '32px 24px' } },
         e('h1', { style: { marginBottom: '24px' } }, 'Dashboard'),
         e('div', null,
-          e('button', { className: 'tab' + (activeTab === 'profile' ? ' active' : ''), onClick: () => setActiveTab('profile') }, 'Profile'),
-          user.userType === 'owner' && e('button', { className: 'tab' + (activeTab === 'properties' ? ' active' : ''), onClick: () => setActiveTab('properties') }, 'My Properties'),
-          e('button', { className: 'tab' + (activeTab === 'proposals' ? ' active' : ''), onClick: () => setActiveTab('proposals') }, 'Proposals')
+          e('button', { className: 'tab' + (activeTab === 'profile' ? ' active' : ''), onClick: function() { setActiveTab('profile'); } }, 'Profile'),
+          user.userType === 'owner' && e('button', { className: 'tab' + (activeTab === 'properties' ? ' active' : ''), onClick: function() { setActiveTab('properties'); } }, 'My Properties'),
+          e('button', { className: 'tab' + (activeTab === 'proposals' ? ' active' : ''), onClick: function() { setActiveTab('proposals'); } }, 'Proposals')
         ),
         e('div', { style: { marginTop: '24px', padding: '24px', background: 'white', borderRadius: '8px' } },
           activeTab === 'profile' && e('div', null,
@@ -940,27 +1058,36 @@
 
     /* ---- MAIN APP ---- */
     function App() {
-      const [page, setPage] = useState('home');
-      const [listings, setListings] = useState([]);
-      const [loading, setLoading] = useState(true);
-      const [user, setUser] = useState(null);
+      var pageState = useState('home');
+      var listingsState = useState([]);
+      var loadingState = useState(true);
+      var userState = useState(null);
 
-      useEffect(() => {
-        const parsed = parseListings();
+      var page = pageState[0];
+      var setPage = pageState[1];
+      var listings = listingsState[0];
+      var setListings = listingsState[1];
+      var loading = loadingState[0];
+      var setLoading = loadingState[1];
+      var user = userState[0];
+      var setUser = userState[1];
+
+      useEffect(function() {
+        var parsed = parseListings();
         setListings(parsed);
         setLoading(false);
-        const stored = localStorage.getItem('ad_current_user');
+        var stored = localStorage.getItem('ad_current_user');
         if (stored) setUser(JSON.parse(stored));
         window.scrollTo(0, 0);
       }, []);
 
-      const handleNavigate = (newPage) => {
+      var handleNavigate = function(newPage) {
         setPage(newPage);
         window.scrollTo(0, 0);
       };
 
-      const handlePropertyClick = (propId) => {
-        const prop = listings.find(l => l.id === propId);
+      var handlePropertyClick = function(propId) {
+        var prop = listings.find(function(l) { return l.id === propId; });
         if (prop) {
           sessionStorage.setItem('ad_current_property', JSON.stringify(prop));
           handleNavigate('detail');
@@ -969,20 +1096,20 @@
 
       if (loading) return e('div', { style: { padding: '40px', textAlign: 'center' } }, e('div', { className: 'spinner' }), e('p', { style: { marginTop: '20px' } }, 'Loading 63,000 properties...'));
 
-      const currentProp = page === 'detail' ? JSON.parse(sessionStorage.getItem('ad_current_property') || 'null') : null;
+      var currentProp = page === 'detail' ? JSON.parse(sessionStorage.getItem('ad_current_property') || 'null') : null;
 
       return e('div', null,
-        e(Nav, { onNavigate: handleNavigate, currentPage: page, user, setUser }),
-        page === 'home' && e(HomePage, { listings, onNavigate: handleNavigate, onPropertyClick: handlePropertyClick }),
-        page === 'search' && e(SearchPage, { listings, onPropertyClick: handlePropertyClick, onNavigate: handleNavigate }),
-        page === 'map' && e(MapPage, { listings }),
-        page === 'detail' && currentProp && e(PropertyDetail, { prop: currentProp, onNavigate: handleNavigate, user }),
-        page === 'login' && e(LoginPage, { onNavigate: handleNavigate, user, setUser }),
-        page === 'dashboard' && user && e(Dashboard, { user, listings, onNavigate: handleNavigate })
+        e(Nav, { onNavigate: handleNavigate, currentPage: page, user: user, setUser: setUser }),
+        page === 'home' && e(HomePage, { listings: listings, onNavigate: handleNavigate, onPropertyClick: handlePropertyClick }),
+        page === 'search' && e(SearchPage, { listings: listings, onPropertyClick: handlePropertyClick, onNavigate: handleNavigate }),
+        page === 'map' && e(MapPage, { listings: listings }),
+        page === 'detail' && currentProp && e(PropertyDetail, { prop: currentProp, onNavigate: handleNavigate, user: user }),
+        page === 'login' && e(LoginPage, { onNavigate: handleNavigate, user: user, setUser: setUser }),
+        page === 'dashboard' && user && e(Dashboard, { user: user, listings: listings, onNavigate: handleNavigate })
       );
     }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
+    var root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(e(App));
   </script>
 </body>
