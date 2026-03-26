@@ -2023,24 +2023,24 @@
         ),
         e('div', { className: 'why-section' },
           e('div', { className: 'why-content' },
-            e('h2', null, 'Why We Do It'),
-            e('p', null, 'Booking platforms charge property owners 15-25% commission on every stay. These costs are passed on to you as a traveler through higher prices. We built DirectBookingsItaly.com to change that.'),
+            e('h2', null, sc.whyTitle || 'Why We Do It'),
+            e('p', null, sc.whyDesc || 'Booking platforms charge property owners 15-25% commission on every stay.'),
             e('div', { className: 'why-grid' },
               e('div', { className: 'why-card' },
-                e('h3', null, 'Guests Save Money'),
-                e('p', null, 'When you book direct, there are no middleman fees. Property owners can offer you better rates because they keep 100% of the booking value.')
+                e('h3', null, sc.whyCard1Title || 'Guests Save Money'),
+                e('p', null, sc.whyCard1Text || '')
               ),
               e('div', { className: 'why-card' },
-                e('h3', null, 'Owners Earn More'),
-                e('p', null, 'A hotel losing 20% to booking platforms loses thousands per month. With Direct Bookings Italy, listing is free forever. Owners keep every euro they earn.')
+                e('h3', null, sc.whyCard2Title || 'Owners Earn More'),
+                e('p', null, sc.whyCard2Text || '')
               ),
               e('div', { className: 'why-card' },
-                e('h3', null, 'Personal Connection'),
-                e('p', null, 'Talk directly to your host. Need a late check-in? Special dietary needs? Direct communication means better service and flexibility.')
+                e('h3', null, sc.whyCard3Title || 'Personal Connection'),
+                e('p', null, sc.whyCard3Text || '')
               )
             ),
             e('div', { style: { marginTop: '2rem' } },
-              e('button', { className: 'btn-primary', style: { padding: '0.8rem 2rem' }, onClick: function() { onNavigate('about'); } }, 'Learn More About Us')
+              e('button', { className: 'btn-primary', style: { padding: '0.8rem 2rem' }, onClick: function() { onNavigate('about'); } }, sc.learnMoreBtn || 'Learn More About Us')
             )
           )
         )
@@ -2442,6 +2442,7 @@
 
     function BlogPage(props) {
       var onNavigate = props.onNavigate;
+      var sc = JSON.parse(localStorage.getItem('ad_site_content') || 'null') || {};
       var stateCat = useState('');
       var selectedCat = stateCat[0]; var setSelectedCat = stateCat[1];
       var posts = window.BLOG_POSTS || [];
@@ -2456,7 +2457,7 @@
       }, [posts, selectedCat]);
       return e('div', { className: 'blog-container' },
         e('div', { className: 'blog-header' },
-          e('h1', { style: { fontSize: '1.8rem', fontWeight: 800 } }, 'Travel Blog'),
+          e('h1', { style: { fontSize: '1.8rem', fontWeight: 800 } }, sc.blogTitle || 'Travel Blog'),
           e('div', { className: 'blog-categories' },
             e('button', { className: 'blog-cat-btn' + (!selectedCat ? ' active' : ''), onClick: function() { setSelectedCat(''); } }, 'All'),
             categories.map(function(cat) {
@@ -2483,6 +2484,7 @@
       var slug = props.slug;
       var handleBack = props.handleBack;
       var onNavigate = props.onNavigate;
+      var sc = JSON.parse(localStorage.getItem('ad_site_content') || 'null') || {};
       var posts = window.BLOG_POSTS || [];
       var post = posts.find(function(p) { return p.slug === slug; });
       if (!post) return e('div', { className: 'blog-article' },
@@ -2495,8 +2497,8 @@
         e('div', { className: 'blog-article-meta' }, post.category + ' • ' + post.date + ' • ' + post.readTime),
         e('div', { className: 'blog-article-content', dangerouslySetInnerHTML: { __html: post.content } }),
         e('div', { style: { marginTop: '2rem', padding: '1.5rem', background: '#f0f4ff', borderRadius: '12px', textAlign: 'center' } },
-          e('h3', { style: { marginBottom: '0.5rem' } }, 'Find Your Perfect Stay'),
-          e('p', { style: { color: '#666', marginBottom: '1rem' } }, 'Browse 63,000+ direct booking accommodations across Italy'),
+          e('h3', { style: { marginBottom: '0.5rem' } }, sc.blogCTATitle || 'Find Your Perfect Stay'),
+          e('p', { style: { color: '#666', marginBottom: '1rem' } }, sc.blogCTADesc || 'Browse 63,000+ direct booking accommodations across Italy'),
           e('button', { className: 'btn-primary', onClick: function() { onNavigate('search'); } }, 'Search Properties')
         )
       );
@@ -2504,36 +2506,37 @@
 
     function AboutPage(props) {
       var onNavigate = props.onNavigate;
+      var sc = JSON.parse(localStorage.getItem('ad_site_content') || 'null') || {};
       return e('div', { className: 'about-container' },
-        e('h1', null, 'About DirectBookingsItaly.com'),
-        e('p', { style: { fontSize: '1.1rem' } }, 'We believe everyone deserves a fair deal when traveling in Italy. DirectBookingsItaly.com is a free platform that connects travelers directly with property owners across Italy, cutting out the middleman and the hefty commission fees that come with it.'),
+        e('h1', null, sc.aboutTitle || 'About DirectBookingsItaly.com'),
+        e('p', { style: { fontSize: '1.1rem' } }, sc.aboutIntro || 'We believe everyone deserves a fair deal when traveling in Italy.'),
         e('div', { className: 'about-stats' },
           e('div', { className: 'about-stat' },
-            e('div', { className: 'about-stat-value' }, '63,000+'),
-            e('div', { className: 'about-stat-label' }, 'Properties Listed')
+            e('div', { className: 'about-stat-value' }, sc.aboutStat1 || '63,000+'),
+            e('div', { className: 'about-stat-label' }, sc.aboutStat1Label || 'Properties Listed')
           ),
           e('div', { className: 'about-stat' },
-            e('div', { className: 'about-stat-value' }, '2,040'),
-            e('div', { className: 'about-stat-label' }, 'Cities Covered')
+            e('div', { className: 'about-stat-value' }, sc.aboutStat2 || '2,040'),
+            e('div', { className: 'about-stat-label' }, sc.aboutStat2Label || 'Cities Covered')
           ),
           e('div', { className: 'about-stat' },
-            e('div', { className: 'about-stat-value' }, '20'),
-            e('div', { className: 'about-stat-label' }, 'Italian Regions')
+            e('div', { className: 'about-stat-value' }, sc.aboutStat3 || '20'),
+            e('div', { className: 'about-stat-label' }, sc.aboutStat3Label || 'Italian Regions')
           )
         ),
-        e('h2', null, 'Our Mission'),
-        e('p', null, 'The big booking platforms charge property owners 15-25% commission on every reservation. These costs get passed on to travelers through inflated prices. We created DirectBookingsItaly.com to break this cycle.'),
-        e('p', null, 'For guests, this means lower prices and a direct relationship with your host. Need to change your dates? Have a special request? When you book direct, you talk to the person who owns the property, not a call center halfway across the world.'),
-        e('p', null, 'For property owners, this means keeping more of what they earn. A hotel owner paying 20% commission on a platform loses thousands of euros every month. With Direct Bookings Italy, their listing is free. They keep 100% of the booking revenue.'),
-        e('h2', null, 'How It Works'),
-        e('p', null, 'We aggregate publicly available accommodation data from Italian tourism registries and enrich it with Google Hotels ratings, reviews, and real photos. Property owners can claim their listing for free, verify their identity, and start receiving direct inquiries from travelers.'),
-        e('p', null, 'We will never charge guests to search or book. We will never charge property owners to list. Our revenue comes solely from optional promoted listings, where hosts can pay a small fee to appear in featured positions on the homepage.'),
-        e('h2', null, 'Who We Are'),
-        e('p', null, 'DirectBookingsItaly.com is built by a small team passionate about Italian hospitality and fair travel. We are based in Italy and understand firsthand how the platform economy has squeezed both travelers and local accommodation providers.'),
-        e('p', null, 'We started this project because we saw an opportunity to do something genuinely useful: give travelers better prices and give hosts their margins back, all through the simple act of connecting them directly.'),
+        e('h2', null, sc.aboutMissionTitle || 'Our Mission'),
+        e('p', null, sc.aboutMission1 || 'The big booking platforms charge property owners 15-25% commission on every reservation.'),
+        e('p', null, sc.aboutMission2 || 'For guests, this means lower prices and a direct relationship with your host.'),
+        e('p', null, sc.aboutMission3 || 'For property owners, this means keeping more of what they earn.'),
+        e('h2', null, sc.aboutHowTitle || 'How It Works'),
+        e('p', null, sc.aboutHow1 || 'We aggregate publicly available accommodation data from Italian tourism registries.'),
+        e('p', null, sc.aboutHow2 || 'We will never charge guests to search or book.'),
+        e('h2', null, sc.aboutWhoTitle || 'Who We Are'),
+        e('p', null, sc.aboutWho1 || 'DirectBookingsItaly.com is built by a small team passionate about Italian hospitality.'),
+        e('p', null, sc.aboutWho2 || 'We started this project because we saw an opportunity to do something genuinely useful.'),
         e('div', { style: { marginTop: '2rem', padding: '1.5rem', background: '#f0f4ff', borderRadius: '12px', textAlign: 'center' } },
-          e('h3', { style: { marginBottom: '0.5rem' } }, 'Ready to Book Direct?'),
-          e('p', { style: { color: '#666', marginBottom: '1rem' } }, 'Browse 63,000+ accommodations across all of Italy'),
+          e('h3', { style: { marginBottom: '0.5rem' } }, sc.aboutCTA || 'Ready to Book Direct?'),
+          e('p', { style: { color: '#666', marginBottom: '1rem' } }, sc.aboutCTADesc || 'Browse 63,000+ accommodations across all of Italy'),
           e('button', { className: 'btn-primary', onClick: function() { onNavigate('search'); } }, 'Search Properties')
         )
       );
@@ -3506,8 +3509,7 @@
 
       var generateEmailContent = function(prop, template, recipientEmail) {
         var slug = (prop.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 60);
-        var directPrefix = (prop.website || prop.verified) ? 'book-direct/' : '';
-        var propertyUrl = 'https://directbookingsitaly.com/#/property/' + directPrefix + prop.id + '/' + slug + '?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim&utm_content=' + prop.id;
+        var propertyUrl = 'https://directbookingsitaly.com/#/property/' + prop.id + '/' + slug + '?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim&utm_content=' + prop.id;
         var content = template.replace(/\[PROPERTY_NAME\]/g, prop.name || 'Your Property')
           .replace(/\[PROPERTY_ID\]/g, prop.id)
           .replace(/\[SLUG\]/g, slug)
@@ -3515,10 +3517,8 @@
           .replace(/\[PROPERTY_REGION\]/g, prop.region || '');
         var bodyHtml = '<p>' + content.replace(/\n/g, '</p><p>') + '</p>';
 
-        // Wrap in full HTML email with tracking pixel + unsubscribe
-        var emailId = 'e_' + prop.id + '_' + Date.now();
+        // Brevo handles open/click tracking natively via their API - no custom pixel needed
         var unsubUrl = 'https://directbookingsitaly.com/#/unsubscribe?email=' + encodeURIComponent(recipientEmail || '') + '&id=' + prop.id;
-        var trackPixelUrl = 'https://directbookingsitaly.com/api/track?type=open&eid=' + emailId + '&pid=' + prop.id + '&email=' + encodeURIComponent(recipientEmail || '');
 
         return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
           + '<body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px;">'
@@ -3535,7 +3535,6 @@
           + '<p>DirectBookingsItaly.com | info@directbookingsitaly.com</p>'
           + '<p><a href="' + unsubUrl + '" style="color:#999;text-decoration:underline;">Unsubscribe</a> | <a href="https://directbookingsitaly.com/#/about" style="color:#999;text-decoration:underline;">About Us</a></p>'
           + '</div>'
-          + '<img src="' + trackPixelUrl + '" width="1" height="1" style="display:none;" alt="" />'
           + '</body></html>';
       };
 
@@ -3674,9 +3673,9 @@
           e('h3', { style: { marginBottom: '0.75rem' } }, 'Email Tracking'),
           e('div', { style: { background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' } },
             e('p', { style: { fontSize: '0.9rem', color: '#166534', lineHeight: 1.6, margin: 0 } },
-              'All emails include: a 1x1 tracking pixel (records opens when loaded), UTM-tagged links with property IDs (tracks clicks), '
-              + 'List-Unsubscribe header (one-click unsubscribe in Gmail/Outlook), and unsubscribe link in footer. '
-              + 'Click data appears in the Link Clicks counter above. Unsubscribed addresses are automatically skipped.'
+              'Brevo handles open and click tracking automatically on all emails sent via their API (free tier included). '
+              + 'All emails include: UTM-tagged links with property IDs, List-Unsubscribe header (one-click unsubscribe in Gmail/Outlook), and unsubscribe link in footer. '
+              + 'View detailed open/click stats in your Brevo dashboard at app.brevo.com. Unsubscribed addresses are automatically skipped.'
             )
           ),
           e('div', { style: { display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' } },
@@ -3785,40 +3784,84 @@
 
       // Site Editor state
       var defaultSiteContent = {
-        heroTitle: 'Book Direct in Italy. Save More.',
-        heroSubtitle: 'Skip the middleman fees. Connect directly with 63,000+ Italian property hosts.',
-        heroButton: 'Search Properties',
-        vp1Title: 'Save 15-20%',
-        vp1Text: 'Book direct and avoid platform commission fees',
-        vp2Title: 'Direct Contact',
-        vp2Text: 'Communicate directly with your host',
-        vp3Title: '63,000+ Properties',
-        vp3Text: 'Hotels, B&Bs, agriturismos and villas across all of Italy',
+        // Homepage - Hero
+        heroTitle: 'Book Direct in Italy',
+        heroSubtitle: '63,000+ direct accommodations with no middleman fees',
+        searchPlaceholder: 'Where in Italy? Try Rome, Florence, Venice, Milano...',
         featuredTitle: 'Featured Properties',
+        // Homepage - Why Section
+        whyTitle: 'Why We Do It',
+        whyDesc: 'Booking platforms charge property owners 15-25% commission on every stay. These costs are passed on to you as a traveler through higher prices. We built DirectBookingsItaly.com to change that.',
+        whyCard1Title: 'Guests Save Money',
+        whyCard1Text: 'When you book direct, there are no middleman fees. Property owners can offer you better rates because they keep 100% of the booking value.',
+        whyCard2Title: 'Owners Earn More',
+        whyCard2Text: 'A hotel losing 20% to booking platforms loses thousands per month. With Direct Bookings Italy, listing is free forever. Owners keep every euro they earn.',
+        whyCard3Title: 'Personal Connection',
+        whyCard3Text: 'Talk directly to your host. Need a late check-in? Special dietary needs? Direct communication means better service and flexibility.',
+        learnMoreBtn: 'Learn More About Us',
+        // About Page
+        aboutTitle: 'About DirectBookingsItaly.com',
+        aboutIntro: 'We believe everyone deserves a fair deal when traveling in Italy. DirectBookingsItaly.com is a free platform that connects travelers directly with property owners across Italy, cutting out the middleman and the hefty commission fees that come with it.',
+        aboutStat1: '63,000+', aboutStat1Label: 'Properties Listed',
+        aboutStat2: '2,040', aboutStat2Label: 'Cities Covered',
+        aboutStat3: '20', aboutStat3Label: 'Italian Regions',
+        aboutMissionTitle: 'Our Mission',
+        aboutMission1: 'The big booking platforms charge property owners 15-25% commission on every reservation. These costs get passed on to travelers through inflated prices. We created DirectBookingsItaly.com to break this cycle.',
+        aboutMission2: 'For guests, this means lower prices and a direct relationship with your host. Need to change your dates? Have a special request? When you book direct, you talk to the person who owns the property, not a call center halfway across the world.',
+        aboutMission3: 'For property owners, this means keeping more of what they earn. A hotel owner paying 20% commission on a platform loses thousands of euros every month. With Direct Bookings Italy, their listing is free. They keep 100% of the booking revenue.',
+        aboutHowTitle: 'How It Works',
+        aboutHow1: 'We aggregate publicly available accommodation data from Italian tourism registries and enrich it with Google Hotels ratings, reviews, and real photos. Property owners can claim their listing for free, verify their identity, and start receiving direct inquiries from travelers.',
+        aboutHow2: 'We will never charge guests to search or book. We will never charge property owners to list. Our revenue comes solely from optional promoted listings, where hosts can pay a small fee to appear in featured positions on the homepage.',
+        aboutWhoTitle: 'Who We Are',
+        aboutWho1: 'DirectBookingsItaly.com is built by a small team passionate about Italian hospitality and fair travel. We are based in Italy and understand firsthand how the platform economy has squeezed both travelers and local accommodation providers.',
+        aboutWho2: 'We started this project because we saw an opportunity to do something genuinely useful: give travelers better prices and give hosts their margins back, all through the simple act of connecting them directly.',
+        aboutCTA: 'Ready to Book Direct?',
+        aboutCTADesc: 'Browse 63,000+ accommodations across all of Italy',
+        // Navbar & Footer
+        brandName: 'Direct Bookings Italy',
+        navHome: 'Home', navSearch: 'Search', navMap: 'Map', navBlog: 'Blog', navAbout: 'About',
         footerText: '2026 DirectBookingsItaly.com - Book Direct in Italy',
         contactEmail: 'info@directbookingsitaly.com',
-        privacyText: '',
-        termsText: '',
-        customLinks: '[]'
+        privacyText: 'DirectBookingsItaly.com respects your privacy. We collect only the information necessary to facilitate direct bookings between guests and property hosts in Italy. Your personal data (name, email) is stored locally in your browser and is never sent to third-party servers. We do not use tracking cookies or share your information with advertisers. Property listing data is sourced from public tourism registries.',
+        termsText: 'DirectBookingsItaly.com is a directory connecting guests directly with Italian property hosts. We do not process payments or act as an intermediary. All booking arrangements, payments, and cancellations are handled directly between the guest and the property host. Listings are provided for informational purposes. We make no guarantees about availability, pricing accuracy, or property conditions. Users are responsible for verifying details directly with hosts.',
+        contactText: 'Have questions or feedback? Reach us at:\n\nEmail: info@directbookingsitaly.com\n\nWe are an Italian startup based in Venice, dedicated to helping travelers book directly with local hosts and skip the middleman fees.',
+        // Blog
+        blogTitle: 'Travel Blog',
+        blogCTATitle: 'Find Your Perfect Stay',
+        blogCTADesc: 'Browse 63,000+ direct booking accommodations across Italy',
+        // Promote
+        promotePrice: '10',
+        promoteMinDays: '10',
+        promoteDesc: 'Get your property featured on the homepage and top of search results. Only 10 featured spots available.'
       };
       var savedSiteContent = JSON.parse(localStorage.getItem('ad_site_content') || 'null');
-      var stateSiteContent = useState(savedSiteContent || defaultSiteContent);
+      var stateSiteContent = useState(Object.assign({}, defaultSiteContent, savedSiteContent || {}));
       var siteContent = stateSiteContent[0];
       var setSiteContent = stateSiteContent[1];
-      var stateSiteEditField = useState(null);
-      var siteEditField = stateSiteEditField[0];
-      var setSiteEditField = stateSiteEditField[1];
+      var stateCmsTab = useState('home');
+      var cmsTab = stateCmsTab[0];
+      var setCmsTab = stateCmsTab[1];
 
       var handleSaveSiteContent = function() {
         localStorage.setItem('ad_site_content', JSON.stringify(siteContent));
-        setNotice({ type: 'success', text: 'Site content saved. Changes will appear on the live site.' });
-        setSiteEditField(null);
+        setNotice({ type: 'success', text: 'Site content saved. Reload pages to see changes.' });
       };
 
       var handleSiteFieldChange = function(field, value) {
         var updated = Object.assign({}, siteContent);
         updated[field] = value;
         setSiteContent(updated);
+      };
+
+      // Helper: render a field row
+      var cmsField = function(label, key, type) {
+        type = type || 'input';
+        return e('div', { style: { marginBottom: '0.5rem' }, key: key },
+          e('label', { style: { fontSize: '0.8rem', fontWeight: 600, color: '#555', display: 'block', marginBottom: '2px' } }, label),
+          type === 'textarea'
+            ? e('textarea', { className: 'form-input', rows: '3', value: siteContent[key] || '', onChange: function(ev) { handleSiteFieldChange(key, ev.target.value); }, style: { width: '100%', boxSizing: 'border-box', fontSize: '0.85rem' } })
+            : e('input', { className: 'form-input', value: siteContent[key] || '', onChange: function(ev) { handleSiteFieldChange(key, ev.target.value); }, style: { width: '100%', boxSizing: 'border-box', fontSize: '0.85rem' } })
+        );
       };
 
       var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
@@ -3985,62 +4028,126 @@
           ) : null,
           adminTab === 'outreach' ? e(OutreachTab, { listings: listings }) : null,
           adminTab === 'siteeditor' ? e('div', sty,
-            e('h3', null, 'Site Content Editor'),
-            e('p', { style: { color: '#666', marginBottom: '1rem', fontSize: '0.9rem' } }, 'Edit text, headings, and links across the site. Changes are saved to localStorage and applied on page load.'),
-            e('div', { style: { display: 'grid', gap: '1rem' } },
-              // Hero Section
-              e('div', { style: { background: '#f0f4ff', padding: '1rem', borderRadius: '8px', border: '1px solid #ccc' } },
-                e('h4', { style: { color: 'var(--primary-blue)', marginBottom: '0.75rem' } }, 'Hero Section'),
-                e('div', { style: { display: 'grid', gap: '0.5rem' } },
-                  e('label', { className: 'form-label' }, 'Main Heading'),
-                  e('input', { className: 'form-input', value: siteContent.heroTitle, onChange: function(ev) { handleSiteFieldChange('heroTitle', ev.target.value); } }),
-                  e('label', { className: 'form-label' }, 'Subtitle'),
-                  e('input', { className: 'form-input', value: siteContent.heroSubtitle, onChange: function(ev) { handleSiteFieldChange('heroSubtitle', ev.target.value); } }),
-                  e('label', { className: 'form-label' }, 'Button Text'),
-                  e('input', { className: 'form-input', value: siteContent.heroButton, onChange: function(ev) { handleSiteFieldChange('heroButton', ev.target.value); } })
-                )
-              ),
-              // Value Props
-              e('div', { style: { background: '#f0fff4', padding: '1rem', borderRadius: '8px', border: '1px solid #ccc' } },
-                e('h4', { style: { color: '#2e7d32', marginBottom: '0.75rem' } }, 'Value Propositions'),
-                [['vp1Title', 'vp1Text', 'Card 1'], ['vp2Title', 'vp2Text', 'Card 2'], ['vp3Title', 'vp3Text', 'Card 3']].map(function(vp) {
-                  return e('div', { key: vp[2], style: { marginBottom: '0.5rem' } },
-                    e('strong', { style: { fontSize: '0.85rem' } }, vp[2]),
-                    e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.5rem', marginTop: '0.25rem' } },
-                      e('input', { className: 'form-input', placeholder: 'Title', value: siteContent[vp[0]], onChange: function(ev) { handleSiteFieldChange(vp[0], ev.target.value); } }),
-                      e('input', { className: 'form-input', placeholder: 'Description', value: siteContent[vp[1]], onChange: function(ev) { handleSiteFieldChange(vp[1], ev.target.value); } })
-                    )
-                  );
-                })
-              ),
-              // Featured & Footer
-              e('div', { style: { background: '#fff9f0', padding: '1rem', borderRadius: '8px', border: '1px solid #ccc' } },
-                e('h4', { style: { color: 'var(--secondary-orange)', marginBottom: '0.75rem' } }, 'Sections & Footer'),
-                e('div', { style: { display: 'grid', gap: '0.5rem' } },
-                  e('label', { className: 'form-label' }, 'Featured Section Title'),
-                  e('input', { className: 'form-input', value: siteContent.featuredTitle, onChange: function(ev) { handleSiteFieldChange('featuredTitle', ev.target.value); } }),
-                  e('label', { className: 'form-label' }, 'Footer Text'),
-                  e('input', { className: 'form-input', value: siteContent.footerText, onChange: function(ev) { handleSiteFieldChange('footerText', ev.target.value); } }),
-                  e('label', { className: 'form-label' }, 'Contact Email'),
-                  e('input', { className: 'form-input', type: 'email', value: siteContent.contactEmail, onChange: function(ev) { handleSiteFieldChange('contactEmail', ev.target.value); } })
-                )
-              ),
-              // Custom Links
-              e('div', { style: { background: '#f5f0ff', padding: '1rem', borderRadius: '8px', border: '1px solid #ccc' } },
-                e('h4', { style: { color: '#7c3aed', marginBottom: '0.75rem' } }, 'Custom Links (JSON)'),
-                e('p', { style: { fontSize: '0.8rem', color: '#666', marginBottom: '0.5rem' } }, 'Format: [{"label":"Link Name","url":"https://...","position":"navbar|footer"}]'),
-                e('textarea', { className: 'form-input', rows: '3', value: siteContent.customLinks, onChange: function(ev) { handleSiteFieldChange('customLinks', ev.target.value); }, style: { fontFamily: 'monospace', fontSize: '0.8rem' } })
-              ),
-              // Save button
-              e('div', { style: { display: 'flex', gap: '0.5rem', marginTop: '0.5rem' } },
-                e('button', { className: 'cta-button', onClick: handleSaveSiteContent }, 'Save All Changes'),
-                e('button', { className: 'back-btn', onClick: function() {
-                  setSiteContent(defaultSiteContent);
-                  localStorage.removeItem('ad_site_content');
-                  setNotice({ type: 'success', text: 'Reset to defaults.' });
-                } }, 'Reset to Defaults')
+            e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' } },
+              e('h3', { style: { margin: 0 } }, 'Site Content Editor'),
+              e('div', { style: { display: 'flex', gap: '0.5rem' } },
+                e('button', { className: 'cta-button', onClick: handleSaveSiteContent, style: { padding: '6px 16px', fontSize: '0.85rem' } }, 'Save All'),
+                e('button', { className: 'back-btn', onClick: function() { setSiteContent(Object.assign({}, defaultSiteContent)); localStorage.removeItem('ad_site_content'); setNotice({ type: 'success', text: 'Reset to defaults.' }); }, style: { padding: '6px 12px', fontSize: '0.85rem' } }, 'Reset')
               )
-            )
+            ),
+            // CMS sub-tabs
+            e('div', { style: { display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '1rem', borderBottom: '2px solid #ddd', paddingBottom: '8px' } },
+              ['home', 'about', 'navbar', 'footer', 'blog', 'promote'].map(function(t) {
+                return e('button', { key: t, onClick: function() { setCmsTab(t); }, style: { padding: '5px 12px', borderRadius: '4px', border: cmsTab === t ? '2px solid var(--primary-blue)' : '1px solid #ccc', background: cmsTab === t ? '#e8f0ff' : '#fff', fontWeight: cmsTab === t ? 700 : 400, fontSize: '0.8rem', cursor: 'pointer', textTransform: 'capitalize' } }, t);
+              })
+            ),
+            // HOME tab
+            cmsTab === 'home' ? e('div', null,
+              e('div', { style: { background: '#f0f4ff', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' } },
+                e('h4', { style: { color: 'var(--primary-blue)', margin: '0 0 0.75rem' } }, 'Hero Section'),
+                cmsField('Main Heading', 'heroTitle'),
+                cmsField('Subtitle', 'heroSubtitle'),
+                cmsField('Search Placeholder', 'searchPlaceholder'),
+                cmsField('Featured Section Title', 'featuredTitle')
+              ),
+              e('div', { style: { background: '#f0fff4', padding: '1rem', borderRadius: '8px' } },
+                e('h4', { style: { color: '#2e7d32', margin: '0 0 0.75rem' } }, 'Why We Do It Section'),
+                cmsField('Section Title', 'whyTitle'),
+                cmsField('Section Description', 'whyDesc', 'textarea'),
+                e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginTop: '0.5rem' } },
+                  e('div', null, e('strong', { style: { fontSize: '0.8rem', color: '#2e7d32' } }, 'Card 1'), cmsField('Title', 'whyCard1Title'), cmsField('Text', 'whyCard1Text', 'textarea')),
+                  e('div', null, e('strong', { style: { fontSize: '0.8rem', color: '#2e7d32' } }, 'Card 2'), cmsField('Title', 'whyCard2Title'), cmsField('Text', 'whyCard2Text', 'textarea')),
+                  e('div', null, e('strong', { style: { fontSize: '0.8rem', color: '#2e7d32' } }, 'Card 3'), cmsField('Title', 'whyCard3Title'), cmsField('Text', 'whyCard3Text', 'textarea'))
+                ),
+                cmsField('Learn More Button Text', 'learnMoreBtn')
+              )
+            ) : null,
+            // ABOUT tab
+            cmsTab === 'about' ? e('div', null,
+              e('div', { style: { background: '#f0f4ff', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' } },
+                e('h4', { style: { color: 'var(--primary-blue)', margin: '0 0 0.75rem' } }, 'About Page'),
+                cmsField('Page Title', 'aboutTitle'),
+                cmsField('Introduction', 'aboutIntro', 'textarea'),
+                e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginTop: '0.5rem' } },
+                  e('div', null, cmsField('Stat 1 Value', 'aboutStat1'), cmsField('Stat 1 Label', 'aboutStat1Label')),
+                  e('div', null, cmsField('Stat 2 Value', 'aboutStat2'), cmsField('Stat 2 Label', 'aboutStat2Label')),
+                  e('div', null, cmsField('Stat 3 Value', 'aboutStat3'), cmsField('Stat 3 Label', 'aboutStat3Label'))
+                )
+              ),
+              e('div', { style: { background: '#fff9f0', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' } },
+                e('h4', { style: { color: 'var(--secondary-orange)', margin: '0 0 0.75rem' } }, 'Mission Section'),
+                cmsField('Mission Title', 'aboutMissionTitle'),
+                cmsField('Paragraph 1', 'aboutMission1', 'textarea'),
+                cmsField('Paragraph 2', 'aboutMission2', 'textarea'),
+                cmsField('Paragraph 3', 'aboutMission3', 'textarea')
+              ),
+              e('div', { style: { background: '#f0fff4', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' } },
+                e('h4', { style: { color: '#2e7d32', margin: '0 0 0.75rem' } }, 'How It Works'),
+                cmsField('Section Title', 'aboutHowTitle'),
+                cmsField('Paragraph 1', 'aboutHow1', 'textarea'),
+                cmsField('Paragraph 2', 'aboutHow2', 'textarea')
+              ),
+              e('div', { style: { background: '#f5f0ff', padding: '1rem', borderRadius: '8px' } },
+                e('h4', { style: { color: '#7c3aed', margin: '0 0 0.75rem' } }, 'Who We Are + CTA'),
+                cmsField('Section Title', 'aboutWhoTitle'),
+                cmsField('Paragraph 1', 'aboutWho1', 'textarea'),
+                cmsField('Paragraph 2', 'aboutWho2', 'textarea'),
+                cmsField('CTA Heading', 'aboutCTA'),
+                cmsField('CTA Description', 'aboutCTADesc')
+              )
+            ) : null,
+            // NAVBAR tab
+            cmsTab === 'navbar' ? e('div', null,
+              e('div', { style: { background: '#f0f4ff', padding: '1rem', borderRadius: '8px' } },
+                e('h4', { style: { color: 'var(--primary-blue)', margin: '0 0 0.75rem' } }, 'Navigation Bar'),
+                cmsField('Brand Name', 'brandName'),
+                e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr', gap: '0.5rem' } },
+                  cmsField('Home', 'navHome'),
+                  cmsField('Search', 'navSearch'),
+                  cmsField('Map', 'navMap'),
+                  cmsField('Blog', 'navBlog'),
+                  cmsField('About', 'navAbout')
+                )
+              )
+            ) : null,
+            // FOOTER tab
+            cmsTab === 'footer' ? e('div', null,
+              e('div', { style: { background: '#f8f9fa', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' } },
+                e('h4', { style: { margin: '0 0 0.75rem' } }, 'Footer'),
+                cmsField('Footer Copyright Text', 'footerText'),
+                cmsField('Contact Email', 'contactEmail')
+              ),
+              e('div', { style: { background: '#f0f4ff', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' } },
+                e('h4', { style: { color: 'var(--primary-blue)', margin: '0 0 0.75rem' } }, 'Privacy Policy'),
+                cmsField('Privacy Text', 'privacyText', 'textarea')
+              ),
+              e('div', { style: { background: '#fff9f0', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' } },
+                e('h4', { style: { color: 'var(--secondary-orange)', margin: '0 0 0.75rem' } }, 'Terms of Service'),
+                cmsField('Terms Text', 'termsText', 'textarea')
+              ),
+              e('div', { style: { background: '#f0fff4', padding: '1rem', borderRadius: '8px' } },
+                e('h4', { style: { color: '#2e7d32', margin: '0 0 0.75rem' } }, 'Contact Info'),
+                cmsField('Contact Page Text', 'contactText', 'textarea')
+              )
+            ) : null,
+            // BLOG tab
+            cmsTab === 'blog' ? e('div', null,
+              e('div', { style: { background: '#f0f4ff', padding: '1rem', borderRadius: '8px' } },
+                e('h4', { style: { color: 'var(--primary-blue)', margin: '0 0 0.75rem' } }, 'Blog Pages'),
+                cmsField('Blog Page Title', 'blogTitle'),
+                cmsField('Blog CTA Title', 'blogCTATitle'),
+                cmsField('Blog CTA Description', 'blogCTADesc')
+              )
+            ) : null,
+            // PROMOTE tab
+            cmsTab === 'promote' ? e('div', null,
+              e('div', { style: { background: '#fff9f0', padding: '1rem', borderRadius: '8px' } },
+                e('h4', { style: { color: '#d97706', margin: '0 0 0.75rem' } }, 'Promoted Listings'),
+                cmsField('Price per Day (EUR)', 'promotePrice'),
+                cmsField('Minimum Days', 'promoteMinDays'),
+                cmsField('Promotion Description', 'promoteDesc', 'textarea')
+              )
+            ) : null
           ) : null
         )
       );
@@ -4224,6 +4331,7 @@
       var user = props.user;
       var onLogout = props.onLogout;
       var conversations = props.conversations;
+      var sc = JSON.parse(localStorage.getItem('ad_site_content') || 'null') || {};
 
       var unreadCount = 0;
       if (user && conversations) {
@@ -4236,14 +4344,14 @@
         e('div', { className: 'navbar-container' },
           e('a', { className: 'navbar-logo', onClick: function() { onNavigate('home'); } },
             e('img', { src: 'dbi_logo_light.png', alt: 'DBI' }),
-            'Direct Bookings Italy'
+            sc.brandName || 'Direct Bookings Italy'
           ),
           e('div', { className: 'navbar-links' },
-            e('a', { className: 'navbar-link' + (currentPage === 'home' ? ' active' : ''), onClick: function() { onNavigate('home'); } }, 'Home'),
-            e('a', { className: 'navbar-link' + (currentPage === 'search' ? ' active' : ''), onClick: function() { onNavigate('search'); } }, 'Search'),
-            e('a', { className: 'navbar-link' + (currentPage === 'map' ? ' active' : ''), onClick: function() { onNavigate('map'); } }, 'Map'),
-            e('a', { className: 'navbar-link' + (currentPage === 'blog' || currentPage === 'blogpost' ? ' active' : ''), onClick: function() { onNavigate('blog'); } }, 'Blog'),
-            e('a', { className: 'navbar-link' + (currentPage === 'about' ? ' active' : ''), onClick: function() { onNavigate('about'); } }, 'About'),
+            e('a', { className: 'navbar-link' + (currentPage === 'home' ? ' active' : ''), onClick: function() { onNavigate('home'); } }, sc.navHome || 'Home'),
+            e('a', { className: 'navbar-link' + (currentPage === 'search' ? ' active' : ''), onClick: function() { onNavigate('search'); } }, sc.navSearch || 'Search'),
+            e('a', { className: 'navbar-link' + (currentPage === 'map' ? ' active' : ''), onClick: function() { onNavigate('map'); } }, sc.navMap || 'Map'),
+            e('a', { className: 'navbar-link' + (currentPage === 'blog' || currentPage === 'blogpost' ? ' active' : ''), onClick: function() { onNavigate('blog'); } }, sc.navBlog || 'Blog'),
+            e('a', { className: 'navbar-link' + (currentPage === 'about' ? ' active' : ''), onClick: function() { onNavigate('about'); } }, sc.navAbout || 'About'),
             user ? e('a', { className: 'navbar-link' + (currentPage === 'dashboard' ? ' active' : ''), onClick: function() { onNavigate('dashboard'); } }, 'Dashboard', unreadCount > 0 ? e('span', { className: 'unread-badge' }, unreadCount) : null) : null,
             !user ? e('button', { className: 'btn-primary', onClick: function() { onNavigate('login'); } }, 'Sign In') : e('button', { className: 'btn-secondary', onClick: onLogout }, 'Logout')
           )
@@ -4254,10 +4362,16 @@
     function FooterModal(props) {
       var title = props.title;
       var onClose = props.onClose;
-      var content = {
+      var sc = JSON.parse(localStorage.getItem('ad_site_content') || 'null') || {};
+      var defaultContent = {
         'Privacy': 'DirectBookingsItaly.com respects your privacy. We collect only the information necessary to facilitate direct bookings between guests and property hosts in Italy. Your personal data (name, email) is stored locally in your browser and is never sent to third-party servers. We do not use tracking cookies or share your information with advertisers. Property listing data is sourced from public tourism registries.',
         'Terms': 'DirectBookingsItaly.com is a directory connecting guests directly with Italian property hosts. We do not process payments or act as an intermediary. All booking arrangements, payments, and cancellations are handled directly between the guest and the property host. Listings are provided for informational purposes. We make no guarantees about availability, pricing accuracy, or property conditions. Users are responsible for verifying details directly with hosts.',
         'Contact': 'Have questions or feedback? Reach us at:\n\nEmail: info@directbookingsitaly.com\n\nWe are an Italian startup based in Venice, dedicated to helping travelers book directly with local hosts and skip the middleman fees.'
+      };
+      var content = {
+        'Privacy': sc.privacyText || defaultContent['Privacy'],
+        'Terms': sc.termsText || defaultContent['Terms'],
+        'Contact': sc.contactText || defaultContent['Contact']
       };
       return e('div', { className: 'modal-overlay', onClick: onClose },
         e('div', { className: 'modal', onClick: function(ev) { ev.stopPropagation(); }, style: { maxWidth: '600px' } },
