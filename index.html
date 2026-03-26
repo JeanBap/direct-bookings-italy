@@ -13,6 +13,14 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="data_public.js"></script>
+  <script>var ENRICHMENT_MAP = {};</script>
+  <script>
+    (function() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'enrichment_map.json', false);
+      try { xhr.send(); if (xhr.status === 200) ENRICHMENT_MAP = JSON.parse(xhr.responseText); } catch(e) {}
+    })();
+  </script>
   <style>
     :root {
       --primary-blue: #003580;
@@ -337,6 +345,7 @@
       height: 150px;
       border-radius: 4px;
       overflow: hidden;
+      position: relative;
     }
 
     .h-card-image img {
@@ -1483,11 +1492,28 @@
         };
       });
       return listings.map(function(p) {
-        return Object.assign({}, p, { neighborhood: getNeighborhood(p) });
+        var enr = window.ENRICHMENT_MAP[p.id];
+        var enriched = Object.assign({}, p, { neighborhood: getNeighborhood(p) });
+        if (enr) {
+          enriched.googleRating = enr.gr || 0;
+          enriched.googleReviews = enr.rc || 0;
+          enriched.googlePrice = enr.pn || 0;
+          enriched.googleImage = enr.img || '';
+          enriched.googleDesc = enr.desc || '';
+          enriched.checkInTime = enr.ci || '';
+          enriched.checkOutTime = enr.co || '';
+          enriched.hasGoogle = true;
+        } else {
+          enriched.hasGoogle = false;
+          enriched.googleRating = 0;
+          enriched.googleReviews = 0;
+        }
+        return enriched;
       }).sort(function(a, b) {
-        if (a.claimed && !b.claimed) return -1;
-        if (!a.claimed && b.claimed) return 1;
-        return 0;
+        // Smart sort: verified > google enriched > most data > rest
+        var scoreA = (a.verified ? 1000 : 0) + (a.hasGoogle ? 500 : 0) + (a.stars * 20) + (a.website ? 50 : 0) + Math.min(a.beds, 10) + (a.googleReviews ? Math.min(Math.log10(a.googleReviews) * 30, 100) : 0);
+        var scoreB = (b.verified ? 1000 : 0) + (b.hasGoogle ? 500 : 0) + (b.stars * 20) + (b.website ? 50 : 0) + Math.min(b.beds, 10) + (b.googleReviews ? Math.min(Math.log10(b.googleReviews) * 30, 100) : 0);
+        return scoreB - scoreA;
       });
     }
 
@@ -1612,22 +1638,30 @@
       var prop = props.prop;
       var onSelect = props.onSelect;
       var amenities = getTopAmenities(prop);
-      var price = estimatePrice(prop);
+      var price = prop.googlePrice || estimatePrice(prop);
+      var isGooglePrice = !!prop.googlePrice;
+      var imgSrc = prop.googleImage || getCardImage(prop);
       return e('div', { className: 'horizontal-card', onClick: function() { onSelect(prop); } },
         e('div', { className: 'h-card-image' },
-          e('img', { src: getCardImage(prop), alt: prop.name })
+          e('img', { src: imgSrc, alt: prop.name }),
+          prop.verified && e('div', { style: { position: 'absolute', top: '6px', left: '6px', background: '#0d7377', color: '#fff', fontSize: '0.7rem', fontWeight: 600, padding: '2px 6px', borderRadius: '4px' } }, 'VERIFIED'),
+          prop.hasGoogle && !prop.verified && e('div', { style: { position: 'absolute', top: '6px', left: '6px', background: '#4285f4', color: '#fff', fontSize: '0.7rem', fontWeight: 600, padding: '2px 6px', borderRadius: '4px' } }, 'GOOGLE')
         ),
         e('div', { className: 'h-card-content' },
           e('div', { className: 'h-card-header' },
             e('div', { className: 'h-card-name' }, prop.name),
-            e('div', { className: 'h-card-price' }, '€' + price + '/night')
+            e('div', { className: 'h-card-price' },
+              '€' + price + '/night',
+              isGooglePrice ? e('span', { style: { fontSize: '0.7rem', color: '#888', marginLeft: '4px' } }, 'Google') : null
+            )
           ),
           e('div', { className: 'h-card-meta' }, prop.type + ' • ' + prop.region),
           e('div', { className: 'h-card-stats' },
             e('span', null, prop.beds + ' beds'),
             e('span', null, prop.baths + ' baths'),
-            e('span', null, renderStars(prop.stars))
+            prop.googleRating ? e('span', { style: { color: '#f59e0b', fontWeight: 600 } }, prop.googleRating.toFixed(1) + '/5 (' + prop.googleReviews.toLocaleString() + ')') : e('span', null, renderStars(prop.stars))
           ),
+          prop.googleDesc ? e('div', { style: { fontSize: '0.8rem', color: '#666', marginTop: '0.25rem', lineHeight: 1.3 } }, prop.googleDesc) : null,
           e('div', { className: 'h-card-amenities' },
             amenities.map(function(amenity) {
               return e('span', { className: 'amenity-chip', key: amenity }, amenity);
@@ -1643,21 +1677,73 @@
     function HomePage(props) {
       var listings = props.listings;
       var onSelectProperty = props.onSelectProperty;
+      var onNavigate = props.onNavigate;
       var featuredListings = listings.slice(0, 6);
+
+      var stateQuery = useState('');
+      var query = stateQuery[0];
+      var setQuery = stateQuery[1];
+      var stateShowDropdown = useState(false);
+      var showDropdown = stateShowDropdown[0];
+      var setShowDropdown = stateShowDropdown[1];
+
+      var allCities = useMemo(function() { return buildCommunesByAllRegions(listings); }, [listings]);
+
+      var filteredCities = useMemo(function() {
+        if (!query || query.length < 2) return [];
+        var q = query.toUpperCase();
+        return allCities.filter(function(c) { return c.indexOf(q) === 0; }).slice(0, 8);
+      }, [query, allCities]);
+
+      var handleSearch = function() {
+        var cityMatch = allCities.find(function(c) { return c === query.toUpperCase(); });
+        onNavigate('search', { initialCity: cityMatch || query.toUpperCase() });
+      };
+
+      var handleCitySelect = function(city) {
+        setQuery(city);
+        setShowDropdown(false);
+        onNavigate('search', { initialCity: city });
+      };
+
+      var handleKeyDown = function(ev) {
+        if (ev.key === 'Enter') handleSearch();
+      };
+
       return e('div', null,
         e('div', { className: 'hero' },
           e('div', { className: 'hero-content' },
             e('h1', null, 'Book Direct in Italy'),
-            e('p', null, 'Direct accommodations with no middleman fees'),
-            e('div', { className: 'search-bar' },
-              e('input', { type: 'text', placeholder: 'Region or city' }),
-              e('select', null,
-                e('option', null, 'Property Type'),
-                e('option', null, 'Hotel'),
-                e('option', null, 'B&B'),
-                e('option', null, 'Agriturismo')
+            e('p', null, '63,000+ direct accommodations with no middleman fees'),
+            e('div', { className: 'search-bar', style: { position: 'relative' } },
+              e('div', { style: { position: 'relative', flex: 1 } },
+                e('input', {
+                  type: 'text',
+                  placeholder: 'Where in Italy? (e.g. Roma, Venezia, Firenze...)',
+                  value: query,
+                  onChange: function(ev) { setQuery(ev.target.value); setShowDropdown(true); },
+                  onFocus: function() { setShowDropdown(true); },
+                  onBlur: function() { setTimeout(function() { setShowDropdown(false); }, 200); },
+                  onKeyDown: handleKeyDown,
+                  style: { width: '100%' }
+                }),
+                showDropdown && filteredCities.length > 0 && e('div', {
+                  style: { position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #ddd', borderRadius: '0 0 8px 8px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: '300px', overflow: 'auto' }
+                },
+                  filteredCities.map(function(city) {
+                    var count = listings.filter(function(l) { return l.comune === city; }).length;
+                    return e('div', {
+                      key: city,
+                      onMouseDown: function() { handleCitySelect(city); },
+                      style: { padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }
+                    },
+                      e('span', { style: { fontWeight: 500 } }, city),
+                      e('span', { style: { color: '#888', fontSize: '0.85rem' } }, count + ' properties')
+                    );
+                  })
+                )
               ),
-              e('button', null, 'Search')
+              e('button', { onClick: handleSearch }, 'Search')
             )
           )
         ),
@@ -1693,9 +1779,14 @@
       var listings = props.listings;
       var onSelectProperty = props.onSelectProperty;
 
-      var stateCity = useState('');
+      var stateCity = useState(props.initialCity || '');
       var city = stateCity[0];
       var setCity = stateCity[1];
+
+      // Sync if initialCity prop changes (from Home search)
+      useEffect(function() {
+        if (props.initialCity) setCity(props.initialCity);
+      }, [props.initialCity]);
 
       var stateNeighborhood = useState('');
       var neighborhood = stateNeighborhood[0];
@@ -1745,10 +1836,21 @@
           }
           return true;
         });
-        if (sortBy === 'name') {
+        if (sortBy === 'relevant') {
+          // Smart sort: 1) verified/claimed, 2) Google enriched, 3) most data, 4) rest
+          result.sort(function(a, b) {
+            var sa = (a.verified ? 1000 : 0) + (a.hasGoogle ? 500 : 0) + (a.stars * 20) + (a.website ? 50 : 0) + Math.min(a.beds, 10) + (a.googleReviews ? Math.min(Math.log10(a.googleReviews) * 30, 100) : 0);
+            var sb = (b.verified ? 1000 : 0) + (b.hasGoogle ? 500 : 0) + (b.stars * 20) + (b.website ? 50 : 0) + Math.min(b.beds, 10) + (b.googleReviews ? Math.min(Math.log10(b.googleReviews) * 30, 100) : 0);
+            return sb - sa;
+          });
+        } else if (sortBy === 'name') {
           result.sort(function(a, b) { return a.name.localeCompare(b.name); });
         } else if (sortBy === 'rated') {
-          result.sort(function(a, b) { return b.stars - a.stars; });
+          result.sort(function(a, b) {
+            var ra = a.googleRating || a.stars;
+            var rb = b.googleRating || b.stars;
+            return rb - ra;
+          });
         } else if (sortBy === 'price_low') {
           result.sort(function(a, b) { return estimatePrice(a) - estimatePrice(b); });
         } else if (sortBy === 'price_high') {
@@ -3063,8 +3165,8 @@
 
       return e('div', null,
         e(Navbar, { currentPage: currentPage, onNavigate: handleNavigate, user: user, onLogout: handleLogout, conversations: conversations }),
-        currentPage === 'home' ? e(HomePage, { listings: listings, onSelectProperty: handleSelectProperty }) :
-        currentPage === 'search' ? e(SearchPage, { listings: listings, onSelectProperty: handleSelectProperty, onNavigate: function() { handleNavigate('home'); } }) :
+        currentPage === 'home' ? e(HomePage, { listings: listings, onSelectProperty: handleSelectProperty, onNavigate: handleNavigate }) :
+        currentPage === 'search' ? e(SearchPage, { listings: listings, onSelectProperty: handleSelectProperty, onNavigate: function() { handleNavigate('home'); }, initialCity: pageState && pageState.initialCity ? pageState.initialCity : '' }) :
         currentPage === 'map' ? e(MapPage, { listings: listings, onSelectProperty: handleSelectProperty, onNavigate: function() { handleNavigate('home'); } }) :
         currentPage === 'detail' ? e(PropertyDetail, { currentProperty: currentProperty, onNavigate: handleNavigate, handleBack: handleBack, user: user, onPropertySaved: handlePropertySaved }) :
         currentPage === 'login' ? e(LoginPage, { onLogin: function(u) { setUser(u); setCurrentPage('dashboard'); } }) :
