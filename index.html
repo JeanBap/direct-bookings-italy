@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AffittoDiretto.it - Book Direct in Italy</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -1771,9 +1774,23 @@
           e('div', { className: 'filter-sidebar' },
             e('div', { className: 'filter-group' },
               e('label', { className: 'filter-label' }, 'City'),
-              e('select', { className: 'filter-select', value: city, onChange: function(ev) { setCity(ev.target.value); setNeighborhood(''); setCurrentPage(1); } },
-                e('option', { value: '' }, 'All cities (' + listings.length + ')'),
-                allCommunes.map(function(c) { return e('option', { key: c, value: c }, c); })
+              e('div', { style: { position: 'relative' } },
+                e('input', {
+                  className: 'filter-select',
+                  type: 'text',
+                  placeholder: 'Search ' + allCommunes.length + ' cities...',
+                  value: city,
+                  onChange: function(ev) { setCity(ev.target.value.toUpperCase()); setNeighborhood(''); setCurrentPage(1); },
+                  list: 'city-datalist',
+                  autoComplete: 'off'
+                }),
+                city && e('button', {
+                  onClick: function() { setCity(''); setNeighborhood(''); setCurrentPage(1); },
+                  style: { position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#666', padding: '2px 6px' }
+                }, 'x'),
+                e('datalist', { id: 'city-datalist' },
+                  allCommunes.slice(0, 500).map(function(c) { return e('option', { key: c, value: c }); })
+                )
               )
             ),
             city && e('div', { className: 'filter-group' },
@@ -1874,18 +1891,25 @@
           attribution: '© OpenStreetMap contributors',
           maxZoom: 19
         }).addTo(map);
+        var cluster = window.L.markerClusterGroup({
+          maxClusterRadius: 50,
+          spiderfyOnMaxZoom: true,
+          showCoverageOnHover: false,
+          zoomToBoundsOnClick: true,
+          chunkedLoading: true,
+          chunkInterval: 100,
+          chunkDelay: 10
+        });
         listings.forEach(function(prop) {
           if (prop.lat && prop.lon) {
-            var marker = window.L.marker([prop.lat, prop.lon]).addTo(map);
+            var marker = window.L.marker([prop.lat, prop.lon]);
             var price = estimatePrice(prop);
-            var popupHtml = '<b>' + prop.name + '</b><br/>' + prop.type + '<br/><span style="color:#c4652a;font-weight:700">€' + price + '/night</span>';
+            var popupHtml = '<div style="min-width:180px"><b>' + prop.name + '</b><br/>' + prop.type + ' - ' + prop.comune + '<br/><span style="color:#c4652a;font-weight:700">€' + price + '/night</span><br/><a href="#" onclick="event.preventDefault();sessionStorage.setItem(\'ad_map_select\',\'' + prop.id + '\');window.dispatchEvent(new Event(\'mapSelect\'));" style="color:#003580;font-weight:600;text-decoration:none;display:inline-block;margin-top:4px">View Details &rarr;</a></div>';
             marker.bindPopup(popupHtml);
-            marker.on('click', function() {
-              sessionStorage.setItem('ad_current_property', prop.id);
-              onSelectProperty(prop);
-            });
+            cluster.addLayer(marker);
           }
         });
+        map.addLayer(cluster);
         leafletMapRef.current = map;
         return function() {
           if (leafletMapRef.current) {
@@ -1894,8 +1918,19 @@
           }
         };
       }, [listings, onSelectProperty]);
+      useEffect(function() {
+        var handler = function() {
+          var propId = sessionStorage.getItem('ad_map_select');
+          if (propId) {
+            sessionStorage.removeItem('ad_map_select');
+            var found = props.listings.find(function(p) { return p.id === propId; });
+            if (found) onSelectProperty(found);
+          }
+        };
+        window.addEventListener('mapSelect', handler);
+        return function() { window.removeEventListener('mapSelect', handler); };
+      }, [props.listings, onSelectProperty]);
       return e('div', { className: 'detail-page' },
-        e('button', { className: 'back-btn', onClick: props.onNavigate }, '← Back'),
         e('h1', null, 'Browse on Map'),
         e('div', { ref: mapRef, className: 'map-embed', style: { height: '70vh', marginTop: '1rem' } })
       );
@@ -2699,8 +2734,7 @@
             !isHost ? e('button', { className: 'dashboard-tab' + (tab === 'saved' ? ' active' : ''), onClick: function() { setTab('saved'); } }, 'Saved Properties') : null,
             e('button', { className: 'dashboard-tab' + (tab === 'messages' ? ' active' : ''), onClick: function() { setTab('messages'); } }, 'Messages'),
             isHost ? e('button', { className: 'dashboard-tab' + (tab === 'properties' ? ' active' : ''), onClick: function() { setTab('properties'); } }, 'My Properties') : null,
-            isHost ? e('button', { className: 'dashboard-tab' + (tab === 'settings' ? ' active' : ''), onClick: function() { setTab('settings'); } }, 'Settings') : null,
-            e('button', { className: 'dashboard-tab', onClick: onLogout, style: { marginLeft: 'auto' } }, 'Logout')
+            isHost ? e('button', { className: 'dashboard-tab' + (tab === 'settings' ? ' active' : ''), onClick: function() { setTab('settings'); } }, 'Settings') : null
           ),
           e('div', { className: 'dashboard-content' },
             tab === 'profile' ? e('div', null,
@@ -2911,13 +2945,34 @@
       );
     }
 
+    function FooterModal(props) {
+      var title = props.title;
+      var onClose = props.onClose;
+      var content = {
+        'Privacy': 'AffittoDiretto.it respects your privacy. We collect only the information necessary to facilitate direct bookings between guests and property hosts in Italy. Your personal data (name, email) is stored locally in your browser and is never sent to third-party servers. We do not use tracking cookies or share your information with advertisers. Property listing data is sourced from public tourism registries.',
+        'Terms': 'AffittoDiretto.it is a directory connecting guests directly with Italian property hosts. We do not process payments or act as an intermediary. All booking arrangements, payments, and cancellations are handled directly between the guest and the property host. Listings are provided for informational purposes. We make no guarantees about availability, pricing accuracy, or property conditions. Users are responsible for verifying details directly with hosts.',
+        'Contact': 'Have questions or feedback? Reach us at:\n\nEmail: info@affittodiretto.it\n\nWe are an Italian startup based in Venice, dedicated to helping travelers book directly with local hosts and skip the middleman fees.'
+      };
+      return e('div', { className: 'modal-overlay', onClick: onClose },
+        e('div', { className: 'modal', onClick: function(ev) { ev.stopPropagation(); }, style: { maxWidth: '600px' } },
+          e('button', { className: 'modal-close', onClick: onClose }, 'X'),
+          e('h2', null, title),
+          e('div', { style: { whiteSpace: 'pre-line', lineHeight: '1.6', color: '#444', marginTop: '1rem' } }, content[title] || '')
+        )
+      );
+    }
+
     function Footer(props) {
+      var stateModal = useState(null);
+      var modal = stateModal[0];
+      var setModal = stateModal[1];
       return e('footer', { className: 'footer' },
+        modal && e(FooterModal, { title: modal, onClose: function() { setModal(null); } }),
         e('p', null, '© 2026 AffittoDiretto.it - Book Direct in Italy'),
         e('div', { className: 'footer-links' },
-          e('a', { href: '#' }, 'Privacy'),
-          e('a', { href: '#' }, 'Terms'),
-          e('a', { href: '#' }, 'Contact')
+          e('a', { href: '#', onClick: function(ev) { ev.preventDefault(); setModal('Privacy'); } }, 'Privacy'),
+          e('a', { href: '#', onClick: function(ev) { ev.preventDefault(); setModal('Terms'); } }, 'Terms'),
+          e('a', { href: '#', onClick: function(ev) { ev.preventDefault(); setModal('Contact'); } }, 'Contact')
         )
       );
     }
@@ -2999,6 +3054,7 @@
         localStorage.removeItem('ad_user');
         setUser(null);
         setCurrentPage('home');
+        window.location.hash = '#/home';
       };
 
       var handlePropertySaved = function() {
