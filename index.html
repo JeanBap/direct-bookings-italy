@@ -1584,28 +1584,20 @@
     }
 
     function buildCommunesByAllRegions(listings) {
-      var map = {};
-      listings.forEach(function(prop) {
-        if (prop.region && prop.comune) {
-          if (!map[prop.region]) map[prop.region] = [];
-          if (map[prop.region].indexOf(prop.comune) === -1) {
-            map[prop.region].push(prop.comune);
-          }
-        }
-      });
-      return map;
+      var allCommunes = new Set();
+      listings.forEach(function(l) { allCommunes.add(l.comune); });
+      return Array.from(allCommunes).sort();
     }
 
-    function buildNeighborhoodsByComune(listings, targetComune) {
-      var neighborhoods = [];
-      listings.forEach(function(prop) {
-        if (prop.comune === targetComune && prop.neighborhood) {
-          if (neighborhoods.indexOf(prop.neighborhood) === -1) {
-            neighborhoods.push(prop.neighborhood);
-          }
-        }
+    function buildNeighborhoodsByComune(listings) {
+      var map = {};
+      listings.forEach(function(l) {
+        var key = l.comune;
+        if (!map[key]) map[key] = new Set();
+        if (l.neighborhood) map[key].add(l.neighborhood);
       });
-      return neighborhoods;
+      Object.keys(map).forEach(function(k) { map[k] = Array.from(map[k]).sort(); });
+      return map;
     }
 
     function getTopAmenities(prop) {
