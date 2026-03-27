@@ -14,14 +14,66 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="data_public.js"></script>
-  <script src="blog_posts.js"></script>
-  <script>var ENRICHMENT_MAP = {};</script>
   <script>
-    (function() {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', 'enrichment_map.json', false);
-      try { xhr.send(); if (xhr.status === 200) ENRICHMENT_MAP = JSON.parse(xhr.responseText); } catch(e) {}
-    })();
+    // Supabase config
+    var SUPABASE_URL = 'https://cvclgdzjrmuaowwnayuw.supabase.co';
+    var SUPABASE_KEY = 'sb_publishable_zjbtS9iX-ZR2vLuQrL0RKw_LMBcQQgc';
+    // Enrichment starts empty; loaded async from Supabase after page load
+    var ENRICHMENT_MAP = {};
+    // Blog posts: loaded async from Supabase on demand
+    window.BLOG_POSTS = null; // null = not yet loaded
+
+    async function loadEnrichmentFromSupabase() {
+      try {
+        var allRows = [];
+        var batchSize = 1000;
+        var offset = 0;
+        while (true) {
+          var resp = await fetch(
+            SUPABASE_URL + '/rest/v1/enrichment?select=*&limit=' + batchSize + '&offset=' + offset,
+            { headers: { 'apikey': SUPABASE_KEY, 'Prefer': 'count=exact' } }
+          );
+          if (!resp.ok) break;
+          var rows = await resp.json();
+          if (!Array.isArray(rows) || rows.length === 0) break;
+          allRows = allRows.concat(rows);
+          if (rows.length < batchSize) break;
+          offset += batchSize;
+        }
+        var map = {};
+        allRows.forEach(function(r) {
+          if (r.property_id) {
+            map[r.property_id] = {
+              gr: r.google_rating || 0,
+              rc: r.google_reviews || 0,
+              pn: r.google_price || 0,
+              img: r.img_url || '',
+              desc: r.description || '',
+              ci: r.check_in || '',
+              co: r.check_out || ''
+            };
+          }
+        });
+        return map;
+      } catch(err) {
+        console.warn('Enrichment load failed:', err);
+        return {};
+      }
+    }
+
+    async function loadBlogPostsFromSupabase() {
+      try {
+        var resp = await fetch(
+          SUPABASE_URL + '/rest/v1/blog_posts?select=*&order=date.desc',
+          { headers: { 'apikey': SUPABASE_KEY } }
+        );
+        if (!resp.ok) return [];
+        return await resp.json();
+      } catch(err) {
+        console.warn('Blog posts load failed:', err);
+        return [];
+      }
+    }
   </script>
   <style>
     :root {
@@ -2638,7 +2690,18 @@
       var sc = JSON.parse(localStorage.getItem('ad_site_content') || 'null') || {};
       var stateCat = useState('');
       var selectedCat = stateCat[0]; var setSelectedCat = stateCat[1];
-      var posts = window.BLOG_POSTS || [];
+      var statePosts = useState(window.BLOG_POSTS || []);
+      var posts = statePosts[0]; var setPosts = statePosts[1];
+      var stateLoadingBlog = useState(window.BLOG_POSTS === null);
+      var loadingBlog = stateLoadingBlog[0]; var setLoadingBlog = stateLoadingBlog[1];
+      useEffect(function() {
+        if (window.BLOG_POSTS !== null) { setPosts(window.BLOG_POSTS); setLoadingBlog(false); return; }
+        loadBlogPostsFromSupabase().then(function(bp) {
+          window.BLOG_POSTS = bp;
+          setPosts(bp);
+          setLoadingBlog(false);
+        });
+      }, []);
       var categories = useMemo(function() {
         var cats = new Set();
         posts.forEach(function(p) { cats.add(p.category); });
@@ -2648,6 +2711,7 @@
         if (!selectedCat) return posts;
         return posts.filter(function(p) { return p.category === selectedCat; });
       }, [posts, selectedCat]);
+      if (loadingBlog) return e('div', { style: { padding: '4rem', textAlign: 'center', color: '#666' } }, 'Loading posts...');
       return e('div', { className: 'blog-container' },
         e('div', { className: 'blog-header' },
           e('h1', { style: { fontSize: '1.8rem', fontWeight: 800 } }, sc.blogTitle || 'Travel Blog'),
@@ -2658,14 +2722,15 @@
             })
           )
         ),
+        posts.length === 0 ? e('div', { style: { padding: '3rem', textAlign: 'center', color: '#888' } }, 'No blog posts yet.') :
         e('div', { className: 'blog-grid' },
           filteredPosts.map(function(post) {
-            return e('div', { key: post.id, className: 'blog-card', onClick: function() { onNavigate('blogpost', { postSlug: post.slug }); } },
+            return e('div', { key: post.id || post.slug, className: 'blog-card', onClick: function() { onNavigate('blogpost', { postSlug: post.slug }); } },
               e('div', { className: 'blog-card-body' },
                 e('div', { className: 'blog-card-category' }, post.category),
                 e('div', { className: 'blog-card-title' }, post.title),
-                e('div', { className: 'blog-card-meta' }, post.date + ' • ' + post.readTime),
-                e('div', { className: 'blog-card-desc' }, post.metaDescription)
+                e('div', { className: 'blog-card-meta' }, post.date + ' • ' + (post.read_time || post.readTime || '')),
+                e('div', { className: 'blog-card-desc' }, post.meta_description || post.metaDescription || '')
               )
             );
           })
@@ -2678,8 +2743,30 @@
       var handleBack = props.handleBack;
       var onNavigate = props.onNavigate;
       var sc = JSON.parse(localStorage.getItem('ad_site_content') || 'null') || {};
-      var posts = window.BLOG_POSTS || [];
-      var post = posts.find(function(p) { return p.slug === slug; });
+      var statePost = useState(null);
+      var post = statePost[0]; var setPost = statePost[1];
+      var stateLoading = useState(true);
+      var loading = stateLoading[0]; var setLoading = stateLoading[1];
+      useEffect(function() {
+        // Check if already loaded in global cache
+        if (window.BLOG_POSTS !== null) {
+          var found = (window.BLOG_POSTS || []).find(function(p) { return p.slug === slug; });
+          setPost(found || null);
+          setLoading(false);
+          return;
+        }
+        // Load all posts from Supabase, cache globally
+        loadBlogPostsFromSupabase().then(function(bp) {
+          window.BLOG_POSTS = bp;
+          var found = bp.find(function(p) { return p.slug === slug; });
+          setPost(found || null);
+          setLoading(false);
+        });
+      }, [slug]);
+      if (loading) return e('div', { className: 'blog-article' },
+        e('p', { style: { color: '#888', padding: '2rem' } }, 'Loading...'),
+        e('button', { className: 'back-btn', onClick: handleBack }, '← Back to Blog')
+      );
       if (!post) return e('div', { className: 'blog-article' },
         e('p', null, 'Blog post not found.'),
         e('button', { className: 'back-btn', onClick: handleBack }, '← Back to Blog')
@@ -2687,7 +2774,7 @@
       return e('div', { className: 'blog-article' },
         e('button', { className: 'back-btn', onClick: handleBack }, '← Back to Blog'),
         e('h1', null, post.title),
-        e('div', { className: 'blog-article-meta' }, post.category + ' • ' + post.date + ' • ' + post.readTime),
+        e('div', { className: 'blog-article-meta' }, post.category + ' • ' + post.date + ' • ' + (post.read_time || post.readTime || '')),
         e('div', { className: 'blog-article-content', dangerouslySetInnerHTML: { __html: post.content } }),
         e('div', { style: { marginTop: '2rem', padding: '1.5rem', background: '#f0f4ff', borderRadius: '12px', textAlign: 'center' } },
           e('h3', { style: { marginBottom: '0.5rem' } }, sc.blogCTATitle || 'Find Your Perfect Stay'),
@@ -4802,8 +4889,18 @@
       var setConversations = stateConversations[1];
 
       useEffect(function() {
+        // Initial parse with whatever enrichment is already in ENRICHMENT_MAP (empty on first load)
         var parsed = parseListings();
         setListings(parsed);
+
+        // Load enrichment from Supabase async, then re-merge into listings
+        loadEnrichmentFromSupabase().then(function(enrichMap) {
+          if (Object.keys(enrichMap).length > 0) {
+            window.ENRICHMENT_MAP = enrichMap;
+            setListings(parseListings());
+          }
+        });
+
         var savedUser = localStorage.getItem('ad_user');
         if (savedUser) {
           var u = JSON.parse(savedUser);
