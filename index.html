@@ -3784,12 +3784,14 @@
 
       var generatePropertyUrl = function(prop) {
         var slug = (prop.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 60);
-        return 'https://directbookingsitaly.com/#/property/' + prop.id + '/' + slug + '?utm_source=outreach&utm_medium=whatsapp&utm_campaign=owner_claim&utm_content=' + prop.id;
+        var routeType = (prop.website || prop.googleImage) ? 'book-direct' : 'property';
+        return 'https://directbookingsitaly.com/#/' + routeType + '/' + prop.id + '/' + slug + '?utm_source=outreach&utm_medium=whatsapp&utm_campaign=owner_claim&utm_content=' + prop.id;
       };
 
       var generateEmailContent = function(prop, template, recipientEmail) {
         var slug = (prop.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 60);
-        var propertyUrl = 'https://directbookingsitaly.com/#/property/' + prop.id + '/' + slug + '?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim&utm_content=' + prop.id;
+        var routeType2 = (prop.website || prop.googleImage) ? 'book-direct' : 'property';
+        var propertyUrl = 'https://directbookingsitaly.com/#/' + routeType2 + '/' + prop.id + '/' + slug + '?utm_source=outreach&utm_medium=email&utm_campaign=owner_claim&utm_content=' + prop.id;
         var content = template.replace(/\[PROPERTY_NAME\]/g, prop.name || 'Your Property')
           .replace(/\[PROPERTY_ID\]/g, prop.id)
           .replace(/\[SLUG\]/g, slug)
@@ -4912,12 +4914,13 @@
               setCurrentPage('blogpost');
               setPageState({ postSlug: postSlug });
             }
-          } else if (hash.startsWith('property/')) {
-            var propPath = hash.substring(9);
+          } else if (hash.startsWith('property/') || hash.startsWith('book-direct/')) {
+            var isBookDirect = hash.startsWith('book-direct/');
+            var propPath = hash.substring(isBookDirect ? 12 : 9);
             var propId = propPath.split('/')[0];
             if (propId) {
               setCurrentPage('detail');
-              setPageState({ propertyId: propId });
+              setPageState({ propertyId: propId, bookDirect: isBookDirect });
             }
           } else if (hash.startsWith('unsubscribe')) {
             setCurrentPage('unsubscribe');
@@ -4993,7 +4996,8 @@
         setCurrentPage('detail');
         setPageState({ propertyId: prop.id });
         var slug = (prop.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 30);
-        window.location.hash = '#/property/' + prop.id + '/' + slug;
+        var route = (prop.website || prop.googleImage) ? 'book-direct' : 'property';
+        window.location.hash = '#/' + route + '/' + prop.id + '/' + slug;
         window.scrollTo(0, 0);
       };
 
