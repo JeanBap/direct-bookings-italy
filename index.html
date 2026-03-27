@@ -1814,6 +1814,7 @@
       return e('div', { className: 'property-card', onClick: function() { onSelect(prop); } },
         e('div', { className: 'card-image' },
           prop.verified ? e('div', { className: 'verified-badge' }, 'VERIFIED') : null,
+          prop.hasGoogle && !prop.verified ? e('div', { style: { position: 'absolute', top: '10px', left: '10px', background: '#4285f4', color: '#fff', fontSize: '0.7rem', fontWeight: 700, padding: '3px 7px', borderRadius: '4px', zIndex: 2 } }, 'GOOGLE') : null,
           e('img', { src: imgSrc, alt: prop.name }),
           !prop.googleImage ? e('div', { className: 'sample-label' }, 'Sample') : null
         ),
