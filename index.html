@@ -1951,8 +1951,13 @@
       var onSelectProperty = props.onSelectProperty;
       var onNavigate = props.onNavigate;
       var featuredListings = useMemo(function() {
-        return listings.filter(function(l) { return l.hasGoogle && l.googleRating; })
+        var google = listings.filter(function(l) { return l.hasGoogle && l.googleRating; })
           .sort(function(a, b) { return (b.googleRating * 1000 + b.googleReviews) - (a.googleRating * 1000 + a.googleReviews); })
+          .slice(0, 12);
+        if (google.length >= 4) return google;
+        // Fallback: top listings by beds when no Google-enriched data available
+        return listings.filter(function(l) { return l.denominazione; })
+          .sort(function(a, b) { return (b.beds || 0) - (a.beds || 0); })
           .slice(0, 12);
       }, [listings]);
 
@@ -2076,15 +2081,15 @@
             e('div', { className: 'why-grid' },
               e('div', { className: 'why-card' },
                 e('h3', null, sc.whyCard1Title || 'Guests Save Money'),
-                e('p', null, sc.whyCard1Text || '')
+                e('p', null, sc.whyCard1Text || 'When you book direct, there are no middleman fees. Property owners can offer you better rates because they keep 100% of the booking value.')
               ),
               e('div', { className: 'why-card' },
                 e('h3', null, sc.whyCard2Title || 'Owners Earn More'),
-                e('p', null, sc.whyCard2Text || '')
+                e('p', null, sc.whyCard2Text || 'A hotel losing 20% to booking platforms loses thousands per month. With Direct Bookings Italy, listing is free forever. Owners keep every euro they earn.')
               ),
               e('div', { className: 'why-card' },
                 e('h3', null, sc.whyCard3Title || 'Personal Connection'),
-                e('p', null, sc.whyCard3Text || '')
+                e('p', null, sc.whyCard3Text || 'Talk directly to your host. Need a late check-in? Special dietary needs? Direct communication means better service and flexibility.')
               )
             ),
             e('div', { style: { marginTop: '2rem' } },
@@ -4803,27 +4808,42 @@
           var u = JSON.parse(savedUser);
           setUser(u);
         }
-        var hash = window.location.hash.replace('#/', '');
-        if (hash === 'dashboard' || hash === 'search' || hash === 'map' || hash === 'admin' || hash === 'blog' || hash === 'about') {
-          setCurrentPage(hash);
-        } else if (hash.startsWith('blog/')) {
-          var postSlug = hash.substring(5);
-          if (postSlug) {
-            setCurrentPage('blogpost');
-            setPageState({ postSlug: postSlug });
+        var parseAndRoute = function() {
+          var rawHash = window.location.hash.replace('#/', '');
+          var hashParts = rawHash.split('?');
+          var hash = hashParts[0];
+          var hashQuery = new URLSearchParams(hashParts[1] || '');
+          if (hash === 'dashboard' || hash === 'map' || hash === 'admin' || hash === 'blog' || hash === 'about') {
+            setCurrentPage(hash);
+            setPageState({});
+          } else if (hash === 'search') {
+            var cityParam = hashQuery.get('city') || '';
+            setCurrentPage('search');
+            setPageState(cityParam ? { initialCity: cityParam } : {});
+          } else if (hash.startsWith('blog/')) {
+            var postSlug = hash.substring(5);
+            if (postSlug) {
+              setCurrentPage('blogpost');
+              setPageState({ postSlug: postSlug });
+            }
+          } else if (hash.startsWith('property/')) {
+            var propPath = hash.substring(9);
+            var propId = propPath.split('/')[0];
+            if (propId) {
+              setCurrentPage('detail');
+              setPageState({ propertyId: propId });
+            }
+          } else if (hash.startsWith('unsubscribe')) {
+            setCurrentPage('unsubscribe');
+            var uParams = new URLSearchParams(hash.split('?')[1] || '');
+            setPageState({ unsubEmail: uParams.get('email') || '' });
+          } else {
+            setCurrentPage('home');
+            setPageState({});
           }
-        } else if (hash.startsWith('property/')) {
-          var propPath = hash.substring(9);
-          var propId = propPath.split('/')[0];
-          if (propId) {
-            setCurrentPage('detail');
-            setPageState({ propertyId: propId });
-          }
-        } else if (hash.startsWith('unsubscribe')) {
-          setCurrentPage('unsubscribe');
-          var uParams = new URLSearchParams(hash.split('?')[1] || '');
-          setPageState({ unsubEmail: uParams.get('email') || '' });
-        }
+        };
+        parseAndRoute();
+        window.addEventListener('hashchange', parseAndRoute);
         var savedConvs = localStorage.getItem('ad_conversations');
         if (savedConvs) {
           setConversations(JSON.parse(savedConvs));
@@ -4847,6 +4867,7 @@
           stats.linkClicks = (stats.linkClicks || 0) + 1;
           localStorage.setItem('dbi_outreach_stats', JSON.stringify(stats));
         }
+        return function() { window.removeEventListener('hashchange', parseAndRoute); };
       }, []);
 
       var currentProperty = useMemo(function() {
