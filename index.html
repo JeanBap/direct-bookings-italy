@@ -4901,7 +4901,7 @@
           var hashParts = rawHash.split('?');
           var hash = hashParts[0];
           var hashQuery = new URLSearchParams(hashParts[1] || '');
-          if (hash === 'dashboard' || hash === 'map' || hash === 'admin' || hash === 'blog' || hash === 'about') {
+          if (hash === 'dashboard' || hash === 'map' || hash === 'admin' || hash === 'blog' || hash === 'about' || hash === 'login') {
             setCurrentPage(hash);
             setPageState({});
           } else if (hash === 'search') {
