@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DirectBookingsItaly — Full Flow Wireframe v2</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; color: #1a202c; }
+:root { --blue: #1a56db; --green: #16a34a; --amber: #d97706; --red: #dc2626; --gray: #6b7280; --light: #f8fafc; }
+
+/* NAV */
+.toc { position: fixed; top: 0; left: 0; width: 200px; height: 100vh; background: #1e293b; color: white; padding: 1rem; overflow-y: auto; z-index: 100; }
+.toc h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 0.75rem; }
+.toc a { display: block; font-size: 0.78rem; color: #cbd5e1; text-decoration: none; padding: 0.35rem 0.5rem; border-radius: 4px; margin-bottom: 2px; }
+.toc a:hover { background: #334155; color: white; }
+.toc .section-head { font-size: 0.65rem; text-transform: uppercase; color: #475569; margin-top: 1rem; margin-bottom: 0.3rem; padding: 0 0.5rem; }
+main { margin-left: 200px; padding: 2rem; max-width: 1100px; }
+
+/* HEADERS */
+.page-title { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 0.25rem; }
+.page-sub { color: #64748b; font-size: 0.95rem; margin-bottom: 2.5rem; }
+.section-title { font-size: 1.2rem; font-weight: 700; color: #0f172a; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; gap: 0.5rem; }
+.section-title .badge { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+.badge-guest { background: #eff6ff; color: var(--blue); }
+.badge-host { background: #f0fdf4; color: var(--green); }
+.badge-shared { background: #fef3c7; color: var(--amber); }
+
+/* FLOW DIAGRAM */
+.flow { display: flex; align-items: flex-start; gap: 0; overflow-x: auto; padding: 1rem 0; margin-bottom: 1.5rem; }
+.flow-step { display: flex; flex-direction: column; align-items: center; min-width: 160px; }
+.flow-box { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 0.9rem 0.75rem; text-align: center; width: 148px; position: relative; }
+.flow-box.active { border-color: var(--blue); }
+.flow-box.success { border-color: var(--green); }
+.flow-box.warn { border-color: var(--amber); }
+.flow-box .icon { font-size: 1.4rem; margin-bottom: 0.3rem; }
+.flow-box .label { font-size: 0.78rem; font-weight: 700; color: #1e293b; }
+.flow-box .sub { font-size: 0.68rem; color: #64748b; margin-top: 0.2rem; line-height: 1.3; }
+.flow-arrow { display: flex; align-items: center; justify-content: center; padding: 0 4px; color: #94a3b8; font-size: 1.2rem; margin-top: 1.5rem; flex-shrink: 0; }
+
+/* SCREEN MOCKUPS */
+.screen { background: white; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; margin-bottom: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.screen-bar { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+.screen-dot { width: 10px; height: 10px; border-radius: 50%; }
+.screen-dot.r { background: #f87171; }
+.screen-dot.y { background: #fbbf24; }
+.screen-dot.g { background: #34d399; }
+.screen-url { font-size: 0.72rem; color: #64748b; margin-left: 0.5rem; font-family: monospace; }
+.screen-body { padding: 1.25rem; }
+.screen-title { font-size: 0.85rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+
+/* MOCK UI ELEMENTS */
+.mock-nav { background: #1a56db; color: white; padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+.mock-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.9rem; margin-bottom: 0.6rem; font-size: 0.82rem; }
+.mock-card.blue { background: #eff6ff; border-color: #bfdbfe; }
+.mock-card.green { background: #f0fdf4; border-color: #bbf7d0; }
+.mock-card.amber { background: #fffbeb; border-color: #fde68a; }
+.mock-card.red { background: #fef2f2; border-color: #fecaca; }
+.mock-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.mock-label { color: #64748b; font-size: 0.75rem; }
+.mock-val { font-weight: 600; font-size: 0.82rem; }
+.status-pill { font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+.pill-pending { background: #fef3c7; color: #92400e; }
+.pill-active { background: #eff6ff; color: #1d4ed8; }
+.pill-quoted { background: #f0fdf4; color: #15803d; }
+.pill-accepted { background: #dcfce7; color: #166534; }
+.pill-declined { background: #fef2f2; color: #991b1b; }
+.pill-expired { background: #f1f5f9; color: #64748b; }
+.mock-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; border-radius: 7px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; }
+.btn-blue { background: var(--blue); color: white; }
+.btn-gray { background: white; border: 1px solid #d1d5db; color: #374151; }
+.btn-green { background: var(--green); color: white; }
+.mock-input { width: 100%; padding: 0.5rem 0.7rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.82rem; color: #374151; background: white; }
+.mock-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 1rem; }
+.mock-tab { padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+.mock-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+/* STATS */
+.stats-row { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+.stat-box { flex: 1; background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem; text-align: center; }
+.stat-num { font-size: 1.5rem; font-weight: 800; color: var(--blue); }
+.stat-label { font-size: 0.68rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* CALENDAR */
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-top: 0.75rem; }
+.cal-head { text-align: center; font-size: 0.65rem; font-weight: 700; color: #94a3b8; padding: 0.3rem; }
+.cal-day { text-align: center; font-size: 0.72rem; padding: 0.35rem; border-radius: 4px; cursor: pointer; }
+.cal-day.empty { color: transparent; }
+.cal-day.req { background: #dbeafe; color: #1d4ed8; font-weight: 600; }
+.cal-day.quoted { background: #fef3c7; color: #92400e; font-weight: 600; }
+.cal-day.booked { background: #dcfce7; color: #166534; font-weight: 700; }
+.cal-day.today { border: 2px solid var(--blue); }
+
+/* ANNOTATIONS */
+.annotation { display: flex; align-items: flex-start; gap: 0.6rem; background: #fafafa; border-left: 3px solid var(--blue); padding: 0.6rem 0.8rem; border-radius: 0 6px 6px 0; margin-bottom: 0.5rem; font-size: 0.78rem; }
+.annotation.warn { border-left-color: var(--amber); }
+.annotation.fix { border-left-color: var(--green); }
+.annotation .icon { flex-shrink: 0; font-size: 0.9rem; }
+
+/* TIMELINE */
+.timeline { position: relative; padding-left: 1.5rem; }
+.timeline::before { content: ''; position: absolute; left: 0.4rem; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+.tl-item { position: relative; padding: 0 0 1rem 1rem; }
+.tl-item::before { content: ''; position: absolute; left: -1.15rem; top: 0.25rem; width: 10px; height: 10px; border-radius: 50%; background: var(--blue); }
+.tl-item.done::before { background: var(--green); }
+.tl-item.pending-dot::before { background: #d1d5db; }
+.tl-time { font-size: 0.68rem; color: #94a3b8; margin-bottom: 0.1rem; }
+.tl-text { font-size: 0.82rem; font-weight: 600; color: #1e293b; }
+.tl-sub { font-size: 0.75rem; color: #64748b; }
+
+/* GRID */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+@media (max-width: 768px) { .two-col, .three-col { grid-template-columns: 1fr; } .toc { display: none; } main { margin-left: 0; } }
+</style>
+</head>
+<body>
+
+<nav class="toc">
+  <h3>DirectBookingsItaly</h3>
+  <div class="section-head">Overview</div>
+  <a href="#account">Account System</a>
+  <a href="#guest-flow">Guest Flow</a>
+  <a href="#host-flow">Host Flow</a>
+  <div class="section-head">Screens</div>
+  <a href="#s-login">Login</a>
+  <a href="#s-request">Make Request</a>
+  <a href="#s-tracking">Guest Tracking</a>
+  <a href="#s-authgate">Host Auth Gate</a>
+  <a href="#s-quotform">Host Quote Form</a>
+  <a href="#s-dashboard">Dashboard</a>
+  <a href="#s-myrequests">My Requests</a>
+  <a href="#s-myquotes">My Quotes</a>
+  <a href="#s-calendar">Calendar & Earnings</a>
+  <div class="section-head">Details</div>
+  <a href="#notifications">Notifications</a>
+  <a href="#states">State Machine</a>
+  <a href="#issues">Issues Fixed</a>
+</nav>
+
+<main>
+  <div class="page-title">DirectBookingsItaly — Full UX Flow</div>
+  <div class="page-sub">Guest & Host experience wireframe · All states · Dashboard views · Earnings · v2 · 28 Mar 2026</div>
+
+  <!-- ACCOUNT SYSTEM -->
+  <div id="account" class="section-title">🔑 Account System <span class="badge badge-shared">BOTH ROLES</span></div>
+  <div class="annotation fix">
+    <span class="icon">✅</span>
+    <span><strong>Fix applied:</strong> One account per email. No more Guest/Host split at login. The same account can make requests (guest activity) AND respond to them (host activity if they have listed properties). Dashboard shows both views separately.</span>
+  </div>
+  <div class="two-col" style="margin-bottom:1.5rem">
+    <div>
+      <div style="font-size:0.78rem;font-weight:700;color:#64748b;margin-bottom:0.5rem">BEFORE (confusing)</div>
+      <div class="mock-card red">
+        <div class="mock-row"><span>papoutsis89@gmail.com</span><span class="status-pill pill-declined">Guest</span></div>
+        <div class="mock-row"><span>papoutsis89+host@gmail.com</span><span class="status-pill pill-quoted">Host</span></div>
+        <div style="font-size:0.72rem;color:#991b1b;margin-top:0.5rem">❌ Same person, two accounts, can't see both sides</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:0.78rem;font-weight:700;color:#64748b;margin-bottom:0.5rem">AFTER (unified)</div>
+      <div class="mock-card green">
+        <div class="mock-row"><span>papoutsis89@gmail.com</span><span class="status-pill pill-accepted">Unified Account</span></div>
+        <div style="font-size:0.72rem;color:#166534;margin-top:0.5rem">✅ Sees all their requests + all quotes they sent in one dashboard</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUEST FLOW -->
+  <div id="guest-flow" class="section-title">🧳 Guest Flow <span class="badge badge-guest">GUEST</span></div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-box active">
+        <div class="icon">🏠</div>
+        <div class="label">Make Request</div>
+        <div class="sub">City, dates, guests, budget, amenities</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box">
+        <div class="icon">📧</div>
+        <div class="label">Confirmation Email</div>
+        <div class="sub">Link to tracking page + guest token</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box">
+        <div class="icon">⏳</div>
+        <div class="label">Waiting</div>
+        <div class="sub">Hosts notified in batches of 10</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box warn">
+        <div class="icon">💬</div>
+        <div class="label">Quotes Arrive</div>
+        <div class="sub">Real-time, price + message + property link</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box success">
+        <div class="icon">🎉</div>
+        <div class="label">Accept Quote</div>
+        <div class="sub">Host contact revealed, direct booking</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box success">
+        <div class="icon">✅</div>
+        <div class="label">Book Direct</div>
+        <div class="sub">No commission, pay host directly</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOST FLOW -->
+  <div id="host-flow" class="section-title">🏡 Host Flow <span class="badge badge-host">HOST</span></div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-box">
+        <div class="icon">📨</div>
+        <div class="label">Email Notified</div>
+        <div class="sub">Guest request summary + respond link</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box warn">
+        <div class="icon">🔒</div>
+        <div class="label">Click Link</div>
+        <div class="sub">Auth gate if not logged in (shows request preview)</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box active">
+        <div class="icon">🏘️</div>
+        <div class="label">Pick Property</div>
+        <div class="sub">Dropdown of their listed properties</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box active">
+        <div class="icon">💶</div>
+        <div class="label">Set Price</div>
+        <div class="sub">Price/night, cleaning fee, validity, message</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box">
+        <div class="icon">📤</div>
+        <div class="label">Quote Sent</div>
+        <div class="sub">Appears instantly on guest tracking page</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box success">
+        <div class="icon">🎉</div>
+        <div class="label">Accepted!</div>
+        <div class="sub">Host notified, contact shared with guest</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREENS -->
+  <div id="s-login" class="section-title">📱 Screen: Unified Login <span class="badge badge-shared">UPDATED</span></div>
+  <div class="annotation fix"><span class="icon">✅</span><span>Role toggle removed. One account per email. Creating account auto-enables both guest and host capabilities. Host capabilities unlock when first property is listed/claimed.</span></div>
+  <div class="two-col">
+    <div class="screen">
+      <div class="screen-bar"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><div class="screen-url">directbookingsitaly.com/#/login</div></div>
+      <div class="screen-body">
+        <div class="screen-title">Sign In</div>
+        <div class="mock-nav">Direct Bookings Italy</div>
+        <div style="max-width:340px;margin:0 auto">
+          <div style="font-size:1.1rem;font-weight:700;margin-bottom:1rem">Welcome back</div>
+          <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.4rem">Email</div>
+          <input class="mock-input" value="papoutsis89@gmail.com" readonly style="margin-bottom:0.75rem">
+          <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.4rem">Password</div>
+          <input class="mock-input" value="••••••••" type="password" readonly style="margin-bottom:1rem">
+          <div class="mock-btn btn-blue" style="width:100%;justify-content:center;margin-bottom:0.75rem">Sign In</div>
+          <div style="font-size:0.75rem;color:#64748b;text-align:center">Don't have an account? <strong style="color:var(--blue)">Sign Up</strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="screen">
+      <div class="screen-bar"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><div class="screen-url">directbookingsitaly.com/#/login</div></div>
+      <div class="screen-body">
+        <div class="screen-title">Create Account</div>
+        <div style="max-width:340px;margin:0 auto">
+          <div style="font-size:1.1rem;font-weight:700;margin-bottom:1rem">Create your account</div>
+          <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.4rem">Full Name</div>
+          <input class="mock-input" value="Yanni Papoutsis" readonly style="margin-bottom:0.75rem">
+          <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.4rem">Email</div>
+          <input class="mock-input" value="papoutsis89@gmail.com" readonly style="margin-bottom:0.75rem">
+          <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.4rem">Password</div>
+          <input class="mock-input" value="••••••••" type="password" readonly style="margin-bottom:1rem">
+          <div class="mock-btn btn-blue" style="width:100%;justify-content:center">Create Account</div>
+          <div style="font-size:0.72rem;color:#94a3b8;text-align:center;margin-top:0.75rem">One account for guest requests + hosting</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUEST TRACKING -->
+  <div id="s-tracking" class="section-title">📊 Screen: Guest Quote Tracking <span class="badge badge-guest">GUEST</span></div>
+  <div class="annotation"><span class="icon">ℹ️</span><span>Accessed via unique link in confirmation email. Shows live state of the request — no login required (guest_token). Updates every 15 seconds.</span></div>
+  <div class="screen">
+    <div class="screen-bar"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><div class="screen-url">directbookingsitaly.com/#/quote-request/2428ca854a...</div></div>
+    <div class="screen-body">
+      <div class="mock-nav">
+        <span>📊 Your Quote Request</span>
+        <span class="status-pill" style="background:rgba(255,255,255,0.2);color:white">ACTIVE</span>
+      </div>
+      <div style="font-size:0.8rem;color:#64748b;margin-bottom:1rem">Rome · 15 Apr 2026 → 18 Apr 2026 · 2 guests</div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num">3</div><div class="stat-label">Hosts Notified</div></div>
+        <div class="stat-box"><div class="stat-num">1</div><div class="stat-label">Quotes Received</div></div>
+        <div class="stat-box"><div class="stat-num">3</div><div class="stat-label">Nights</div></div>
+        <div class="stat-box"><div class="stat-num">€80–150</div><div class="stat-label">Budget/night</div></div>
+      </div>
+      <!-- Quote card -->
+      <div class="mock-card green" style="margin-top:0.5rem">
+        <div class="mock-row">
+          <span style="font-weight:700">🏡 Villa Trastevere</span>
+          <span class="status-pill pill-quoted">Quote</span>
+        </div>
+        <div class="mock-row" style="margin-top:0.5rem">
+          <span class="mock-label">Price/night</span><span class="mock-val" style="color:var(--green)">€95</span>
+        </div>
+        <div class="mock-row">
+          <span class="mock-label">Cleaning fee</span><span class="mock-val">€10</span>
+        </div>
+        <div class="mock-row">
+          <span class="mock-label">Total (3 nights)</span><span class="mock-val" style="color:var(--blue);font-size:1rem">€295</span>
+        </div>
+        <div style="font-size:0.75rem;color:#64748b;margin-top:0.5rem;font-style:italic">"Welcome! My apartment is in the heart of Trastevere, walking distance to everything."</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-top:0.4rem">Valid 48h · Expires 30 Apr 2026</div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.75rem">
+          <div class="mock-btn btn-green" style="flex:2;justify-content:center">✓ Accept & Get Contact</div>
+          <div class="mock-btn btn-gray" style="flex:1;justify-content:center">✗ Decline</div>
+        </div>
+      </div>
+      <div class="mock-card amber" style="font-size:0.78rem">
+        <strong>⏳ Searching for more quotes...</strong><br>
+        <span style="color:#92400e">We've notified 3 matching hosts. More quotes may arrive within 24h.</span>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:0.75rem">
+        <div class="mock-btn btn-gray" style="font-size:0.75rem;color:#dc2626">Cancel Request</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOST AUTH GATE -->
+  <div id="s-authgate" class="section-title">🔒 Screen: Host Auth Gate <span class="badge badge-host">HOST</span></div>
+  <div class="annotation fix"><span class="icon">✅</span><span>Request preview shown before sign-in so host knows what they're responding to. "Sign In" button sets loginDefaultRole=host in sessionStorage so the login page pre-selects the right behavior (no tab to switch).</span></div>
+  <div class="screen">
+    <div class="screen-bar"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><div class="screen-url">directbookingsitaly.com/#/respond-to-quote/abc123...</div></div>
+    <div class="screen-body" style="max-width:480px;margin:0 auto;text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:0.75rem">🔒</div>
+      <div style="font-size:1.1rem;font-weight:700;color:var(--blue);margin-bottom:0.5rem">Sign in to Submit Your Quote</div>
+      <div class="mock-card blue" style="text-align:left;margin-bottom:1rem">
+        <div style="font-size:0.72rem;font-weight:700;color:#1d4ed8;margin-bottom:0.4rem">THE REQUEST YOU'RE RESPONDING TO</div>
+        <div style="font-size:0.82rem;line-height:1.8">
+          <div><strong>📍</strong> Rome — Trastevere</div>
+          <div><strong>📅</strong> 15 Apr 2026 → 18 Apr 2026 (3 nights)</div>
+          <div><strong>💶</strong> €80 – €150 / night</div>
+        </div>
+      </div>
+      <div style="font-size:0.82rem;color:#64748b;margin-bottom:1rem">Create a free account or sign in to respond to this request and manage all your bookings in one place.</div>
+      <div class="mock-btn btn-blue" style="width:100%;justify-content:center;margin-bottom:0.75rem">Sign In / Create Account</div>
+      <a style="color:#94a3b8;font-size:0.78rem">← Back to homepage</a>
+    </div>
+  </div>
+
+  <!-- HOST QUOTE FORM -->
+  <div id="s-quotform" class="section-title">💶 Screen: Host Quote Form <span class="badge badge-host">HOST</span></div>
+  <div class="annotation fix"><span class="icon">✅</span><span>Property picker added. Host selects which property they're quoting for from a dropdown of their listed/claimed properties. Auto-fills the property website link.</span></div>
+  <div class="screen">
+    <div class="screen-bar"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><div class="screen-url">directbookingsitaly.com/#/respond-to-quote/abc123...</div></div>
+    <div class="screen-body">
+      <div style="font-size:1rem;font-weight:700;color:var(--blue);margin-bottom:1rem">🏡 Quote Request — Respond to Guest</div>
+      <div class="mock-card blue">
+        <div style="font-size:0.72rem;font-weight:700;color:#1d4ed8;margin-bottom:0.5rem">📩 GUEST REQUEST</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:0.3rem 0.75rem;font-size:0.82rem">
+          <strong>📍</strong><span>Rome — Trastevere</span>
+          <strong>📅</strong><span>15 Apr 2026 → 18 Apr 2026 (3 nights)</span>
+          <strong>👥</strong><span>2 adults</span>
+          <strong>💶</strong><span>€80 – €150 / night</span>
+        </div>
+      </div>
+      <div class="mock-card amber" style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem">
+        <span>⏰</span><span>Quote window open — <strong>23h 26m left</strong></span>
+      </div>
+
+      <div style="font-size:0.85rem;font-weight:700;color:#374151;margin:1rem 0 0.5rem">🏘️ Which property are you quoting for?</div>
+      <select class="mock-input" style="margin-bottom:0.5rem">
+        <option>— Select your property —</option>
+        <option selected>Villa Trastevere, Rome (claimed)</option>
+        <option>Apt Roma Centro (created)</option>
+      </select>
+      <div style="font-size:0.72rem;color:#64748b;margin-bottom:1rem">Don't see your property? <strong style="color:var(--blue)">Add it in My Properties →</strong></div>
+
+      <div style="font-size:0.85rem;font-weight:700;color:#374151;margin-bottom:0.5rem">💶 Your Quote</div>
+      <div class="two-col" style="margin-bottom:0.5rem">
+        <div>
+          <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.3rem">Price per night (€) *</div>
+          <input class="mock-input" value="95">
+        </div>
+        <div>
+          <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.3rem">Cleaning fee (€)</div>
+          <input class="mock-input" value="10">
+        </div>
+      </div>
+      <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.3rem">Message to guest</div>
+      <textarea class="mock-input" rows="2" style="resize:none">Welcome! My apartment is in the heart of Trastevere...</textarea>
+      <div style="font-size:0.75rem;color:#64748b;margin:0.5rem 0 0.3rem">Quote valid for</div>
+      <div style="display:flex;gap:0.5rem;margin-bottom:1rem">
+        <div class="mock-btn btn-gray">24h</div>
+        <div class="mock-btn btn-blue">48h</div>
+        <div class="mock-btn btn-gray">72h</div>
+      </div>
+
+      <div style="font-size:0.85rem;font-weight:700;color:#374151;margin-bottom:0.5rem">📞 Contact Details</div>
+      <div class="two-col" style="margin-bottom:0.5rem">
+        <div>
+          <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.3rem">Email *</div>
+          <input class="mock-input" value="papoutsis89@gmail.com">
+        </div>
+        <div>
+          <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.3rem">Phone</div>
+          <input class="mock-input" value="+39 333 ...">
+        </div>
+      </div>
+      <div style="margin-bottom:0.75rem">
+        <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.3rem">Booking website (auto-filled from property)</div>
+        <input class="mock-input" value="https://villatrastevere.com">
+      </div>
+      <div style="display:flex;gap:0.75rem">
+        <div class="mock-btn btn-blue" style="flex:2;justify-content:center">📤 Send My Quote</div>
+        <div class="mock-btn btn-gray" style="flex:1;justify-content:center">✗ Not available</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="s-dashboard" class="section-title">🗂️ Dashboard — Overview <span class="badge badge-shared">UNIFIED</span></div>
+  <div class="screen">
+    <div class="screen-bar"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><div class="screen-url">directbookingsitaly.com/#/dashboard</div></div>
+    <div class="screen-body">
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:0.25rem">Welcome, Yanni</div>
+      <div style="font-size:0.8rem;color:#64748b;margin-bottom:1rem">papoutsis89@gmail.com · Manage your requests, quotes & bookings</div>
+      <div class="mock-tabs">
+        <div class="mock-tab active">📋 My Requests</div>
+        <div class="mock-tab">💬 My Quotes Sent</div>
+        <div class="mock-tab">📅 Calendar & Earnings</div>
+        <div class="mock-tab">🏡 My Properties</div>
+        <div class="mock-tab">⚙️ Settings</div>
+      </div>
+      <div style="font-size:0.75rem;color:#94a3b8;text-align:center;padding:2rem 0">↑ Select a tab above to see the relevant view</div>
+    </div>
+  </div>
+
+  <!-- MY REQUESTS TAB -->
+  <div id="s-myrequests" class="section-title">📋 Dashboard: My Requests <span class="badge badge-guest">GUEST VIEW</span></div>
+  <div class="annotation fix"><span class="icon">✅</span><span>New tab. Fetches all RFQs from Supabase where guest_email = logged-in user's email. Shows status, quotes received count, and direct link to tracking page for each.</span></div>
+  <div class="screen">
+    <div class="screen-bar"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><div class="screen-url">directbookingsitaly.com/#/dashboard → My Requests</div></div>
+    <div class="screen-body">
+      <div class="mock-tabs">
+        <div class="mock-tab active">📋 My Requests</div>
+        <div class="mock-tab">💬 My Quotes Sent</div>
+        <div class="mock-tab">📅 Calendar & Earnings</div>
+        <div class="mock-tab">🏡 My Properties</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div style="font-size:0.95rem;font-weight:700">Your Quote Requests (4)</div>
+        <div class="mock-btn btn-blue" style="font-size:0.78rem">+ New Request</div>
+      </div>
+
+      <!-- Request 1 - active with quote -->
+      <div class="mock-card" style="border-left:4px solid var(--amber)">
+        <div class="mock-row">
+          <span style="font-weight:700">📍 Rome — Trastevere</span>
+          <span class="status-pill pill-quoted">1 Quote</span>
+        </div>
+        <div class="mock-row" style="margin-top:0.3rem">
+          <span class="mock-label">📅 15 Apr – 18 Apr 2026 · 3 nights</span>
+          <span class="mock-label">€80–150/night</span>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+          <div class="mock-btn" style="background:#eff6ff;color:var(--blue);font-size:0.75rem;padding:0.35rem 0.7rem">View Quotes →</div>
+          <div class="mock-btn btn-gray" style="font-size:0.75rem;padding:0.35rem 0.7rem">Track Page</div>
+        </div>
+      </div>
+
+      <!-- Request 2 - waiting -->
+      <div class="mock-card" style="border-left:4px solid #d1d5db">
+        <div class="mock-row">
+          <span style="font-weight:700">📍 Agrigento</span>
+          <span class="status-pill pill-pending">Waiting</span>
+        </div>
+        <div class="mock-row" style="margin-top:0.3rem">
+          <span class="mock-label">📅 11 Apr – 18 Apr 2026 · 7 nights</span>
+          <span class="mock-label">2 adults</span>
+        </div>
+        <div style="font-size:0.72rem;color:#64748b;margin-top:0.3rem">⏳ 3 hosts notified · No quotes yet</div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+          <div class="mock-btn" style="background:#f1f5f9;color:#475569;font-size:0.75rem;padding:0.35rem 0.7rem">Track Page</div>
+          <div class="mock-btn btn-gray" style="font-size:0.75rem;padding:0.35rem 0.7rem;color:#dc2626">Cancel</div>
+        </div>
+      </div>
+
+      <!-- Request 3 - matched -->
+      <div class="mock-card green" style="border-left:4px solid var(--green)">
+        <div class="mock-row">
+          <span style="font-weight:700">📍 Roma — Centro</span>
+          <span class="status-pill pill-accepted">Booked ✓</span>
+        </div>
+        <div class="mock-row" style="margin-top:0.3rem">
+          <span class="mock-label">📅 1 May – 7 May 2026 · 6 nights</span>
+          <span class="mock-label">€540 total</span>
+        </div>
+        <div style="font-size:0.72rem;color:#166534;margin-top:0.3rem">✅ Accepted Apt Roma Centro · Book directly with host</div>
+      </div>
+
+      <!-- Request 4 - expired -->
+      <div class="mock-card" style="border-left:4px solid #d1d5db;opacity:0.7">
+        <div class="mock-row">
+          <span style="font-weight:700">📍 Roma — Jun 2026</span>
+          <span class="status-pill pill-expired">Expired</span>
+        </div>
+        <div class="mock-row" style="margin-top:0.3rem">
+          <span class="mock-label">📅 1 Jun – 7 Jun 2026 · 6 nights</span>
+          <span class="mock-label">0 quotes</span>
+        </div>
+        <div class="mock-btn" style="background:#f1f5f9;color:#475569;font-size:0.75rem;padding:0.35rem 0.7rem;margin-top:0.5rem;display:inline-flex">🔄 Resubmit Request</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY QUOTES SENT -->
+  <div id="s-myquotes" class="section-title">💬 Dashboard: My Quotes Sent <span class="badge badge-host">HOST VIEW</span></div>
+  <div class="annotation fix"><span class="icon">✅</span><span>New tab. Fetches rfq_quotes where host_email = user.email, joined with rfq_requests for context. Shows revenue pipeline: pending (potential), accepted (confirmed income), declined/expired.</span></div>
+  <div class="screen">
+    <div class="screen-bar"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><div class="screen-url">directbookingsitaly.com/#/dashboard → My Quotes Sent</div></div>
+    <div class="screen-body">
+      <div class="mock-tabs">
+        <div class="mock-tab">📋 My Requests</div>
+        <div class="mock-tab active">💬 My Quotes Sent</div>
+        <div class="mock-tab">📅 Calendar & Earnings</div>
+        <div class="mock-tab">🏡 My Properties</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num">1</div><div class="stat-label">Quotes Sent</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--amber)">€105</div><div class="stat-label">Potential Income</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--green)">€0</div><div class="stat-label">Confirmed Income</div></div>
+        <div class="stat-box"><div class="stat-num">0%</div><div class="stat-label">Acceptance Rate</div></div>
+      </div>
+
+      <div class="mock-card" style="border-left:4px solid var(--amber)">
+        <div class="mock-row">
+          <span style="font-weight:700">📍 Roma · Guest Request</span>
+          <span class="status-pill pill-pending">Awaiting Guest</span>
+        </div>
+        <div class="mock-row" style="margin-top:0.3rem">
+          <span class="mock-label">Quoted</span><span class="mock-val">€95/night + €10 cleaning</span>
+        </div>
+        <div class="mock-row">
+          <span class="mock-label">Total</span><span class="mock-val" style="color:var(--blue)">€105</span>
+        </div>
+        <div class="mock-row">
+          <span class="mock-label">Valid until</span><span class="mock-val">30 Mar 2026 21:30</span>
+        </div>
+        <div style="font-size:0.72rem;color:#92400e;margin-top:0.3rem">⏰ Expires in 18h</div>
+      </div>
+
+      <div class="mock-card" style="opacity:0.6;border-left:4px solid #d1d5db">
+        <div style="font-size:0.78rem;color:#64748b;text-align:center;padding:1rem 0">No other quotes yet. Respond to more requests to build your income pipeline.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDAR & EARNINGS -->
+  <div id="s-calendar" class="section-title">📅 Dashboard: Calendar & Earnings <span class="badge badge-shared">BOTH</span></div>
+  <div class="annotation fix"><span class="icon">✅</span><span>New tab. Merges guest requests + host quotes onto a single calendar. Color-coded by type. Side panel shows projected earnings and booked periods.</span></div>
+  <div class="screen">
+    <div class="screen-bar"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><div class="screen-url">directbookingsitaly.com/#/dashboard → Calendar & Earnings</div></div>
+    <div class="screen-body">
+      <div class="mock-tabs">
+        <div class="mock-tab">📋 My Requests</div>
+        <div class="mock-tab">💬 My Quotes Sent</div>
+        <div class="mock-tab active">📅 Calendar & Earnings</div>
+        <div class="mock-tab">🏡 My Properties</div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div style="font-size:0.85rem;font-weight:700;margin-bottom:0.5rem">April 2026</div>
+          <div class="cal">
+            <div class="cal-head">Mon</div><div class="cal-head">Tue</div><div class="cal-head">Wed</div><div class="cal-head">Thu</div><div class="cal-head">Fri</div><div class="cal-head">Sat</div><div class="cal-head">Sun</div>
+            <div class="cal-day empty">0</div><div class="cal-day empty">0</div><div class="cal-day">1</div><div class="cal-day">2</div><div class="cal-day">3</div><div class="cal-day">4</div><div class="cal-day">5</div>
+            <div class="cal-day">6</div><div class="cal-day">7</div><div class="cal-day">8</div><div class="cal-day">9</div><div class="cal-day">10</div><div class="cal-day req">11</div><div class="cal-day req">12</div>
+            <div class="cal-day req">13</div><div class="cal-day req">14</div><div class="cal-day req">15</div><div class="cal-day req">16</div><div class="cal-day req">17</div><div class="cal-day req">18</div><div class="cal-day">19</div>
+            <div class="cal-day">20</div><div class="cal-day">21</div><div class="cal-day">22</div><div class="cal-day">23</div><div class="cal-day">24</div><div class="cal-day">25</div><div class="cal-day">26</div>
+            <div class="cal-day">27</div><div class="cal-day today">28</div><div class="cal-day">29</div><div class="cal-day">30</div><div class="cal-day empty">0</div><div class="cal-day empty">0</div><div class="cal-day empty">0</div>
+          </div>
+          <div style="margin-top:0.75rem;font-size:0.85rem;font-weight:700">May 2026</div>
+          <div class="cal">
+            <div class="cal-head">Mon</div><div class="cal-head">Tue</div><div class="cal-head">Wed</div><div class="cal-head">Thu</div><div class="cal-head">Fri</div><div class="cal-head">Sat</div><div class="cal-head">Sun</div>
+            <div class="cal-day empty">0</div><div class="cal-day empty">0</div><div class="cal-day empty">0</div><div class="cal-day booked">1</div><div class="cal-day booked">2</div><div class="cal-day booked">3</div><div class="cal-day booked">4</div>
+            <div class="cal-day booked">5</div><div class="cal-day booked">6</div><div class="cal-day booked">7</div><div class="cal-day">8</div><div class="cal-day quoted">9</div><div class="cal-day quoted">10</div><div class="cal-day quoted">11</div>
+            <div class="cal-day quoted">12</div><div class="cal-day quoted">13</div><div class="cal-day quoted">14</div><div class="cal-day quoted">15</div><div class="cal-day quoted">16</div><div class="cal-day quoted">17</div><div class="cal-day">18</div>
+          </div>
+          <div style="display:flex;gap:0.75rem;margin-top:0.75rem;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:0.3rem;font-size:0.72rem"><div style="width:12px;height:12px;background:#dbeafe;border-radius:2px"></div>My Request</div>
+            <div style="display:flex;align-items:center;gap:0.3rem;font-size:0.72rem"><div style="width:12px;height:12px;background:#fef3c7;border-radius:2px"></div>Pending Quote</div>
+            <div style="display:flex;align-items:center;gap:0.3rem;font-size:0.72rem"><div style="width:12px;height:12px;background:#dcfce7;border-radius:2px"></div>Confirmed Booking</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.85rem;font-weight:700;margin-bottom:0.75rem">Earnings Overview</div>
+          <div class="mock-card green">
+            <div class="mock-label" style="margin-bottom:0.3rem">✅ Confirmed Income</div>
+            <div style="font-size:1.4rem;font-weight:800;color:var(--green)">€540</div>
+            <div style="font-size:0.72rem;color:#64748b">Roma Centro · May 1–7 · 6 nights</div>
+          </div>
+          <div class="mock-card amber">
+            <div class="mock-label" style="margin-bottom:0.3rem">⏳ Pending (if accepted)</div>
+            <div style="font-size:1.4rem;font-weight:800;color:var(--amber)">€105</div>
+            <div style="font-size:0.72rem;color:#64748b">Roma · Mar 28–29 · 1 night</div>
+          </div>
+          <div class="mock-card">
+            <div class="mock-label" style="margin-bottom:0.3rem">📊 Pipeline Total</div>
+            <div style="font-size:1.4rem;font-weight:800;color:var(--blue)">€645</div>
+            <div style="font-size:0.72rem;color:#64748b">Confirmed + pending</div>
+          </div>
+          <div class="mock-card" style="margin-top:0.5rem">
+            <div style="font-size:0.78rem;font-weight:700;margin-bottom:0.5rem">My Requests (as guest)</div>
+            <div class="timeline">
+              <div class="tl-item done">
+                <div class="tl-time">Apr 11–18</div>
+                <div class="tl-text">Agrigento · 7 nights</div>
+                <div class="tl-sub">Waiting for quotes</div>
+              </div>
+              <div class="tl-item pending-dot">
+                <div class="tl-time">Apr 15–18</div>
+                <div class="tl-text">Rome · 3 nights</div>
+                <div class="tl-sub">1 quote received · Review</div>
+              </div>
+              <div class="tl-item done">
+                <div class="tl-time">May 1–7</div>
+                <div class="tl-text">Roma · 6 nights</div>
+                <div class="tl-sub" style="color:var(--green)">✓ Booked · €540</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div id="notifications" class="section-title">📨 Notification Timeline</div>
+  <div class="two-col">
+    <div>
+      <div style="font-size:0.82rem;font-weight:700;color:#475569;margin-bottom:0.75rem">GUEST RECEIVES</div>
+      <div class="timeline">
+        <div class="tl-item done">
+          <div class="tl-time">T+0: Request submitted</div>
+          <div class="tl-text">📧 Confirmation email</div>
+          <div class="tl-sub">Tracking link + what to expect</div>
+        </div>
+        <div class="tl-item done">
+          <div class="tl-time">T+1h: First quote arrives</div>
+          <div class="tl-text">📧 "You have a new quote!"</div>
+          <div class="tl-sub">Price, property name, view button</div>
+        </div>
+        <div class="tl-item pending-dot">
+          <div class="tl-time">T+24h: Quote expires</div>
+          <div class="tl-text">📧 Reminder: quote expiring soon</div>
+          <div class="tl-sub">Action required</div>
+        </div>
+        <div class="tl-item pending-dot">
+          <div class="tl-time">On accept</div>
+          <div class="tl-text">📧 Booking confirmed!</div>
+          <div class="tl-sub">Host contact + direct booking link</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:0.82rem;font-weight:700;color:#475569;margin-bottom:0.75rem">HOST RECEIVES</div>
+      <div class="timeline">
+        <div class="tl-item done">
+          <div class="tl-time">T+0: New request matched</div>
+          <div class="tl-text">📧 Guest request details</div>
+          <div class="tl-sub">City, dates, budget, respond link</div>
+        </div>
+        <div class="tl-item pending-dot">
+          <div class="tl-time">T+12h: No response</div>
+          <div class="tl-text">📧 Reminder</div>
+          <div class="tl-sub">Window closes in 12h</div>
+        </div>
+        <div class="tl-item pending-dot">
+          <div class="tl-time">On acceptance</div>
+          <div class="tl-text">📧 🎉 Your quote was accepted!</div>
+          <div class="tl-sub">Guest contact + booking details</div>
+        </div>
+        <div class="tl-item pending-dot">
+          <div class="tl-time">On decline/expiry</div>
+          <div class="tl-text">📧 Quote not selected</div>
+          <div class="tl-sub">No action needed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE MACHINE -->
+  <div id="states" class="section-title">⚙️ State Machine</div>
+  <div class="three-col">
+    <div>
+      <div style="font-size:0.78rem;font-weight:700;color:#475569;margin-bottom:0.5rem">RFQ REQUEST STATES</div>
+      <div class="mock-card" style="font-size:0.78rem">
+        <div style="margin-bottom:0.4rem"><span class="status-pill pill-active">active</span> → Accepting quotes</div>
+        <div style="margin-bottom:0.4rem"><span class="status-pill pill-accepted">matched</span> → Quote accepted</div>
+        <div style="margin-bottom:0.4rem"><span class="status-pill pill-expired">expired</span> → No quotes in time</div>
+        <div><span class="status-pill pill-declined">cancelled</span> → Guest cancelled</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:0.78rem;font-weight:700;color:#475569;margin-bottom:0.5rem">OUTREACH STATES</div>
+      <div class="mock-card" style="font-size:0.78rem">
+        <div style="margin-bottom:0.4rem"><span class="status-pill pill-pending">sent</span> → Email delivered</div>
+        <div style="margin-bottom:0.4rem"><span class="status-pill pill-quoted">quoted</span> → Host replied with quote</div>
+        <div style="margin-bottom:0.4rem"><span class="status-pill pill-declined">declined</span> → Host not available</div>
+        <div><span class="status-pill pill-expired">expired</span> → 24h window passed</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:0.78rem;font-weight:700;color:#475569;margin-bottom:0.5rem">QUOTE STATES</div>
+      <div class="mock-card" style="font-size:0.78rem">
+        <div style="margin-bottom:0.4rem"><span class="status-pill pill-pending">pending</span> → Awaiting guest decision</div>
+        <div style="margin-bottom:0.4rem"><span class="status-pill pill-accepted">accepted</span> → Booking confirmed</div>
+        <div style="margin-bottom:0.4rem"><span class="status-pill pill-declined">declined</span> → Guest passed</div>
+        <div><span class="status-pill pill-expired">expired</span> → Validity elapsed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 TEST SCENARIOS -->
+  <div class="section-title">🧪 10 Test Scenarios</div>
+  <div style="display:grid;gap:0.5rem">
+    <div class="mock-card blue"><strong>Case 1:</strong> papoutsis89@gmail.com makes 1 request (Roma, Apr) → 1 host responds → guest accepts → booking confirmed ✅</div>
+    <div class="mock-card"><strong>Case 2:</strong> Same email makes 4 requests across 4 cities/dates → dashboard shows all 4 in "My Requests" with individual statuses</div>
+    <div class="mock-card"><strong>Case 3:</strong> papoutsis89@gmail.com ALSO has a listed property → when email arrives as host, responds to a different user's request → shows in "My Quotes Sent"</div>
+    <div class="mock-card"><strong>Case 4:</strong> Host receives 5 requests simultaneously → responds to all 5 → "My Quotes Sent" shows 5 pending quotes with total potential income</div>
+    <div class="mock-card"><strong>Case 5:</strong> Host responds to request → guest declines → quote shows as "declined" in host dashboard, potential income removed</div>
+    <div class="mock-card"><strong>Case 6:</strong> Guest makes request → no host responds in 72h → request expires → dashboard shows "Expired" with "Resubmit" button</div>
+    <div class="mock-card"><strong>Case 7:</strong> Guest accepts one quote → other pending quotes for same request automatically declined (rfq-accept edge function handles this)</div>
+    <div class="mock-card"><strong>Case 8:</strong> Host with 3 properties picks different one for each quote → each quote card in "My Quotes Sent" shows correct property name</div>
+    <div class="mock-card"><strong>Case 9:</strong> yanni@raisereadybook.com makes a request → signs in on dashboard → sees their request → timeline shows quotes arriving</div>
+    <div class="mock-card amber"><strong>Case 10:</strong> New user signs up → immediately sees empty "My Requests" and "My Quotes" with CTAs to make a request / list a property</div>
+  </div>
+
+  <!-- ISSUES FIXED -->
+  <div id="issues" class="section-title">🔧 Issues Fixed</div>
+  <div style="display:grid;gap:0.4rem">
+    <div class="annotation fix"><span class="icon">✅</span><span><strong>Unified login:</strong> Guest/Host role tab removed. One account per email, works as both.</span></div>
+    <div class="annotation fix"><span class="icon">✅</span><span><strong>Date formatting:</strong> ISO dates now show as "15 Apr 2026" everywhere.</span></div>
+    <div class="annotation fix"><span class="icon">✅</span><span><strong>Timer display:</strong> "Quote window open — 23h 26m left" instead of raw timestamp.</span></div>
+    <div class="annotation fix"><span class="icon">✅</span><span><strong>Auth gate preview:</strong> Host sees city/dates/budget before being asked to log in.</span></div>
+    <div class="annotation fix"><span class="icon">✅</span><span><strong>Host tab auto-select:</strong> Login page defaults correctly when coming from respond-to-quote link.</span></div>
+    <div class="annotation fix"><span class="icon">✅</span><span><strong>"Not available" button:</strong> Restyled from alarming red to neutral gray.</span></div>
+    <div class="annotation fix"><span class="icon">✅</span><span><strong>Guest tracking stats:</strong> Live "Hosts notified" count from DB, "Quotes received" stat added.</span></div>
+    <div class="annotation fix"><span class="icon">✅</span><span><strong>rfq_outreach query:</strong> Fixed — column `created_at` doesn't exist, removed from ORDER BY.</span></div>
+    <div class="annotation"><span class="icon">🔨</span><span><strong>New: My Requests tab</strong> in dashboard — all requests visible with statuses and tracking links.</span></div>
+    <div class="annotation"><span class="icon">🔨</span><span><strong>New: My Quotes Sent tab</strong> in dashboard — all host quotes with revenue pipeline view.</span></div>
+    <div class="annotation"><span class="icon">🔨</span><span><strong>New: Calendar & Earnings tab</strong> — visual calendar + confirmed/pending income.</span></div>
+    <div class="annotation"><span class="icon">🔨</span><span><strong>New: Host property picker</strong> — dropdown to select which property when quoting.</span></div>
+  </div>
+
+  <div style="height:3rem"></div>
+</main>
+</body>
+</html>

@@ -4471,11 +4471,350 @@
       );
     }
 
+    // ============================================================
+    // DASHBOARD — My Requests tab (guest side)
+    // ============================================================
+    function MyRequestsTab(props) {
+      var user = props.user;
+      var stateRfqs = useState([]); var rfqs = stateRfqs[0]; var setRfqs = stateRfqs[1];
+      var stateQuoteCounts = useState({}); var quoteCounts = stateQuoteCounts[0]; var setQuoteCounts = stateQuoteCounts[1];
+      var stateLoading = useState(true); var loading = stateLoading[0]; var setLoading = stateLoading[1];
+
+      useEffect(function() {
+        if (!user || !user.email) return;
+        fetch(SUPABASE_URL + '/rest/v1/rfq_requests?guest_email=eq.' + encodeURIComponent(user.email) + '&order=created_at.desc&select=*', { headers:{'apikey':SUPABASE_KEY} })
+          .then(function(r){return r.json();})
+          .then(function(data) {
+            if (!Array.isArray(data)) { setLoading(false); return; }
+            setRfqs(data);
+            if (data.length === 0) { setLoading(false); return; }
+            var ids = data.map(function(r){return r.id;}).join(',');
+            return fetch(SUPABASE_URL + '/rest/v1/rfq_quotes?rfq_id=in.(' + ids + ')&select=id,rfq_id,status', { headers:{'apikey':SUPABASE_KEY} });
+          })
+          .then(function(r){ return r && r.json(); })
+          .then(function(qs) {
+            if (!Array.isArray(qs)) return;
+            var counts = {};
+            qs.forEach(function(q){ if (!counts[q.rfq_id]) counts[q.rfq_id] = 0; if (q.status !== 'expired') counts[q.rfq_id]++; });
+            setQuoteCounts(counts);
+          })
+          .catch(function(){})
+          .finally(function(){setLoading(false);});
+      }, [user && user.email]);
+
+      var pill = function(rfq, qCount) {
+        if (rfq.status === 'matched') return {bg:'#dcfce7', color:'#166534', label:'✓ Booked'};
+        if (rfq.status === 'cancelled') return {bg:'#fee2e2', color:'#991b1b', label:'Cancelled'};
+        if (rfq.status === 'expired') return {bg:'#f1f5f9', color:'#64748b', label:'Expired'};
+        if (qCount > 0) return {bg:'#fef3c7', color:'#92400e', label: qCount + ' Quote' + (qCount>1?'s':'')};
+        return {bg:'#eff6ff', color:'#1d4ed8', label:'Waiting'};
+      };
+      var borderColor = function(rfq, qCount) {
+        if (rfq.status === 'matched') return '#16a34a';
+        if (rfq.status === 'cancelled' || rfq.status === 'expired') return '#d1d5db';
+        if (qCount > 0) return '#d97706';
+        return '#93c5fd';
+      };
+
+      if (loading) return e('div', { style:{textAlign:'center',padding:'3rem',color:'#888'} }, '⏳ Loading your requests...');
+
+      return e('div', null,
+        e('div', { style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem'} },
+          e('h2', { style:{fontSize:'1.05rem',fontWeight:700} }, 'My Quote Requests (' + rfqs.length + ')'),
+          e('a', { href:'#/request-quote', style:{background:'var(--primary-blue)',color:'white',padding:'0.5rem 1rem',borderRadius:'7px',textDecoration:'none',fontSize:'0.82rem',fontWeight:600} }, '+ New Request')
+        ),
+        rfqs.length === 0 && e('div', { style:{textAlign:'center',padding:'3rem',background:'#f8fafc',borderRadius:'12px',border:'1px dashed #cbd5e1'} },
+          e('div', { style:{fontSize:'2rem',marginBottom:'0.5rem'} }, '🏠'),
+          e('p', { style:{fontWeight:600,color:'#475569'} }, 'No requests yet'),
+          e('p', { style:{color:'#94a3b8',fontSize:'0.85rem',marginTop:'0.3rem'} }, 'Make your first quote request and get direct offers from hosts in minutes'),
+          e('a', { href:'#/request-quote', style:{display:'inline-block',marginTop:'1rem',background:'var(--primary-blue)',color:'white',padding:'0.6rem 1.25rem',borderRadius:'7px',textDecoration:'none',fontWeight:600,fontSize:'0.9rem'} }, '🏠 Request a Quote')
+        ),
+        rfqs.map(function(rfq) {
+          var qCount = quoteCounts[rfq.id] || 0;
+          var nights = Math.round((new Date(rfq.check_out)-new Date(rfq.check_in))/86400000);
+          var p = pill(rfq, qCount);
+          var bc = borderColor(rfq, qCount);
+          return e('div', { key:rfq.id, style:{background:'white',border:'1px solid #e5e7eb',borderLeft:'4px solid '+bc,borderRadius:'10px',padding:'1rem',marginBottom:'0.75rem'} },
+            e('div', { style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'0.4rem'} },
+              e('div', { style:{fontWeight:700,fontSize:'0.95rem'} }, '📍 ' + rfq.city + (rfq.neighborhood ? ' — ' + rfq.neighborhood : '')),
+              e('span', { style:{background:p.bg,color:p.color,fontSize:'0.72rem',fontWeight:700,padding:'2px 8px',borderRadius:'20px',whiteSpace:'nowrap'} }, p.label)
+            ),
+            e('div', { style:{fontSize:'0.82rem',color:'#64748b',marginBottom:'0.5rem'} },
+              '📅 ' + fmtDate(rfq.check_in) + ' → ' + fmtDate(rfq.check_out) + ' · ' + nights + ' nights · ' + rfq.adults + ' adult' + (rfq.adults>1?'s':'') +
+              ' · €' + (rfq.budget_min||'?') + '–€' + (rfq.budget_max||'?') + '/night'
+            ),
+            e('div', { style:{display:'flex',gap:'0.5rem',flexWrap:'wrap'} },
+              rfq.status === 'active' && e('a', {
+                href: '#/quote-request/' + rfq.guest_token,
+                style:{background:'#eff6ff',color:'var(--primary-blue)',padding:'0.35rem 0.75rem',borderRadius:'6px',textDecoration:'none',fontSize:'0.78rem',fontWeight:600}
+              }, qCount > 0 ? '👀 View ' + qCount + ' Quote' + (qCount>1?'s':'') : '🔗 Track Request'),
+              rfq.status === 'matched' && e('a', {
+                href: '#/quote-request/' + rfq.guest_token,
+                style:{background:'#dcfce7',color:'#166534',padding:'0.35rem 0.75rem',borderRadius:'6px',textDecoration:'none',fontSize:'0.78rem',fontWeight:600}
+              }, '✅ View Booking'),
+              (rfq.status === 'expired') && e('a', {
+                href: '#/request-quote',
+                style:{background:'#f1f5f9',color:'#475569',padding:'0.35rem 0.75rem',borderRadius:'6px',textDecoration:'none',fontSize:'0.78rem',fontWeight:600}
+              }, '🔄 Resubmit')
+            )
+          );
+        })
+      );
+    }
+
+    // ============================================================
+    // DASHBOARD — My Quotes Sent tab (host side)
+    // ============================================================
+    function MyQuotesTab(props) {
+      var user = props.user;
+      var stateQuotes = useState([]); var quotes = stateQuotes[0]; var setQuotes = stateQuotes[1];
+      var stateRfqMap = useState({}); var rfqMap = stateRfqMap[0]; var setRfqMap = stateRfqMap[1];
+      var stateLoading = useState(true); var loading = stateLoading[0]; var setLoading = stateLoading[1];
+
+      useEffect(function() {
+        if (!user || !user.email) return;
+        fetch(SUPABASE_URL + '/rest/v1/rfq_quotes?host_email=eq.' + encodeURIComponent(user.email) + '&order=created_at.desc&select=*', { headers:{'apikey':SUPABASE_KEY} })
+          .then(function(r){return r.json();})
+          .then(function(data) {
+            if (!Array.isArray(data)) { setLoading(false); return; }
+            setQuotes(data);
+            if (data.length === 0) { setLoading(false); return; }
+            var ids = data.map(function(q){return q.rfq_id;}).filter(Boolean).join(',');
+            if (!ids) { setLoading(false); return; }
+            return fetch(SUPABASE_URL + '/rest/v1/rfq_requests?id=in.(' + ids + ')&select=id,city,neighborhood,check_in,check_out,adults', { headers:{'apikey':SUPABASE_KEY} });
+          })
+          .then(function(r){ return r && r.json(); })
+          .then(function(rfqs) {
+            if (!Array.isArray(rfqs)) return;
+            var map = {};
+            rfqs.forEach(function(r){ map[r.id] = r; });
+            setRfqMap(map);
+          })
+          .catch(function(){})
+          .finally(function(){setLoading(false);});
+      }, [user && user.email]);
+
+      var pendingTotal = quotes.filter(function(q){return q.status==='pending';}).reduce(function(s,q){return s+(q.total_price||0);},0);
+      var confirmedTotal = quotes.filter(function(q){return q.status==='accepted';}).reduce(function(s,q){return s+(q.total_price||0);},0);
+
+      if (loading) return e('div', { style:{textAlign:'center',padding:'3rem',color:'#888'} }, '⏳ Loading your quotes...');
+
+      return e('div', null,
+        e('div', { style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'0.75rem',marginBottom:'1.25rem'} },
+          e('div', { style:{background:'white',border:'1px solid #e5e7eb',borderRadius:'8px',padding:'0.75rem',textAlign:'center'} },
+            e('div', { style:{fontSize:'1.4rem',fontWeight:800,color:'var(--primary-blue)'} }, quotes.length),
+            e('div', { style:{fontSize:'0.68rem',color:'#64748b',textTransform:'uppercase',letterSpacing:'0.05em'} }, 'Quotes Sent')
+          ),
+          e('div', { style:{background:'white',border:'1px solid #e5e7eb',borderRadius:'8px',padding:'0.75rem',textAlign:'center'} },
+            e('div', { style:{fontSize:'1.4rem',fontWeight:800,color:'#d97706'} }, quotes.filter(function(q){return q.status==='pending';}).length),
+            e('div', { style:{fontSize:'0.68rem',color:'#64748b',textTransform:'uppercase',letterSpacing:'0.05em'} }, 'Awaiting Answer')
+          ),
+          e('div', { style:{background:'#fef3c7',border:'1px solid #fde68a',borderRadius:'8px',padding:'0.75rem',textAlign:'center'} },
+            e('div', { style:{fontSize:'1.4rem',fontWeight:800,color:'#92400e'} }, pendingTotal > 0 ? '€'+pendingTotal : '—'),
+            e('div', { style:{fontSize:'0.68rem',color:'#92400e',textTransform:'uppercase',letterSpacing:'0.05em'} }, 'Potential Income')
+          ),
+          e('div', { style:{background:'#dcfce7',border:'1px solid #bbf7d0',borderRadius:'8px',padding:'0.75rem',textAlign:'center'} },
+            e('div', { style:{fontSize:'1.4rem',fontWeight:800,color:'#166534'} }, confirmedTotal > 0 ? '€'+confirmedTotal : '—'),
+            e('div', { style:{fontSize:'0.68rem',color:'#166534',textTransform:'uppercase',letterSpacing:'0.05em'} }, 'Confirmed Income')
+          )
+        ),
+        quotes.length === 0 && e('div', { style:{textAlign:'center',padding:'3rem',background:'#f8fafc',borderRadius:'12px',border:'1px dashed #cbd5e1'} },
+          e('div', { style:{fontSize:'2rem',marginBottom:'0.5rem'} }, '💬'),
+          e('p', { style:{fontWeight:600,color:'#475569'} }, 'No quotes sent yet'),
+          e('p', { style:{color:'#94a3b8',fontSize:'0.85rem',marginTop:'0.3rem'} }, 'When guests request stays in your area, you\'ll receive emails with a link to respond. Your quotes appear here.')
+        ),
+        quotes.map(function(q) {
+          var rfq = rfqMap[q.rfq_id] || {};
+          var nights = rfq.check_in && rfq.check_out ? Math.round((new Date(rfq.check_out)-new Date(rfq.check_in))/86400000) : null;
+          var statusStyle = q.status === 'accepted' ? {bg:'#dcfce7',color:'#166534',label:'✓ Accepted'} :
+                            q.status === 'declined' ? {bg:'#fee2e2',color:'#991b1b',label:'Declined'} :
+                            q.status === 'expired' ? {bg:'#f1f5f9',color:'#64748b',label:'Expired'} :
+                            {bg:'#fef3c7',color:'#92400e',label:'Awaiting Guest'};
+          var bc = q.status === 'accepted' ? '#16a34a' : q.status === 'pending' ? '#d97706' : '#d1d5db';
+          return e('div', { key:q.id, style:{background:'white',border:'1px solid #e5e7eb',borderLeft:'4px solid '+bc,borderRadius:'10px',padding:'1rem',marginBottom:'0.75rem'} },
+            e('div', { style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'0.4rem'} },
+              e('div', { style:{fontWeight:700,fontSize:'0.95rem'} }, '📍 ' + (rfq.city||'') + (rfq.neighborhood ? ' — '+rfq.neighborhood : '')),
+              e('span', { style:{background:statusStyle.bg,color:statusStyle.color,fontSize:'0.72rem',fontWeight:700,padding:'2px 8px',borderRadius:'20px'} }, statusStyle.label)
+            ),
+            rfq.check_in && e('div', { style:{fontSize:'0.82rem',color:'#64748b',marginBottom:'0.4rem'} },
+              '📅 ' + fmtDate(rfq.check_in) + ' → ' + fmtDate(rfq.check_out) + (nights ? ' · ' + nights + ' nights' : '')
+            ),
+            e('div', { style:{display:'grid',gridTemplateColumns:'auto 1fr auto 1fr',gap:'0.25rem 1rem',fontSize:'0.82rem',marginBottom:'0.5rem'} },
+              e('span', { style:{color:'#64748b'} }, 'Price/night'),
+              e('span', { style:{fontWeight:600} }, '€' + q.price_per_night),
+              e('span', { style:{color:'#64748b'} }, 'Total'),
+              e('span', { style:{fontWeight:700,color:'var(--primary-blue)'} }, '€' + (q.total_price||'?')),
+              q.cleaning_fee > 0 && e('span', { style:{color:'#64748b'} }, 'Cleaning'),
+              q.cleaning_fee > 0 && e('span', { style:{fontWeight:600} }, '€' + q.cleaning_fee),
+              q.valid_until && e('span', { style:{color:'#64748b'} }, 'Valid until'),
+              q.valid_until && e('span', { style:{fontWeight:600,fontSize:'0.78rem'} }, fmtDate(q.valid_until.slice(0,10)))
+            ),
+            q.host_message && e('div', { style:{fontSize:'0.78rem',color:'#475569',fontStyle:'italic',borderTop:'1px solid #f1f5f9',paddingTop:'0.4rem'} }, '"' + q.host_message + '"')
+          );
+        })
+      );
+    }
+
+    // ============================================================
+    // DASHBOARD — Calendar & Earnings tab
+    // ============================================================
+    function CalendarEarningsTab(props) {
+      var user = props.user;
+      var stateRequests = useState([]); var requests = stateRequests[0]; var setRequests = stateRequests[1];
+      var stateQuotes = useState([]); var quotes = stateQuotes[0]; var setQuotes = stateQuotes[1];
+      var stateRfqMap = useState({}); var rfqMap = stateRfqMap[0]; var setRfqMap = stateRfqMap[1];
+      var stateLoading = useState(true); var loading = stateLoading[0]; var setLoading = stateLoading[1];
+      var stateViewMonth = useState(function(){ var d=new Date(); return d.getFullYear()*100+d.getMonth(); });
+      var viewMonthKey = stateViewMonth[0]; var setViewMonthKey = stateViewMonth[1];
+
+      useEffect(function() {
+        if (!user || !user.email) return;
+        Promise.all([
+          fetch(SUPABASE_URL + '/rest/v1/rfq_requests?guest_email=eq.' + encodeURIComponent(user.email) + '&select=*', { headers:{'apikey':SUPABASE_KEY} }).then(function(r){return r.json();}),
+          fetch(SUPABASE_URL + '/rest/v1/rfq_quotes?host_email=eq.' + encodeURIComponent(user.email) + '&select=*', { headers:{'apikey':SUPABASE_KEY} }).then(function(r){return r.json();})
+        ]).then(function(results) {
+          var reqs = Array.isArray(results[0]) ? results[0] : [];
+          var qs = Array.isArray(results[1]) ? results[1] : [];
+          setRequests(reqs);
+          setQuotes(qs);
+          if (qs.length > 0) {
+            var rfqIds = qs.map(function(q){return q.rfq_id;}).filter(Boolean).join(',');
+            if (rfqIds) return fetch(SUPABASE_URL + '/rest/v1/rfq_requests?id=in.(' + rfqIds + ')&select=id,city,check_in,check_out', { headers:{'apikey':SUPABASE_KEY} }).then(function(r){return r.json();});
+          }
+        }).then(function(rfqs) {
+          if (Array.isArray(rfqs)) {
+            var map = {}; rfqs.forEach(function(r){map[r.id]=r;}); setRfqMap(map);
+          }
+        }).catch(function(){}).finally(function(){setLoading(false);});
+      }, [user && user.email]);
+
+      var confirmedIncome = quotes.filter(function(q){return q.status==='accepted';}).reduce(function(s,q){return s+(q.total_price||0);},0);
+      var pendingIncome = quotes.filter(function(q){return q.status==='pending';}).reduce(function(s,q){return s+(q.total_price||0);},0);
+
+      // Build calendar date sets
+      var dateSet = {};
+      requests.forEach(function(r) {
+        var type = r.status==='matched'?'booked':'request';
+        var d = new Date(r.check_in+'T00:00:00');
+        var end = new Date(r.check_out+'T00:00:00');
+        while (d < end) {
+          dateSet[d.toISOString().slice(0,10)] = type;
+          d.setDate(d.getDate()+1);
+        }
+      });
+      quotes.forEach(function(q) {
+        if (q.status === 'accepted') {
+          var rfq = rfqMap[q.rfq_id];
+          if (rfq && rfq.check_in) {
+            var d = new Date(rfq.check_in+'T00:00:00');
+            var end = new Date(rfq.check_out+'T00:00:00');
+            while (d < end) {
+              dateSet[d.toISOString().slice(0,10)] = 'booked';
+              d.setDate(d.getDate()+1);
+            }
+          }
+        } else if (q.status === 'pending') {
+          var rfq2 = rfqMap[q.rfq_id];
+          if (rfq2 && rfq2.check_in) {
+            var d2 = new Date(rfq2.check_in+'T00:00:00');
+            var end2 = new Date(rfq2.check_out+'T00:00:00');
+            while (d2 < end2) {
+              if (!dateSet[d2.toISOString().slice(0,10)]) dateSet[d2.toISOString().slice(0,10)] = 'pending';
+              d2.setDate(d2.getDate()+1);
+            }
+          }
+        }
+      });
+
+      var renderMonth = function(yearMonth) {
+        var year = Math.floor(yearMonth/100);
+        var month = yearMonth % 100;
+        var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        var today = new Date().toISOString().slice(0,10);
+        var firstDay = new Date(year, month, 1);
+        var lastDay = new Date(year, month+1, 0);
+        var startPad = (firstDay.getDay()+6)%7; // Mon-based
+        var cells = [];
+        for (var i=0;i<startPad;i++) cells.push(e('div', {key:'p'+i, style:{}}));
+        for (var d=1;d<=lastDay.getDate();d++) {
+          (function(day) {
+            var iso = year+'-'+String(month+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+            var dtype = dateSet[iso];
+            var bg = dtype==='booked'?'#dcfce7':dtype==='pending'?'#fef3c7':dtype==='request'?'#dbeafe':'transparent';
+            var fw = dtype?700:400;
+            var col = dtype==='booked'?'#166534':dtype==='pending'?'#92400e':dtype==='request'?'#1d4ed8':'#374151';
+            var border = iso===today?'2px solid var(--primary-blue)':'2px solid transparent';
+            cells.push(e('div', {key:day, style:{background:bg,color:col,fontWeight:fw,fontSize:'0.75rem',padding:'0.3rem',borderRadius:'4px',textAlign:'center',border:border}}, day));
+          })(d);
+        }
+        return e('div', null,
+          e('div', { style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.5rem'} },
+            e('div', { style:{fontWeight:700,fontSize:'0.9rem'} }, monthNames[month] + ' ' + year)
+          ),
+          e('div', { style:{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'2px',marginBottom:'0.25rem'} },
+            ['Mo','Tu','We','Th','Fr','Sa','Su'].map(function(d){return e('div',{key:d,style:{textAlign:'center',fontSize:'0.62rem',fontWeight:700,color:'#94a3b8',padding:'0.2rem'}},d);})
+          ),
+          e('div', { style:{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'2px'} }, cells)
+        );
+      };
+
+      if (loading) return e('div', { style:{textAlign:'center',padding:'3rem',color:'#888'} }, '⏳ Loading calendar...');
+
+      var year = Math.floor(viewMonthKey/100);
+      var month = viewMonthKey % 100;
+      var prevMonth = month===0 ? (year-1)*100+11 : year*100+(month-1);
+      var nextMonth = month===11 ? (year+1)*100 : year*100+(month+1);
+
+      return e('div', null,
+        e('div', { style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.75rem',marginBottom:'1.25rem'} },
+          e('div', { style:{background:'#dcfce7',border:'1px solid #bbf7d0',borderRadius:'10px',padding:'1rem'} },
+            e('div', { style:{fontSize:'0.72rem',color:'#166534',fontWeight:700,textTransform:'uppercase',marginBottom:'0.3rem'} }, '✅ Confirmed Income'),
+            e('div', { style:{fontSize:'1.6rem',fontWeight:800,color:'#166534'} }, confirmedIncome > 0 ? '€'+confirmedIncome : '—'),
+            e('div', { style:{fontSize:'0.72rem',color:'#166534'} }, quotes.filter(function(q){return q.status==='accepted';}).length + ' booking' + (quotes.filter(function(q){return q.status==='accepted';}).length!==1?'s':'') + ' confirmed')
+          ),
+          e('div', { style:{background:'#fef3c7',border:'1px solid #fde68a',borderRadius:'10px',padding:'1rem'} },
+            e('div', { style:{fontSize:'0.72rem',color:'#92400e',fontWeight:700,textTransform:'uppercase',marginBottom:'0.3rem'} }, '⏳ Potential Income'),
+            e('div', { style:{fontSize:'1.6rem',fontWeight:800,color:'#92400e'} }, pendingIncome > 0 ? '€'+pendingIncome : '—'),
+            e('div', { style:{fontSize:'0.72rem',color:'#92400e'} }, quotes.filter(function(q){return q.status==='pending';}).length + ' quote' + (quotes.filter(function(q){return q.status==='pending';}).length!==1?'s':'') + ' awaiting response')
+          )
+        ),
+        e('div', { style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.75rem'} },
+          e('button', { onClick:function(){setViewMonthKey(prevMonth);}, style:{background:'white',border:'1px solid #d1d5db',borderRadius:'6px',padding:'0.3rem 0.75rem',cursor:'pointer',fontSize:'0.85rem'} }, '← Prev'),
+          e('button', { onClick:function(){setViewMonthKey(nextMonth);}, style:{background:'white',border:'1px solid #d1d5db',borderRadius:'6px',padding:'0.3rem 0.75rem',cursor:'pointer',fontSize:'0.85rem'} }, 'Next →')
+        ),
+        e('div', { style:{background:'white',border:'1px solid #e5e7eb',borderRadius:'10px',padding:'1.25rem',marginBottom:'1rem'} },
+          renderMonth(viewMonthKey)
+        ),
+        e('div', { style:{display:'flex',gap:'1rem',flexWrap:'wrap',marginBottom:'1.25rem',fontSize:'0.75rem'} },
+          e('div', { style:{display:'flex',alignItems:'center',gap:'0.3rem'} }, e('div',{style:{width:14,height:14,background:'#dbeafe',borderRadius:3}}), 'My Request'),
+          e('div', { style:{display:'flex',alignItems:'center',gap:'0.3rem'} }, e('div',{style:{width:14,height:14,background:'#fef3c7',borderRadius:3}}), 'Pending Quote'),
+          e('div', { style:{display:'flex',alignItems:'center',gap:'0.3rem'} }, e('div',{style:{width:14,height:14,background:'#dcfce7',borderRadius:3}}), 'Confirmed Booking')
+        ),
+        (confirmedIncome > 0 || pendingIncome > 0) && e('div', { style:{background:'white',border:'1px solid #e5e7eb',borderRadius:'10px',padding:'1.25rem'} },
+          e('div', { style:{fontWeight:700,fontSize:'0.9rem',marginBottom:'0.75rem'} }, '📊 Earnings Detail'),
+          quotes.filter(function(q){return q.status==='accepted'||q.status==='pending';}).map(function(q) {
+            var rfq = rfqMap[q.rfq_id] || {};
+            var nights = rfq.check_in && rfq.check_out ? Math.round((new Date(rfq.check_out)-new Date(rfq.check_in))/86400000) : null;
+            return e('div', { key:q.id, style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'0.5rem 0',borderBottom:'1px solid #f1f5f9',fontSize:'0.82rem'} },
+              e('div', null,
+                e('div', { style:{fontWeight:600} }, rfq.city||'—' + (rfq.check_in ? ' · ' + fmtDate(rfq.check_in) + '–' + fmtDate(rfq.check_out) : '')),
+                e('div', { style:{color:'#64748b',fontSize:'0.75rem'} }, (nights?nights+' nights · ':'') + '€' + q.price_per_night + '/night' + (q.cleaning_fee>0?' + €'+q.cleaning_fee+' cleaning':''))
+              ),
+              e('div', { style:{textAlign:'right'} },
+                e('div', { style:{fontWeight:700,color:q.status==='accepted'?'#166534':'#92400e'} }, '€' + (q.total_price||'?')),
+                e('div', { style:{fontSize:'0.7rem',color:q.status==='accepted'?'#166534':'#92400e'} }, q.status==='accepted'?'Confirmed':'Pending')
+              )
+            );
+          })
+        )
+      );
+    }
+
     function Dashboard(props) {
       var user = props.user;
       var onLogout = props.onLogout;
       var listings = props.listings;
-      var stateTab = useState('trips');
+      var stateTab = useState('requests');
       var tab = stateTab[0];
       var setTab = stateTab[1];
 
@@ -4484,54 +4823,28 @@
         localStorage.setItem('ad_user', JSON.stringify(updated));
       };
 
+      var tabStyle = function(t) { return { padding:'0.6rem 1rem', border:'none', borderBottom: tab===t ? '2px solid var(--primary-blue)' : '2px solid transparent', background:'none', cursor:'pointer', fontWeight: tab===t ? 700 : 500, color: tab===t ? 'var(--primary-blue)' : '#64748b', fontSize:'0.88rem', whiteSpace:'nowrap' }; };
+
       return e('div', null,
         e('div', { className: 'dashboard-container' },
           e('div', { className: 'dashboard-header' },
             e('h1', null, 'Welcome, ' + (user ? user.name : 'Guest')),
-            e('p', null, 'Manage your account, trips, and properties')
+            e('p', { style:{color:'#64748b',fontSize:'0.88rem',marginTop:'0.2rem'} }, (user?user.email:'') + ' · Book direct in Italy, no commission')
           ),
-          e('div', { className: 'dashboard-tabs' },
-            e('button', { className: 'dashboard-tab' + (tab === 'trips' ? ' active' : ''), onClick: function() { setTab('trips'); } }, 'My Trips'),
-            e('button', { className: 'dashboard-tab' + (tab === 'messages' ? ' active' : ''), onClick: function() { setTab('messages'); } }, 'Messages'),
-            e('button', { className: 'dashboard-tab' + (tab === 'properties' ? ' active' : ''), onClick: function() { setTab('properties'); } }, 'My Properties'),
-            e('button', { className: 'dashboard-tab' + (tab === 'settings' ? ' active' : ''), onClick: function() { setTab('settings'); } }, 'Settings')
+          e('div', { style:{display:'flex',borderBottom:'1px solid #e5e7eb',gap:'0',overflowX:'auto',marginBottom:'0'} },
+            e('button', { style:tabStyle('requests'), onClick:function(){setTab('requests');} }, '📋 My Requests'),
+            e('button', { style:tabStyle('quotes'), onClick:function(){setTab('quotes');} }, '💬 My Quotes Sent'),
+            e('button', { style:tabStyle('calendar'), onClick:function(){setTab('calendar');} }, '📅 Calendar & Earnings'),
+            e('button', { style:tabStyle('properties'), onClick:function(){setTab('properties');} }, '🏡 My Properties'),
+            e('button', { style:tabStyle('messages'), onClick:function(){setTab('messages');} }, '✉️ Messages'),
+            e('button', { style:tabStyle('settings'), onClick:function(){setTab('settings');} }, '⚙️ Settings')
           ),
           e('div', { className: 'dashboard-content' },
-            tab === 'trips' ? e('div', null,
-              e('h2', null, 'My Trips & Saved Properties'),
-              user ? e(SavedPropertiesTab, { user: user, listings: listings, onSelectProperty: function() {} }) : e('div', null, 'Please log in to view your saved properties.'),
-              (function() {
-                var allConvs = JSON.parse(localStorage.getItem('ad_conversations') || '[]');
-                var myInquiries = allConvs.filter(function(c) { return c.guestId === user.id; });
-                if (myInquiries.length === 0) return null;
-                var statusStyle = function(s) {
-                  if (s === 'agreed') return { bg: '#e8f5e9', color: '#2e7d32', label: 'Confirmed' };
-                  if (s === 'withdrawn') return { bg: '#fff3e0', color: '#e65100', label: 'Withdrawn' };
-                  if (s === 'declined') return { bg: '#fce4ec', color: '#c62828', label: 'Declined' };
-                  return { bg: '#e3f2fd', color: '#1565c0', label: 'Open' };
-                };
-                return e('div', { style: { marginTop: '2rem' } },
-                  e('h2', null, 'My Inquiries (' + myInquiries.length + ')'),
-                  e('div', { style: { display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' } },
-                    myInquiries.map(function(inq) {
-                      var ss = statusStyle(inq.status);
-                      return e('div', { key: inq.id, style: { padding: '1rem', background: '#fff', border: '1px solid #e0e0e0', borderRadius: '10px' } },
-                        e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
-                          e('div', { style: { fontWeight: 600 } }, inq.propertyName),
-                          e('span', { style: { padding: '3px 8px', borderRadius: '4px', background: ss.bg, color: ss.color, fontWeight: 600, fontSize: '0.8rem' } }, ss.label)
-                        ),
-                        inq.checkIn ? e('div', { style: { fontSize: '0.85rem', color: '#666', marginTop: '0.3rem' } },
-                          inq.checkIn + ' to ' + inq.checkOut + ' | ' + (inq.guests || '-') + ' guests, ' + (inq.rooms || '-') + ' rooms'
-                        ) : null,
-                        e('div', { style: { fontSize: '0.8rem', color: '#999', marginTop: '0.3rem' } }, 'Sent ' + new Date(inq.createdAt).toLocaleDateString())
-                      );
-                    })
-                  )
-                );
-              })()
-            ) : null,
-            tab === 'messages' ? e(MessagesTab, { user: user }) : null,
+            tab === 'requests' ? e(MyRequestsTab, { user: user }) : null,
+            tab === 'quotes' ? e(MyQuotesTab, { user: user }) : null,
+            tab === 'calendar' ? e(CalendarEarningsTab, { user: user }) : null,
             tab === 'properties' ? e(MyPropertiesTab, { user: user, listings: listings }) : null,
+            tab === 'messages' ? e(MessagesTab, { user: user }) : null,
             tab === 'settings' ? e(SettingsTab, { user: user, onSaveSettings: handleSaveSettings }) : null
           )
         )
@@ -4569,7 +4882,7 @@
       // Google Sign-In handler
       var handleGoogleLogin = function(decoded) {
         var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
-        var found = users.find(function(u) { return u.email === decoded.email && u.role === role; });
+        var found = users.find(function(u) { return u.email === decoded.email; });
         if (found) {
           found.emailConfirmed = true;
           found.googleId = decoded.sub;
@@ -4585,7 +4898,7 @@
             email: decoded.email,
             password: '',
             name: decoded.name || decoded.email.split('@')[0],
-            role: role,
+            role: 'user',
             googleId: decoded.sub,
             avatar: decoded.picture,
             phone: '',
@@ -4627,7 +4940,7 @@
           }
         } catch(err) { /* GSI not ready yet */ }
         return function() { window._googleLoginCallback = null; };
-      }, [role, mode]);
+      }, [mode]);
 
       var handleLogin = function() {
         if (!email || !password) {
@@ -4635,7 +4948,7 @@
           return;
         }
         var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
-        var found = users.find(function(u) { return u.email === email && u.password === password && u.role === role; });
+        var found = users.find(function(u) { return u.email === email && u.password === password; });
         if (found) {
           if (!found.emailConfirmed) {
             var code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -4647,7 +4960,7 @@
             onLogin(found);
           }
         } else {
-          setLoginNotice({ type: 'error', text: 'No account found with this email and role' });
+          setLoginNotice({ type: 'error', text: 'No account found with this email and password' });
         }
       };
 
@@ -4657,7 +4970,7 @@
           return;
         }
         var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
-        var found = users.find(function(u) { return u.email === email && u.password === password && u.role === role; });
+        var found = users.find(function(u) { return u.email === email && u.password === password; });
         if (found) {
           found.emailConfirmed = true;
           users = users.map(function(u) { return u.id === found.id ? found : u; });
@@ -4673,8 +4986,8 @@
           return;
         }
         var users = JSON.parse(localStorage.getItem('ad_users') || '[]');
-        if (users.find(function(u) { return u.email === email && u.role === role; })) {
-          setLoginNotice({ type: 'error', text: 'Email already registered for this role' });
+        if (users.find(function(u) { return u.email === email; })) {
+          setLoginNotice({ type: 'error', text: 'Email already registered. Please sign in.' });
           return;
         }
         var code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -4683,7 +4996,7 @@
           email: email,
           password: password,
           name: name,
-          role: role,
+          role: 'user',
           phone: '',
           whatsapp: '',
           bio: '',
@@ -4703,19 +5016,7 @@
         setLoginNotice(null);
       };
 
-      var roleToggle = e('div', { className: 'form-group' },
-        e('label', { className: 'form-label' }, 'I am a:'),
-        e('div', { style: { display: 'flex', gap: '0', marginBottom: '0.5rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--primary-blue)' } },
-          e('button', {
-            onClick: function() { setRole('guest'); },
-            style: { flex: 1, padding: '0.75rem', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem', background: role === 'guest' ? 'var(--primary-blue)' : '#fff', color: role === 'guest' ? '#fff' : 'var(--primary-blue)' }
-          }, 'Guest'),
-          e('button', {
-            onClick: function() { setRole('host'); },
-            style: { flex: 1, padding: '0.75rem', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem', background: role === 'host' ? 'var(--primary-blue)' : '#fff', color: role === 'host' ? '#fff' : 'var(--primary-blue)' }
-          }, 'Host')
-        )
-      );
+      // roleToggle removed — unified account (no guest/host split at login)
 
       var googleBtnSection = e('div', { style: { marginTop: '1rem', marginBottom: '1rem' } },
         GOOGLE_CLIENT_ID
@@ -4756,7 +5057,6 @@
             )
           ) : mode === 'login' ? e('div', null,
             e('h2', null, 'Sign In'),
-            roleToggle,
             googleBtnSection,
             e('div', { className: 'form-group' },
               e('label', { className: 'form-label' }, 'Email'),
@@ -4773,7 +5073,6 @@
             )
           ) : e('div', null,
             e('h2', null, 'Create Account'),
-            roleToggle,
             googleBtnSection,
             e('div', { className: 'form-group' },
               e('label', { className: 'form-label' }, 'Full Name'),
@@ -5705,6 +6004,44 @@
           e('span', null, '⏰'),
           e('span', null, (function(){ var tr = timeRemaining(outreach.expires_at); return tr ? ('Quote window open — ' + tr) : 'Quote window has expired'; }()))
         ),
+
+        // Property picker
+        (function() {
+          var myProps = [];
+          if (user) {
+            var claimed = (user.claimedProperties || []);
+            var created = (user.createdProperties || []);
+            myProps = claimed.concat(created);
+          }
+          if (myProps.length === 0) return null;
+          return e('div', { style:{background:'#f8fafc',border:'1px solid #e5e7eb',borderRadius:'10px',padding:'1.2rem',marginBottom:'1rem'} },
+            e('label', { style:{display:'block',fontWeight:700,fontSize:'0.88rem',color:'#374151',marginBottom:'0.5rem'} }, '🏘️ Which property are you quoting for?'),
+            e('select', {
+              style:{width:'100%',padding:'0.6rem 0.8rem',border:'1px solid #ddd',borderRadius:'7px',fontSize:'0.92rem',background:'white'},
+              value: quoteForm.selected_property || '',
+              onChange: function(ev) {
+                var pid = ev.target.value;
+                updateQ('selected_property', pid);
+                // Auto-fill website from created property if available
+                if (user && user.createdProperties) {
+                  var cp = user.createdProperties.find(function(p){return (p.id||p.name)===pid;});
+                  if (cp && cp.website) updateQ('host_website', cp.website);
+                }
+              }
+            },
+              e('option', {value:''}, '— Select your property —'),
+              (user.claimedProperties||[]).map(function(pid, i) { return e('option', {key:'c'+i, value:pid}, 'Property #' + pid.slice(-6) + ' (listed)'); }),
+              (user.createdProperties||[]).map(function(cp, i) {
+                var label = (cp.name||'Property') + (cp.comune?' · '+cp.comune:'') + ' (my property)';
+                return e('option', {key:'m'+i, value:(cp.id||cp.name)}, label);
+              })
+            ),
+            e('div', { style:{fontSize:'0.72rem',color:'#94a3b8',marginTop:'0.4rem'} },
+              'Don\'t see your property? ',
+              e('a', { href:'#/dashboard', style:{color:'var(--primary-blue)',fontWeight:600} }, 'Add it in My Properties →')
+            )
+          );
+        })(),
 
         // Quote form
         e('div', { style:{background:'white',border:'1px solid #e5e7eb',borderRadius:'10px',padding:'1.5rem',marginBottom:'1rem'} },
