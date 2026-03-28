@@ -4873,19 +4873,157 @@
     }
 
     // ============================================================
+    // CITY_NEIGHBORHOODS — real neighborhood / metro lists per city
+    // ============================================================
+    var CITY_NEIGHBORHOODS = {
+      'Roma':['Centro Storico','Trastevere','Prati','Monti','Testaccio','Pigneto','EUR','Navona / Campo de\' Fiori','Colosseum / Celio','Vatican / Borgo','Flaminio','Parioli','Ostiense','Garbatella','Tiburtina','Esquilino','Aventino','Nomentano','Tor di Quinto','Metro A: Spagna','Metro A: Barberini','Metro A: Termini','Metro A: Ottaviano','Metro A: Lepanto','Metro B: Colosseo','Metro B: Termini','Metro B: EUR Palasport','Metro C: San Giovanni'],
+      'Milano':['Centro / Duomo','Brera','Navigli','Porta Romana','Isola','Città Studi','Porta Garibaldi','Sempione','Ticinese','Tortona / Zona Solari','Porta Venezia','Lambrate','Lorenteggio','Moscova','Nolo','Metro M1: Duomo','Metro M1: Cadorna','Metro M1: Loreto','Metro M2: Centrale','Metro M2: Garibaldi','Metro M3: Missori','Metro M5: Monumentale'],
+      'Firenze':['Centro Storico','Oltrarno','Santa Croce','San Lorenzo','Piazza Repubblica','Campo di Marte','Isolotto','Rifredi','Santa Maria Novella','Le Cure','Bellariva'],
+      'Venezia':['San Marco','Cannaregio','Dorsoduro','Santa Croce','San Polo','Castello','Giudecca','Lido di Venezia','Mestre','Marghera'],
+      'Napoli':['Centro Storico','Mergellina','Posillipo','Chiaia','Vomero','Spaccanapoli','Quartieri Spagnoli','Fuorigrotta','Bagnoli','Piazza Garibaldi','Decumani','Metro 1: Toledo','Metro 1: Dante','Metro 1: Municipio','Metro 1: Università','Metro 2: Mergellina'],
+      'Torino':['Centro','Crocetta','San Salvario','Vanchiglia','Quadrilatero Romano','Aurora','Lingotto','Barriera di Milano','Madonna di Campagna','Metro: Porta Susa','Metro: Porta Nuova','Metro: XVIII Dicembre','Metro: Bernini'],
+      'Bologna':['Centro Storico','Bolognina','San Vitale','Saragozza','Santo Stefano','Navile','Mazzini','Murri','Savena'],
+      'Palermo':['Centro Storico','Mondello','Libertà','Politeama','Kalsa','Ballarò','Noce','Zisa','Vucciria'],
+      'Genova':['Centro Storico','Nervi','Albaro','Sestri Ponente','Marassi','Pré','Carignano','Castelletto','Sampierdarena'],
+      'Bari':['Centro','Bari Vecchia','Libertà','Carrassi','Japigia','Madonnella','Poggiofranco','Carbonara'],
+      'Verona':['Centro Storico','Veronetta','San Zeno','Borgo Trento','Borgo Roma','Golosine'],
+      'Catania':['Centro','Ognina','Librino','Piano Terra','San Berillo','Cibali'],
+      'Padova':['Centro Storico','Arcella','Portello','Forcellini','Prato della Valle area','Stazione'],
+      'Trieste':['Centro','Barcola','Roiano','Opicina','Gretta','Borgo Teresiano'],
+      'Bergamo':['Città Alta','Città Bassa','Longuelo','Colognola','Campagnola'],
+      'Brescia':['Centro Storico','Don Bosco','Mompiano','Urago Mella','Sant\'Eufemia'],
+      'Catanzaro':['Centro','Lido','Germaneto'],
+      'Reggio Calabria':['Centro','Gallico','Pellaro','Modena'],
+      'Perugia':['Centro Storico','Fontivegge','Monteluce','Porta Pesa','San Sisto'],
+      'Lecce':['Centro Storico','Rudiae','Stadio','San Lazzaro'],
+      'Taranto':['Città Vecchia','Paolo VI','Talsano','Tamburi'],
+      'Pescara':['Centro','Portanuova','Pineta','Castellamare Adriatico'],
+      'Rimini':['Centro Storico','Marina Centro','Miramare','Rivabella','Riccione area'],
+      'Salerno':['Centro','Lungomare','Pastena','Torrione'],
+      'Cagliari':['Centro','Villanova','Poetto','Pirri','Quartu Sant\'Elena area','Is Mirrionis'],
+      'Sassari':['Centro','Luna e Sole','Porcellana','Monte Rosello'],
+      'Siena':['Centro Storico / Piazza del Campo','San Miniato','Acquacalda','Viale Toselli area'],
+      'Pisa':['Centro Storico','Torre di Pisa area','Marina di Pisa','Tirrenia','Navacchio'],
+      'Lucca':['Centro Storico','San Marco','Sant\'Anna','Arancio'],
+      'Trento':['Centro','Gardolo','Mattarello','Povo','Villazzano'],
+      'Bolzano':['Centro','Gries','Europa','Don Bosco','Oltrisarco'],
+      'Aosta':['Centro Storico','Porossan','Excenex'],
+      'Ancona':['Centro','Piano San Lazzaro','Pietralacroce','Posatora'],
+      'L\'Aquila':['Centro Storico','Pettino','Pile','Paganica'],
+      'Campobasso':['Centro','Toro','Ferrazzano area'],
+      'Potenza':['Centro','Macchia Romana','Poggio Tre Galli'],
+      'Matera':['Sassi di Matera','Agna al Piano','Serra Rifusa','Villa Longo'],
+      'Reggio nell\'Emilia':['Centro','Ospizio','Masone','Santa Croce'],
+      'Modena':['Centro Storico','Sacca','Crocetta','Buon Pastore'],
+      'Parma':['Centro Storico','Oltretorrente','Pablo','Molinetto'],
+      'Ferrara':['Centro Storico','Barco','Doro','Fuori Mura'],
+      'Ravenna':['Centro Storico','Marina di Ravenna','Lido Adriano','Casalborsetti'],
+      'Forlì':['Centro','Schiavonia','Villanova','Coriano'],
+      'Cesena':['Centro','Borello','Madonna del Monte'],
+      'Piacenza':['Centro','Farnesiana','Besurica','Gerbido'],
+      'Mantova':['Centro Storico','Borgochiesanuova','Lunetta','Colle Aperto'],
+      'Cremona':['Centro Storico','Po','Zaist','Boschetto'],
+      'Como':['Centro','Muggiò','Rebbio','Lora'],
+      'Varese':['Centro','Biumo','Masnago','Avigno'],
+      'Novara':['Centro','Sant\'Agabio','Vignale','Bicocca'],
+      'Alessandria':['Centro','Cristo','Pista','Orti'],
+      'Asti':['Centro','Torretta','Canelli area'],
+      'Cuneo':['Centro','Borgo San Giuseppe','Madonna dell\'Olmo'],
+      'Verbania':['Pallanza','Intra','Suna','Fondotoce'],
+      'Biella':['Centro','Riva','Chiavazza','Vandorno'],
+      'Vercelli':['Centro','Sant\'Agabio','Serravalle area'],
+      'Savona':['Centro','Legino','Lavagnola','Fornaci'],
+      'La Spezia':['Centro','Migliarina','Rebocco','Pegazzano'],
+      'Imperia':['Oneglia','Porto Maurizio','Caramagna Ligure'],
+      'Livorno':['Centro','Antignano','Ardenza','Quercianella'],
+      'Arezzo':['Centro Storico','Giotto','Saione','Fiorentina'],
+      'Grosseto':['Centro','Barbanella','Gorarella','Marina di Grosseto'],
+      'Massa':['Centro','Marina di Massa','Ronchi','Lavacchio'],
+      'Carrara':['Centro','Marina di Carrara','Avenza','Fossola'],
+      'Terni':['Centro','Borgo Rivo','Cospea','Polymer'],
+      'Viterbo':['Centro Storico','La Quercia','Pilastro','Villanova'],
+      'Frosinone':['Centro','Scalo','Mola','Pile'],
+      'Latina':['Centro','Borgo Piave','Quartaccio','Varco Sabino'],
+      'Rieti':['Centro','Terminillo','Vazia','San Mauro'],
+      'Caserta':['Centro','Centurano','Vaccheria','San Nicola la Strada area'],
+      'Benevento':['Centro','Libertà','Mellusi','Capodimonte'],
+      'Avellino':['Centro','Valle','Bellizzi Irpino','Borgo Ferrovia'],
+      'Foggia':['Centro','Ordona','Cervaro','Borgo Incoronata'],
+      'Andria':['Centro','San Valentino','Montegrosso'],
+      'Barletta':['Centro','Borgovilla','Patalini'],
+      'Brindisi':['Centro','Casale','Sant\'Elia','La Rosa'],
+      'Taranto':['Città Vecchia','Paolo VI','Talsano','Tamburi'],
+      'Cosenza':['Centro','Quattromiglia','Portapiana','Gergeri'],
+      'Messina':['Centro','Gazzi','Gravitelli','Provinciale'],
+      'Palermo':['Centro Storico','Mondello','Libertà','Politeama','Kalsa','Ballarò','Noce'],
+      'Trapani':['Centro','Porto','San Lorenzo','Fontanelle'],
+      'Agrigento':['Centro','San Leone','Villaseta','Bonamorone'],
+      'Caltanissetta':['Centro','Pian del Lago','Angeli'],
+      'Enna':['Centro','Pergusa','Calascibetta area'],
+      'Ragusa':['Ragusa Superiore','Ibla / Centro Storico','Marina di Ragusa'],
+      'Siracusa':['Ortigia / Centro Storico','Akradina','Tiche','Neapolis area'],
+      'Nuoro':['Centro','Seuna','Biscollai','Santa Maria della Neve'],
+      'Oristano':['Centro','Torangius','San Nicola','Sa Rodia'],
+      'Positano':['Centro','Montepertuso','Nocelle'],
+      'Amalfi':['Centro','Atrani','Ravello','Minori'],
+      'Taormina':['Centro Storico','Naxos / Giardini','Mazzarò'],
+      'Capri':['Capri Town','Anacapri','Marina Grande'],
+      'Ischia':['Ischia Porto','Forio','Casamicciola','Sant\'Angelo'],
+      'Sorrento':['Centro','Meta di Sorrento','Piano di Sorrento','Marina Grande'],
+      'Stresa':['Centro','Baveno','Verbania area','Pallanza'],
+      'Cortina d\'Ampezzo':['Centro','Pocol','Ronco','Zuel'],
+      'Courmayeur':['Centro','Entrèves','La Palud','Dolonne'],
+      'Portofino':['Portofino','Santa Margherita Ligure','Camogli'],
+      'Cinque Terre':['Monterosso','Vernazza','Corniglia','Manarola','Riomaggiore'],
+      'San Gimignano':['Centro Storico / Medievale','Fuori Porta','Poggibonsi area'],
+      'Assisi':['Centro Storico','San Francesco area','Rivotorto','Santa Maria degli Angeli'],
+      'Orvieto':['Centro Storico','Ciconia','Sferracavallo'],
+      'Spoleto':['Centro Storico','Monteluco','Baiano di Spoleto'],
+      'Alghero':['Centro Storico','Borgo Sant\'Agostino','Fertilia','Lo Quarter'],
+      'Olbia':['Centro','Isola Bianca','Murta Maria','Porto Rotondo area'],
+      'Pula':['Centro','Nora area','Chia area'],
+    };
+
+    // ============================================================
     // RFQ PAGE — Guest multi-step quote request form
     // ============================================================
     function RFQPage(props) {
       var onNavigate = props.onNavigate;
-      var REGIONS_LIST = Object.values(window.REGIONS || {"0":"Lazio","1":"Piemonte","2":"Puglia","3":"Veneto","4":"Liguria"}).sort();
+      var user = props.user;
+      var listings = props.listings || [];
+      // Build unique sorted city list from actual property data
+      var allCities = useMemo(function() {
+        var seen = new Set();
+        var cities = [];
+        listings.forEach(function(l) {
+          var c = l.comune;
+          if (c && c.trim() && !seen.has(c)) { seen.add(c); cities.push(c); }
+        });
+        return cities.sort(function(a,b){return a.localeCompare(b,'it');});
+      }, [listings]);
+
+      // SIGN-IN GATE — must be logged in to submit a quote request
+      if (!user) {
+        return e('div', { style: { maxWidth:'500px', margin:'4rem auto', padding:'2rem', textAlign:'center' } },
+          e('div', { style:{ fontSize:'3rem', marginBottom:'1rem' } }, '🔒'),
+          e('h2', { style:{ color:'var(--primary-blue)', marginBottom:'0.5rem' } }, 'Sign in to Request a Quote'),
+          e('p', { style:{ color:'#666', marginBottom:'1.5rem', lineHeight:'1.6' } }, 'Create a free account or sign in so we can pre-fill your details and track all your quote requests in one place.'),
+          e('button', { className:'cta-button', onClick:function(){ onNavigate('login'); } }, 'Sign In / Create Account'),
+          e('p', null, e('a', { href:'#/home', style:{ color:'#999', fontSize:'0.85rem', marginTop:'1rem', display:'inline-block' } }, '← Back to homepage'))
+        );
+      }
+
       var stateStep = useState(1); var step = stateStep[0]; var setStep = stateStep[1];
       var stateForm = useState({
         city: '', neighborhood: '', property_types: [],
         check_in: '', check_out: '', flexibility_days: 0,
         adults: 2, children: 0, infants: 0, pets: false,
         budget_min: 50, budget_max: 200, amenities: [], min_stars: 0,
-        special_requests: '', guest_name: '', guest_email: '', guest_phone: '',
-        privacy: false
+        special_requests: '',
+        guest_name: user.name || user.given_name || '',
+        guest_email: user.email || '',
+        guest_phone: user.phone || '',
+        privacy: true
       });
       var form = stateForm[0]; var setForm = stateForm[1];
       var stateSubmitting = useState(false); var submitting = stateSubmitting[0]; var setSubmitting = stateSubmitting[1];
@@ -4919,58 +5057,65 @@
           if (nights < 1) { setFormError('Check-out must be after check-in.'); return false; }
         }
         if (s === 3 && form.adults < 1) { setFormError('At least 1 adult required.'); return false; }
-        if (s === 5) {
-          if (!form.guest_name.trim()) { setFormError('Please enter your name.'); return false; }
-          if (!form.guest_email.trim() || !/^[^@]+@[^@]+\.[^@]+$/.test(form.guest_email)) { setFormError('Please enter a valid email.'); return false; }
-          if (!form.privacy) { setFormError('Please accept the privacy policy.'); return false; }
-        }
         return true;
       };
 
       var handleNext = function() {
         if (!validateStep(step)) return;
-        if (step < 5) setStep(step + 1);
+        if (step < 4) setStep(step + 1);
         else handleSubmit();
       };
 
       var handleSubmit = function() {
-        if (!validateStep(5)) return;
-        setSubmitting(true);
+        setSubmitting(true); setFormError('');
         var payload = Object.assign({}, form);
         fetch(SUPABASE_URL + '/rest/v1/rfq_requests', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Prefer': 'return=representation' },
           body: JSON.stringify({
-            guest_name: payload.guest_name, guest_email: payload.guest_email, guest_phone: payload.guest_phone || null,
+            guest_name: payload.guest_name || (user.name || user.given_name || 'Guest'),
+            guest_email: payload.guest_email || user.email,
+            guest_phone: payload.guest_phone || null,
             city: payload.city, neighborhood: payload.neighborhood || null,
             check_in: payload.check_in, check_out: payload.check_out, flexibility_days: payload.flexibility_days,
             adults: payload.adults, children: payload.children, infants: payload.infants, pets: payload.pets,
-            property_types: payload.property_types, budget_min: payload.budget_min, budget_max: payload.budget_max,
-            amenities: payload.amenities, min_stars: payload.min_stars, special_requests: payload.special_requests || null
+            property_types: payload.property_types.length ? payload.property_types : null,
+            budget_min: payload.budget_min, budget_max: payload.budget_max,
+            amenities: payload.amenities.length ? payload.amenities : null,
+            min_stars: payload.min_stars, special_requests: payload.special_requests || null
           })
-        }).then(function(r) { return r.json(); }).then(function(data) {
-          var token = Array.isArray(data) ? data[0].guest_token : data.guest_token;
+        }).then(function(r) {
+          if (!r.ok) { return r.text().then(function(t){ throw new Error(t); }); }
+          return r.json();
+        }).then(function(data) {
+          var row = Array.isArray(data) ? data[0] : data;
+          var token = row && row.guest_token;
           if (token) {
             setSuccessToken(token);
-            // Trigger matching edge function
+            // Fire-and-forget: trigger matching + admin notification edge function
             fetch(SUPABASE_URL + '/functions/v1/rfq-match', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
-              body: JSON.stringify({ rfq_id: Array.isArray(data) ? data[0].id : data.id, batch: 1 })
+              body: JSON.stringify({ rfq_id: row.id, batch: 1 })
             }).catch(function() {});
           } else {
-            setFormError('Submission failed. Please try again.');
+            setFormError('Submission failed: no confirmation token. Make sure the rfq_requests table is set up in Supabase (run rfq_schema.sql).');
           }
-        }).catch(function() { setFormError('Network error. Please try again.'); })
-          .finally(function() { setSubmitting(false); });
+        }).catch(function(err) {
+          console.error('RFQ submit error:', err);
+          setFormError('Error: ' + (err.message || 'Network error. Please try again.'));
+        }).finally(function() { setSubmitting(false); });
       };
 
-      var stepTitles = ['Location','Dates','Party Size','Budget & Preferences','Your Details'];
+      var TOTAL_STEPS = 4;
+      var stepTitles = ['Location','Dates','Party Size','Budget & Preferences'];
       var inputStyle = { width:'100%', padding:'0.6rem 0.8rem', border:'1px solid #ddd', borderRadius:'7px', fontSize:'0.95rem', boxSizing:'border-box' };
       var labelStyle = { display:'block', fontWeight:600, fontSize:'0.85rem', color:'#444', marginBottom:'0.35rem' };
       var stepperStyle = { display:'flex', alignItems:'center', gap:'0.8rem' };
       var stepperBtnStyle = { width:'36px', height:'36px', borderRadius:'50%', border:'1px solid #ddd', background:'#f9f9f9', fontSize:'1.2rem', cursor:'pointer', fontWeight:700 };
       var stepperValStyle = { fontWeight:700, fontSize:'1.1rem', minWidth:'28px', textAlign:'center' };
+      // Neighborhoods for selected city (from CITY_NEIGHBORHOODS map, or empty array for free text)
+      var cityNeighborhoods = CITY_NEIGHBORHOODS[form.city] || [];
 
       if (successToken) {
         return e('div', { style: { maxWidth:'520px', margin:'4rem auto', padding:'2rem', textAlign:'center' } },
@@ -4992,13 +5137,17 @@
           e('h2', { style: { color:'var(--primary-blue)', fontSize:'1.6rem', marginBottom:'0.4rem' } }, '🏠 Request a Quote'),
           e('p', { style: { color:'#666', fontSize:'0.95rem' } }, 'Tell us what you\'re looking for and we\'ll contact the best-matched hosts on your behalf.')
         ),
+        // Signed-in user banner
+        e('div', { style:{ background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'8px', padding:'0.5rem 1rem', marginBottom:'1rem', fontSize:'0.85rem', color:'#166534', display:'flex', alignItems:'center', gap:'0.5rem' } },
+          e('span', null, '✅ Signed in as '), e('strong', null, user.email || user.name)
+        ),
         // Progress bar
         e('div', { style: { display:'flex', gap:'4px', marginBottom:'1.5rem' } },
-          [1,2,3,4,5].map(function(i) {
+          [1,2,3,4].map(function(i) {
             return e('div', { key:i, style:{flex:1, height:'5px', borderRadius:'3px', background: i < step ? 'var(--primary-blue)' : i === step ? 'var(--primary-blue-light)' : '#e5e7eb'} });
           })
         ),
-        e('div', { style: { color:'#999', fontSize:'0.8rem', marginBottom:'1.5rem' } }, 'Step ' + step + ' of 5 — ' + stepTitles[step-1]),
+        e('div', { style: { color:'#999', fontSize:'0.8rem', marginBottom:'1.5rem' } }, 'Step ' + step + ' of ' + TOTAL_STEPS + ' — ' + stepTitles[step-1]),
 
         // Step content
         e('div', { style: { background:'white', border:'1px solid #e5e7eb', borderRadius:'12px', padding:'1.5rem' } },
@@ -5007,18 +5156,30 @@
           step === 1 && e('div', null,
             e('h3', { style: { marginBottom:'1.2rem', color:'#222' } }, '📍 Where are you looking?'),
             e('div', { style: { marginBottom:'1rem' } },
-              e('label', { style: labelStyle }, 'City or Region *'),
+              e('label', { style: labelStyle }, 'City *'),
               e('select', {
                 style: inputStyle, value: form.city,
-                onChange: function(ev) { updateForm('city', ev.target.value); }
+                onChange: function(ev) { updateForm('city', ev.target.value); updateForm('neighborhood', ''); }
               },
-                e('option', { value:'' }, '-- Select city --'),
-                REGIONS_LIST.map(function(r) { return e('option', { key:r, value:r }, r); })
+                e('option', { value:'' }, allCities.length ? '-- Select a city (' + allCities.length + ' available) --' : '-- Loading cities... --'),
+                allCities.map(function(c) { return e('option', { key:c, value:c }, c); })
               )
             ),
-            e('div', { style: { marginBottom:'1rem' } },
+            form.city && e('div', { style: { marginBottom:'1rem' } },
               e('label', { style: labelStyle }, 'Neighborhood or Metro Station'),
-              e('input', { type:'text', style:inputStyle, placeholder:'e.g. Trastevere, Pigneto, Colosseum area', value:form.neighborhood, onChange:function(ev){updateForm('neighborhood',ev.target.value);} })
+              cityNeighborhoods.length > 0
+                ? e('select', {
+                    style: inputStyle, value: form.neighborhood,
+                    onChange: function(ev) { updateForm('neighborhood', ev.target.value); }
+                  },
+                    e('option', { value:'' }, '-- Any area (or select specific) --'),
+                    cityNeighborhoods.map(function(n) { return e('option', { key:n, value:n }, n); }),
+                    e('option', { value:'__custom__' }, '✏️ Type a different area...')
+                  )
+                : e('input', { type:'text', style:inputStyle, placeholder:'e.g. Trastevere, Pigneto, Colosseum area', value:form.neighborhood, onChange:function(ev){updateForm('neighborhood',ev.target.value);} })
+            ),
+            form.neighborhood === '__custom__' && e('div', { style:{marginBottom:'1rem',marginTop:'-0.5rem'} },
+              e('input', { type:'text', style:inputStyle, placeholder:'Type your neighborhood or area...', autoFocus:true, onChange:function(ev){updateForm('neighborhood',ev.target.value==='__custom__'?'':ev.target.value);} })
             ),
             e('div', null,
               e('label', { style: labelStyle }, 'Property Type (select all that apply)'),
@@ -5142,29 +5303,26 @@
             )
           ),
 
-          // STEP 5: Contact
-          step === 5 && e('div', null,
-            e('h3', { style: { marginBottom:'1.2rem', color:'#222' } }, '👤 Your Contact Details'),
-            e('p', { style:{color:'#888', fontSize:'0.85rem', marginBottom:'1.2rem'} }, 'Your details are only shared with the host you choose to book with.'),
-            e('div', { style:{marginBottom:'0.9rem'} },
-              e('label', { style:labelStyle }, 'Full Name *'),
-              e('input', { type:'text', style:inputStyle, placeholder:'e.g. Maria Rossi', value:form.guest_name, onChange:function(ev){updateForm('guest_name',ev.target.value);} })
+          // STEP 4 extra: special requests + review
+          step === 4 && e('div', null,
+            e('div', { style:{marginTop:'1.2rem'} },
+              e('label', { style:labelStyle }, 'Message to hosts (optional)'),
+              e('textarea', { style:Object.assign({},inputStyle,{height:'80px',resize:'vertical'}), placeholder:'Any special requests, arrival time, accessibility needs...', value:form.special_requests, onChange:function(ev){updateForm('special_requests',ev.target.value);} })
             ),
-            e('div', { style:{marginBottom:'0.9rem'} },
-              e('label', { style:labelStyle }, 'Email Address *'),
-              e('input', { type:'email', style:inputStyle, placeholder:'you@email.com', value:form.guest_email, onChange:function(ev){updateForm('guest_email',ev.target.value);} })
-            ),
-            e('div', { style:{marginBottom:'0.9rem'} },
-              e('label', { style:labelStyle }, 'Phone (optional — for WhatsApp quotes)'),
+            e('div', { style:{marginTop:'1.2rem'} },
+              e('label', { style:labelStyle }, 'Phone (optional — for WhatsApp/SMS quotes from hosts)'),
               e('input', { type:'tel', style:inputStyle, placeholder:'+39 333 1234567', value:form.guest_phone, onChange:function(ev){updateForm('guest_phone',ev.target.value);} })
             ),
-            e('div', { style:{marginBottom:'0.9rem'} },
-              e('label', { style:labelStyle }, 'Message to hosts (optional)'),
-              e('textarea', { style:Object.assign({},inputStyle,{height:'80px',resize:'vertical'}), placeholder:'Any special requests or info that might help...', value:form.special_requests, onChange:function(ev){updateForm('special_requests',ev.target.value);} })
-            ),
-            e('div', { style:{display:'flex', alignItems:'flex-start', gap:'0.6rem'} },
-              e('input', { type:'checkbox', id:'rfq-privacy', checked:form.privacy, onChange:function(ev){updateForm('privacy',ev.target.checked);}, style:{marginTop:'2px'} }),
-              e('label', { htmlFor:'rfq-privacy', style:{fontSize:'0.82rem', color:'#666', cursor:'pointer'} }, 'I agree to the DirectBookingsItaly.com privacy policy and consent to sharing my contact details with hosts I choose to book with.')
+            e('div', { style:{background:'#f9fafb', border:'1px solid #e5e7eb', borderRadius:'8px', padding:'1rem', marginTop:'1.2rem'} },
+              e('div', { style:{fontWeight:600, fontSize:'0.85rem', color:'#444', marginBottom:'0.6rem'} }, '📋 Request Summary'),
+              e('div', { style:{fontSize:'0.85rem', color:'#555', lineHeight:'1.7'} },
+                e('div', null, '📍 ', e('strong', null, form.city || '—'), form.neighborhood && form.neighborhood !== '__custom__' ? ' — ' + form.neighborhood : ''),
+                e('div', null, '📅 ', form.check_in || '—', ' → ', form.check_out || '—', ' (', nights, ' nights', form.flexibility_days ? ', ±' + form.flexibility_days + ' days flex' : '', ')'),
+                e('div', null, '👥 ', form.adults, ' adult', form.adults > 1 ? 's' : '', form.children ? ', ' + form.children + ' children' : '', form.infants ? ', ' + form.infants + ' infants' : '', form.pets ? ', pets' : ''),
+                e('div', null, '💶 €', form.budget_min, ' – €', form.budget_max, '/night', form.min_stars > 0 ? ', ' + form.min_stars + '★+' : ''),
+                form.amenities.length > 0 && e('div', null, '✅ ', form.amenities.join(', ')),
+                e('div', null, '👤 Sent as: ', e('strong', null, user.email || user.name))
+              )
             )
           )
         ),
@@ -5181,7 +5339,7 @@
             type:'button', className:'cta-button',
             style:{flex:1, padding:'0.7rem 1.5rem', opacity:submitting?0.7:1, cursor:submitting?'not-allowed':'pointer'},
             onClick: handleNext, disabled: submitting
-          }, submitting ? 'Sending...' : step < 5 ? 'Next →' : '🚀 Send Quote Request')
+          }, submitting ? 'Sending...' : step < TOTAL_STEPS ? 'Next →' : '🚀 Send Quote Request')
         )
       );
     }
@@ -5696,7 +5854,7 @@
         currentPage === 'blog' ? e(BlogPage, { onNavigate: handleNavigate }) :
         currentPage === 'blogpost' ? e(BlogPost, { slug: pageState.postSlug, handleBack: function() { handleNavigate('blog'); }, onNavigate: handleNavigate }) :
         currentPage === 'about' ? e(AboutPage, { onNavigate: handleNavigate }) :
-        currentPage === 'request-quote' ? e(RFQPage, { onNavigate: handleNavigate }) :
+        currentPage === 'request-quote' ? e(RFQPage, { onNavigate: handleNavigate, user: user, listings: listings }) :
         currentPage === 'quote-request' ? e(RFQTrackingPage, { token: pageState.guestToken }) :
         currentPage === 'respond-to-quote' ? e(HostQuotePage, { respondToken: pageState.respondToken }) :
         currentPage === 'unsubscribe' ? (function() {
