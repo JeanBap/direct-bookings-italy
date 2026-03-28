@@ -4552,7 +4552,7 @@
       var stateName = useState('');
       var name = stateName[0];
       var setName = stateName[1];
-      var stateRole = useState('guest');
+      var stateRole = useState(function(){ try { var r = sessionStorage.getItem('loginDefaultRole'); if(r){sessionStorage.removeItem('loginDefaultRole');} return r||'guest'; } catch(e){ return 'guest'; } });
       var role = stateRole[0];
       var setRole = stateRole[1];
       var stateLoginNotice = useState(null);
@@ -5390,20 +5390,29 @@
       var stateLoading = useState(true); var loading = stateLoading[0]; var setLoading = stateLoading[1];
       var stateAccepting = useState(null); var accepting = stateAccepting[0]; var setAccepting = stateAccepting[1];
       var stateAccepted = useState(null); var accepted = stateAccepted[0]; var setAccepted = stateAccepted[1];
+      var stateHostsNotified = useState(0); var hostsNotified = stateHostsNotified[0]; var setHostsNotified = stateHostsNotified[1];
 
       useEffect(function() {
         if (!token) return;
         var load = function() {
+          var rfqId = null;
           fetch(SUPABASE_URL + '/rest/v1/rfq_requests?guest_token=eq.' + token + '&select=*', { headers:{'apikey':SUPABASE_KEY} })
             .then(function(r){return r.json();})
             .then(function(data) {
               var r = Array.isArray(data) && data[0];
               if (!r) { setLoading(false); return; }
+              rfqId = r.id;
               setRfq(r);
               return fetch(SUPABASE_URL + '/rest/v1/rfq_quotes?rfq_id=eq.' + r.id + '&status=neq.expired&order=created_at.asc&select=*', { headers:{'apikey':SUPABASE_KEY} });
             })
             .then(function(r){return r && r.json();})
-            .then(function(qs){ if(qs) setQuotes(qs); })
+            .then(function(qs){
+              if(qs) setQuotes(qs);
+              if(rfqId) return fetch(SUPABASE_URL + '/rest/v1/rfq_outreach?rfq_id=eq.' + rfqId + '&select=id', { headers:{'apikey':SUPABASE_KEY, 'Prefer':'count=exact', 'Range':'0-0'} });
+            })
+            .then(function(r){
+              if(r) { var ct = r.headers && r.headers.get('Content-Range'); if(ct){ var m = ct.match(/\/(\d+)/); if(m) setHostsNotified(parseInt(m[1])); } }
+            })
             .catch(function(){})
             .finally(function(){setLoading(false);});
         };
@@ -5455,7 +5464,7 @@
           e('div', { style:{display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:'0.5rem'} },
             e('div', null,
               e('h2', { style:{margin:0, fontSize:'1.3rem'} }, '📊 Your Quote Request'),
-              e('div', { style:{opacity:0.85, marginTop:'0.3rem', fontSize:'0.9rem'} }, rfq.city + ' · ' + rfq.check_in + ' → ' + rfq.check_out + ' · ' + rfq.adults + ' guest' + (rfq.adults>1?'s':''))
+              e('div', { style:{opacity:0.85, marginTop:'0.3rem', fontSize:'0.9rem'} }, rfq.city + ' · ' + fmtDate(rfq.check_in) + ' → ' + fmtDate(rfq.check_out) + ' · ' + rfq.adults + ' guest' + (rfq.adults>1?'s':''))
             ),
             e('div', { style:{background:'rgba(255,255,255,0.2)', borderRadius:'20px', padding:'0.35rem 0.8rem', fontSize:'0.82rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em'} }, rfq.status)
           )
@@ -5463,7 +5472,8 @@
 
         // Stats bar
         e('div', { style:{background:'white', border:'1px solid #e5e7eb', borderTop:'none', padding:'1rem 1.5rem', display:'flex', gap:'2rem', flexWrap:'wrap'} },
-          e('div', null, e('div', { style:{fontWeight:700, color:'var(--primary-blue)', fontSize:'1.3rem'} }, pendingQuotes.length), e('div', { style:{color:'#888', fontSize:'0.78rem'} }, 'Active quotes')),
+          e('div', null, e('div', { style:{fontWeight:700, color:'var(--primary-blue)', fontSize:'1.3rem'} }, hostsNotified || '—'), e('div', { style:{color:'#888', fontSize:'0.78rem'} }, 'Hosts notified')),
+          e('div', null, e('div', { style:{fontWeight:700, color:'var(--primary-blue)', fontSize:'1.3rem'} }, pendingQuotes.length), e('div', { style:{color:'#888', fontSize:'0.78rem'} }, 'Quotes received')),
           e('div', null, e('div', { style:{fontWeight:700, fontSize:'1.3rem'} }, nights), e('div', { style:{color:'#888', fontSize:'0.78rem'} }, 'Nights')),
           e('div', null, e('div', { style:{fontWeight:700, fontSize:'1.3rem'} }, '€' + (rfq.budget_min||'?') + '–€' + (rfq.budget_max||'?')), e('div', { style:{color:'#888', fontSize:'0.78rem'} }, 'Budget/night')),
           rfq.status === 'active' && e('div', { style:{marginLeft:'auto'} },
@@ -5482,7 +5492,7 @@
           rfq.status === 'active' && pendingQuotes.length === 0 && e('div', { style:{background:'#fffbeb', border:'1px solid #fde68a', borderRadius:'10px', padding:'1.5rem', textAlign:'center', color:'#92400e'} },
             e('div', { style:{fontSize:'2rem', marginBottom:'0.5rem'} }, '⏳'),
             e('p', { style:{fontWeight:600} }, 'Searching for matches...'),
-            e('p', { style:{fontSize:'0.85rem', marginTop:'0.3rem'} }, 'We\'ve contacted the top ' + rfq.current_batch * 10 + ' matching hosts. Quotes appear here in real-time.')
+            e('p', { style:{fontSize:'0.85rem', marginTop:'0.3rem'} }, 'We\'ve notified ' + (hostsNotified || rfq.current_batch * 10 || '...') + ' matching hosts. Quotes appear here in real-time.')
           ),
           quotes.filter(function(q){return q.status!=='expired';}).map(function(q) {
             var isAccepted = q.status === 'accepted' || q.id === accepted;
@@ -5526,6 +5536,21 @@
     // ============================================================
     // HOST QUOTE RESPONSE PAGE — Host responds to a quote request
     // ============================================================
+    function fmtDate(iso) {
+      if (!iso) return '';
+      var d = new Date(iso + 'T00:00:00');
+      return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    }
+    function timeRemaining(isoExpiry) {
+      var ms = new Date(isoExpiry) - Date.now();
+      if (ms <= 0) return null;
+      var h = Math.floor(ms / 3600000);
+      var m = Math.floor((ms % 3600000) / 60000);
+      if (h >= 24) return Math.floor(h/24) + 'd ' + (h%24) + 'h left';
+      if (h > 0) return h + 'h ' + m + 'm left';
+      return m + 'm left';
+    }
+
     function HostQuotePage(props) {
       var respondToken = props.respondToken;
       var user = props.user;
@@ -5536,7 +5561,7 @@
       var stateSubmitted = useState(false); var submitted = stateSubmitted[0]; var setSubmitted = stateSubmitted[1];
       var stateDeclined = useState(false); var declined = stateDeclined[0]; var setDeclined = stateDeclined[1];
       var stateError = useState(''); var formError = stateError[0]; var setFormError = stateError[1];
-      var stateForm = useState({ price_per_night:'', cleaning_fee:'', host_message:'', valid_hours:48, host_email:'', host_phone:'', host_website:'' });
+      var stateForm = useState({ price_per_night:'', cleaning_fee:'', host_message:'', valid_hours:48, host_email: user ? (user.email||'') : '', host_phone: user ? (user.phone||'') : '', host_website:'' });
       var quoteForm = stateForm[0]; var setQuoteForm = stateForm[1];
       var stateSubmitting = useState(false); var submitting = stateSubmitting[0]; var setSubmitting = stateSubmitting[1];
 
@@ -5600,13 +5625,24 @@
       var labelStyle = { display:'block', fontWeight:600, fontSize:'0.85rem', color:'#444', marginBottom:'0.35rem' };
 
       // Auth gate — host must be signed in to submit a quote
-      if (!user) return e('div', { style:{maxWidth:'500px',margin:'4rem auto',padding:'2rem',textAlign:'center'} },
-        e('div', { style:{fontSize:'3rem',marginBottom:'1rem'} }, '🔒'),
-        e('h2', { style:{color:'var(--primary-blue)',marginBottom:'0.5rem'} }, 'Sign in to Submit Your Quote'),
-        e('p', { style:{color:'#666',marginBottom:'1.5rem',lineHeight:'1.6'} }, 'Create a free host account or sign in to respond to this request and manage all your bookings in one place.'),
-        e('button', { className:'cta-button', style:{marginBottom:'1rem'}, onClick:function(){ if(onNavigate) onNavigate('login'); else window.location.hash='#/login'; } }, 'Sign In / Create Account'),
-        e('p', null, e('a', { href:'#/home', style:{color:'#999',fontSize:'0.85rem',marginTop:'1rem',display:'inline-block'} }, '\u2190 Back to homepage'))
-      );
+      if (!user) {
+        var nights = rfq ? Math.round((new Date(rfq.check_out)-new Date(rfq.check_in))/86400000) : 0;
+        return e('div', { style:{maxWidth:'500px',margin:'4rem auto',padding:'2rem',textAlign:'center'} },
+          e('div', { style:{fontSize:'3rem',marginBottom:'1rem'} }, '🔒'),
+          e('h2', { style:{color:'var(--primary-blue)',marginBottom:'0.5rem'} }, 'Sign in to Submit Your Quote'),
+          rfq && e('div', { style:{background:'#eff6ff',border:'1px solid #bfdbfe',borderRadius:'10px',padding:'1rem',marginBottom:'1.2rem',textAlign:'left',fontSize:'0.88rem',lineHeight:'1.8'} },
+            e('div', null, e('strong', null, '📍 '), rfq.city + (rfq.neighborhood ? ' — ' + rfq.neighborhood : '')),
+            e('div', null, e('strong', null, '📅 '), fmtDate(rfq.check_in) + ' → ' + fmtDate(rfq.check_out) + (nights ? ' (' + nights + ' nights)' : '')),
+            e('div', null, e('strong', null, '💶 '), '€' + (rfq.budget_min||'?') + ' – €' + (rfq.budget_max||'?') + ' / night')
+          ),
+          e('p', { style:{color:'#666',marginBottom:'1.5rem',lineHeight:'1.6'} }, 'Create a free host account or sign in to respond to this request and manage all your bookings in one place.'),
+          e('button', { className:'cta-button', style:{marginBottom:'1rem'}, onClick:function(){
+            try { sessionStorage.setItem('loginDefaultRole','host'); } catch(e){}
+            if(onNavigate) onNavigate('login'); else window.location.hash='#/login';
+          } }, 'Sign In / Create Account'),
+          e('p', null, e('a', { href:'#/home', style:{color:'#999',fontSize:'0.85rem',marginTop:'1rem',display:'inline-block'} }, '\u2190 Back to homepage'))
+        );
+      }
 
       if (loading) return e('div', { style:{textAlign:'center',padding:'4rem',color:'#888'} }, '⏳ Loading request details...');
       if (!outreach || !rfq) return e('div', { style:{textAlign:'center',padding:'4rem'} }, e('p', null, 'Request not found or link expired.'));
@@ -5648,7 +5684,7 @@
           e('h3', { style:{color:'var(--primary-blue)',marginBottom:'0.8rem',fontSize:'1rem'} }, '📩 Guest Request Details'),
           e('div', { style:{display:'grid',gridTemplateColumns:'auto 1fr',gap:'0.4rem 1rem',fontSize:'0.88rem'} },
             e('span', { style:{fontWeight:600} }, '📍'), e('span', null, rfq.city + (rfq.neighborhood ? ' — ' + rfq.neighborhood : '')),
-            e('span', { style:{fontWeight:600} }, '📅'), e('span', null, rfq.check_in + ' → ' + rfq.check_out + ' (' + nights + ' nights)'),
+            e('span', { style:{fontWeight:600} }, '📅'), e('span', null, fmtDate(rfq.check_in) + ' → ' + fmtDate(rfq.check_out) + ' (' + nights + ' nights)'),
             e('span', { style:{fontWeight:600} }, '👥'), e('span', null, rfq.adults + ' adult' + (rfq.adults>1?'s':'') + (rfq.children?' + '+rfq.children+' children':'') + (rfq.pets?' + pets':'')),
             e('span', { style:{fontWeight:600} }, '💶'), e('span', null, '€' + (rfq.budget_min||'?') + ' – €' + (rfq.budget_max||'?') + ' / night'),
             rfq.amenities && rfq.amenities.length > 0 && e('span', { style:{fontWeight:600} }, '✅'),
@@ -5667,7 +5703,7 @@
         // Timer warning
         e('div', { style:{background:'#fff7ed',border:'1px solid #fed7aa',borderRadius:'8px',padding:'0.7rem 1rem',marginBottom:'1.5rem',fontSize:'0.85rem',color:'#9a3412',display:'flex',alignItems:'center',gap:'0.5rem'} },
           e('span', null, '⏰'),
-          e('span', null, 'Response window: 24 hours from notification. Expires: ' + new Date(outreach.expires_at).toLocaleString())
+          e('span', null, (function(){ var tr = timeRemaining(outreach.expires_at); return tr ? ('Quote window open — ' + tr) : 'Quote window has expired'; }()))
         ),
 
         // Quote form
@@ -5716,7 +5752,7 @@
           }, submitting ? 'Sending...' : '📤 Send My Quote'),
           e('button', {
             type:'button',
-            style:{flex:1, padding:'0.8rem', border:'1px solid #fca5a5', background:'#fef2f2', color:'var(--error)', borderRadius:'8px', cursor:'pointer', fontWeight:600},
+            style:{flex:1, padding:'0.8rem', border:'1px solid #d1d5db', background:'white', color:'#6b7280', borderRadius:'8px', cursor:'pointer', fontWeight:600},
             onClick:handleDecline
           }, '✗ Not available')
         ),
