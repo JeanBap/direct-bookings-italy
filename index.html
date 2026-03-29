@@ -27,7 +27,22 @@
       try {
         var resp = await fetch('enrichment_map.json');
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        return await resp.json();
+        var data = await resp.json();
+        try {
+          var imgResp = await fetch('enrichment_images.json');
+          if (imgResp.ok) {
+            var images = await imgResp.json();
+            var keys = Object.keys(images);
+            for (var i = 0; i < keys.length; i++) {
+              var k = keys[i];
+              if (!data[k]) data[k] = {};
+              data[k].img = images[k];
+            }
+          }
+        } catch(imgErr) {
+          console.warn('Images enrichment load failed:', imgErr);
+        }
+        return data;
       } catch(err) {
         console.warn('Enrichment load failed:', err);
         return {};
@@ -855,6 +870,129 @@
       border-radius: 50%;
       cursor: pointer;
       font-size: 1.2rem;
+    }
+
+    /* FAX SECTION */
+    .fax-section {
+      padding: 1rem;
+      background: #f0f8ff;
+      border: 1px solid #b3d9ff;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .fax-section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #003580;
+    }
+
+    .fax-number-display {
+      font-size: 1rem;
+      font-family: monospace;
+      background: white;
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      border: 1px solid #ddd;
+    }
+
+    .btn-send-fax {
+      padding: 0.6rem 1.2rem;
+      background: #0066d4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-send-fax:hover {
+      background: #003580;
+    }
+
+    .fax-modal-content {
+      padding: 2rem;
+    }
+
+    .fax-modal-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #003580;
+    }
+
+    .fax-info-box {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid #0066d4;
+    }
+
+    .fax-info-label {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 0.25rem;
+    }
+
+    .fax-info-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      font-family: monospace;
+      color: #003580;
+    }
+
+    .fax-message-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .fax-message-label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .fax-message-textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 0.8rem;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      resize: vertical;
+    }
+
+    .fax-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+
+    .fax-service-link {
+      padding: 0.6rem 1.2rem;
+      background: #0d7377;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .fax-service-link:hover {
+      background: #085d61;
+      text-decoration: none;
     }
 
     .property-type-grid {
@@ -1711,6 +1849,9 @@
           enriched.googleDesc = enr.desc || '';
           enriched.checkInTime = enr.ci || '';
           enriched.checkOutTime = enr.co || '';
+          enriched.email = enr.email || '';
+          enriched.phone = enr.phone || '';
+          enriched.fax = enr.fax || '';
           enriched.hasGoogle = true;
         } else {
           enriched.hasGoogle = false;
@@ -2683,6 +2824,54 @@
       );
     }
 
+    function SendFaxModal(props) {
+      var faxNumber = props.faxNumber;
+      var propertyName = props.propertyName;
+      var stateMessage = useState('');
+      var message = stateMessage[0];
+      var setMessage = stateMessage[1];
+
+      var handleOpenFaxService = function() {
+        var faxServiceUrl = 'https://www.fax.plus/send?recipient=' + encodeURIComponent(faxNumber);
+        window.open(faxServiceUrl, '_blank');
+      };
+
+      return e('div', { className: 'modal-overlay', onClick: function() { props.onClose(); } },
+        e('div', { className: 'modal', onClick: function(ev) { ev.stopPropagation(); } },
+          e('button', { className: 'modal-close', onClick: function() { props.onClose(); } }, 'X'),
+          e('div', { className: 'fax-modal-content' },
+            e('div', { className: 'fax-modal-title' }, 'Send a Fax to ' + propertyName),
+            e('div', { className: 'fax-info-box' },
+              e('div', { className: 'fax-info-label' }, 'Fax Number:'),
+              e('div', { className: 'fax-info-value' }, faxNumber)
+            ),
+            e('div', { className: 'fax-message-group' },
+              e('label', { className: 'fax-message-label' }, 'Message (optional):'),
+              e('textarea', {
+                className: 'fax-message-textarea',
+                value: message,
+                placeholder: 'Type your message here... (You can leave this blank and send via fax.plus)',
+                onChange: function(evt) { setMessage(evt.target.value); }
+              })
+            ),
+            e('div', { className: 'fax-actions' },
+              e('button', { className: 'btn-secondary', onClick: function() { props.onClose(); } }, 'Cancel'),
+              e('a', {
+                className: 'fax-service-link',
+                href: 'https://www.fax.plus/send?recipient=' + encodeURIComponent(faxNumber),
+                target: '_blank',
+                rel: 'noopener noreferrer',
+                onClick: function() { setMessage(''); }
+              }, 'Open Fax Service (fax.plus)')
+            ),
+            e('div', { style: { marginTop: '1rem', padding: '1rem', background: '#f0f0f0', borderRadius: '4px', fontSize: '0.85rem', color: '#666' } },
+              'Tip: Click "Open Fax Service" to use fax.plus to send this fax. You can paste your message there before sending, or send without a message.'
+            )
+          )
+        )
+      );
+    }
+
     function MapPage(props) {
       var listings = props.listings;
       var onSelectProperty = props.onSelectProperty;
@@ -2931,6 +3120,9 @@
       var stateNotice = useState(null);
       var notice = stateNotice[0];
       var setNotice = stateNotice[1];
+      var stateShowFaxModal = useState(false);
+      var showFaxModal = stateShowFaxModal[0];
+      var setShowFaxModal = stateShowFaxModal[1];
 
       useEffect(function() {
         if (user && prop) {
@@ -3054,6 +3246,14 @@
                 e('div', { className: 'address-text' }, prop.street + ' ' + (prop.number || '') + ', ' + (prop.cap || '') + ' ' + prop.comune),
                 e('div', { className: 'address-label', style: { marginTop: '0.3rem' } }, prop.neighborhood + ', ' + prop.provincia + ', ' + prop.region)
               ),
+              prop.fax ? e('div', { className: 'fax-section' },
+                e('div', { className: 'fax-section-header' },
+                  e('span', null, '📠 Fax'),
+                  e('span', null, 'Contact by Fax')
+                ),
+                e('div', { className: 'fax-number-display' }, prop.fax),
+                e('button', { className: 'btn-send-fax', onClick: function() { setShowFaxModal(true); } }, 'Send Fax')
+              ) : null,
               e('div', { className: 'amenities-section' },
                 e('h3', null, 'Amenities'),
                 e('div', { className: 'card-amenities' },
@@ -3157,7 +3357,12 @@
               ) : null
             )
           )
-        )
+        ),
+        showFaxModal && prop.fax ? e(SendFaxModal, {
+          faxNumber: prop.fax,
+          propertyName: prop.name,
+          onClose: function() { setShowFaxModal(false); }
+        }) : null
       );
     }
 
