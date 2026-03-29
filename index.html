@@ -2870,21 +2870,31 @@
 
     function AboutPage(props) {
       var onNavigate = props.onNavigate;
+      var listings = props.listings || [];
       var sc = JSON.parse(localStorage.getItem('ad_site_content') || 'null') || {};
+      var propertyCount = listings.length > 0 ? listings.length.toLocaleString() + '+' : (sc.aboutStat1 || '63,000+');
+      var citySet = {};
+      var regionSet = {};
+      listings.forEach(function(l) {
+        if (l.comune) citySet[l.comune] = true;
+        if (l.region) regionSet[l.region] = true;
+      });
+      var cityCount = Object.keys(citySet).length > 0 ? Object.keys(citySet).length.toLocaleString() : (sc.aboutStat2 || '2,040');
+      var regionCount = Object.keys(regionSet).length > 0 ? String(Object.keys(regionSet).length) : (sc.aboutStat3 || '20');
       return e('div', { className: 'about-container' },
         e('h1', null, sc.aboutTitle || 'About DirectBookingsItaly.com'),
         e('p', { style: { fontSize: '1.1rem' } }, sc.aboutIntro || 'We believe everyone deserves a fair deal when traveling in Italy.'),
         e('div', { className: 'about-stats' },
           e('div', { className: 'about-stat' },
-            e('div', { className: 'about-stat-value' }, sc.aboutStat1 || '63,000+'),
+            e('div', { className: 'about-stat-value' }, propertyCount),
             e('div', { className: 'about-stat-label' }, sc.aboutStat1Label || 'Properties Listed')
           ),
           e('div', { className: 'about-stat' },
-            e('div', { className: 'about-stat-value' }, sc.aboutStat2 || '2,040'),
+            e('div', { className: 'about-stat-value' }, cityCount),
             e('div', { className: 'about-stat-label' }, sc.aboutStat2Label || 'Cities Covered')
           ),
           e('div', { className: 'about-stat' },
-            e('div', { className: 'about-stat-value' }, sc.aboutStat3 || '20'),
+            e('div', { className: 'about-stat-value' }, regionCount),
             e('div', { className: 'about-stat-label' }, sc.aboutStat3Label || 'Italian Regions')
           )
         ),
@@ -2900,7 +2910,7 @@
         e('p', null, sc.aboutWho2 || 'We started this project because we saw an opportunity to do something genuinely useful.'),
         e('div', { style: { marginTop: '2rem', padding: '1.5rem', background: '#f0f4ff', borderRadius: '12px', textAlign: 'center' } },
           e('h3', { style: { marginBottom: '0.5rem' } }, sc.aboutCTA || 'Ready to Book Direct?'),
-          e('p', { style: { color: '#666', marginBottom: '1rem' } }, sc.aboutCTADesc || 'Browse 63,000+ accommodations across all of Italy'),
+          e('p', { style: { color: '#666', marginBottom: '1rem' } }, sc.aboutCTADesc || ('Browse ' + propertyCount + ' accommodations across all of Italy')),
           e('button', { className: 'btn-primary', onClick: function() { onNavigate('search'); } }, 'Search Properties')
         )
       );
@@ -3522,10 +3532,11 @@
         return claimed.concat(created);
       }, [user, listings]);
 
-      var handleSearchProperties = function() {
-        if (!searchTerm.trim()) return;
+      var handleSearchProperties = function(term) {
+        var q = (term !== undefined ? term : searchTerm).trim().toLowerCase();
+        if (!q) { setSearchResults([]); return; }
         var filtered = listings.filter(function(p) {
-          return p.name.toLowerCase().includes(searchTerm.toLowerCase()) && !p.claimedBy;
+          return p.name && p.name.toLowerCase().includes(q) && !p.claimedBy;
         }).slice(0, 20);
         setSearchResults(filtered);
       };
@@ -3634,8 +3645,7 @@
           e('button', { className: 'back-btn', onClick: function() { setMode('list'); } }, '← Back'),
           e('h2', null, 'Claim Existing Property'),
           e('div', { style: { marginBottom: '1.5rem' } },
-            e('input', { className: 'form-input', type: 'text', placeholder: 'Search by property name...', value: searchTerm, onChange: function(evt) { setSearchTerm(evt.target.value); } }),
-            e('button', { className: 'btn-primary', onClick: handleSearchProperties, style: { marginTop: '0.5rem' } }, 'Search')
+            e('input', { className: 'form-input', type: 'text', placeholder: 'Start typing a property name...', value: searchTerm, onChange: function(evt) { setSearchTerm(evt.target.value); handleSearchProperties(evt.target.value); } })
           ),
           searchResults.length > 0 ? e('div', { className: 'search-results' },
             searchResults.map(function(prop) {
@@ -3645,7 +3655,7 @@
                 e('button', { className: 'btn-small', onClick: function() { handleClaimProperty(prop); } }, 'Claim This Property')
               );
             })
-          ) : searchTerm ? e('p', null, 'No properties found') : null
+          ) : searchTerm.trim().length > 1 ? e('p', { style: { color: '#888', fontStyle: 'italic' } }, 'No unclaimed properties found matching "' + searchTerm + '"') : searchTerm.trim().length > 0 ? e('p', { style: { color: '#aaa', fontSize: '0.9rem' } }, 'Keep typing to search...') : null
         ) : null,
         mode === 'create' ? e('div', null,
           e('button', { className: 'back-btn', onClick: function() { setMode('list'); setCreatingProperty(false); } }, '← Back'),
@@ -5076,7 +5086,6 @@
     function ComingSoonTab(props) {
       var user = props.user;
       var verticals = [
-        { id:'tiers', icon:'💳', title:'Subscription Tiers', desc:'Premium features & support for professional hosts', questions:['What features would you most value?','How much would you pay per month?','How many properties do you manage?'] },
         { id:'agriturismo', icon:'🌾', title:'Agriturismo Experiences', desc:'Farm stays, cooking classes, wine tours', questions:['What experiences do you offer?','How many guests per session?','Do you offer meals or classes?'] },
         { id:'monthly', icon:'📅', title:'Monthly Stays', desc:'Special rates for long-term bookings', questions:['Do you offer monthly rates?','What is your monthly discount %?','What is your minimum stay?'] },
         { id:'nomad', icon:'💻', title:'Digital Nomad', desc:'Fast WiFi, workspace, quiet areas for remote work', questions:['Upload speed? (Mbps)','Do you have a dedicated workspace?','Is the area quiet for work?'] },
@@ -6941,7 +6950,7 @@
         currentPage === 'admin' ? e(AdminPanel, { listings: listings, onBack: function() { handleNavigate('home'); } }) :
         currentPage === 'blog' ? e(BlogPage, { onNavigate: handleNavigate }) :
         currentPage === 'blogpost' ? e(BlogPost, { slug: pageState.postSlug, handleBack: function() { handleNavigate('blog'); }, onNavigate: handleNavigate }) :
-        currentPage === 'about' ? e(AboutPage, { onNavigate: handleNavigate }) :
+        currentPage === 'about' ? e(AboutPage, { onNavigate: handleNavigate, listings: listings }) :
         currentPage === 'request-quote' ? e(RFQPage, { onNavigate: handleNavigate, user: user, listings: listings }) :
         currentPage === 'quote-request' ? e(RFQTrackingPage, { token: pageState.guestToken }) :
         currentPage === 'respond-to-quote' ? e(HostQuotePage, { respondToken: pageState.respondToken, user: user, onNavigate: handleNavigate }) :
