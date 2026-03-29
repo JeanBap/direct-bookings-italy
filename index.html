@@ -2069,15 +2069,94 @@
       if (heroSub.indexOf('63,000') !== -1) heroSub = heroSub.replace('63,000+', totalCount.toLocaleString() + '+');
 
       return e('div', null,
-        e('div', { className: 'hero' },
-          e('div', { className: 'hero-content' },
-            e('h1', null, sc.heroTitle || 'Book Direct in Italy'),
-            e('p', null, heroSub),
+        // HERO: RFQ-first design
+        e('div', { style:{background:'linear-gradient(135deg, #003580 0%, #0052cc 50%, #003580 100%)',color:'white',padding:'3rem 2rem 2.5rem',textAlign:'center',position:'relative',overflow:'hidden'} },
+          // Subtle background pattern
+          e('div', { style:{position:'absolute',top:0,left:0,right:0,bottom:0,background:'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%)',pointerEvents:'none'} }),
+          e('div', { style:{maxWidth:'800px',margin:'0 auto',position:'relative',zIndex:1} },
+            e('div', { style:{fontSize:'0.85rem',fontWeight:600,color:'rgba(255,255,255,0.8)',marginBottom:'0.5rem',letterSpacing:'0.05em',textTransform:'uppercase'} }, totalCount.toLocaleString() + '+ properties across Italy'),
+            e('h1', { style:{fontSize:'2.4rem',fontWeight:800,lineHeight:1.2,marginBottom:'0.8rem'} }, 'Get the Best Price on Your Stay in Italy'),
+            e('p', { style:{fontSize:'1.15rem',color:'rgba(255,255,255,0.9)',maxWidth:'650px',margin:'0 auto 1.5rem',lineHeight:1.5} },
+              'Tell us where and when. We match you with multiple hosts who compete for your booking. No platform fees, no middleman. Just the best direct price.'
+            ),
+            // Value pills
+            e('div', { style:{display:'flex',justifyContent:'center',gap:'0.75rem',flexWrap:'wrap',marginBottom:'2rem'} },
+              [
+                {icon:'💰',text:'Save 15-25% vs. booking platforms'},
+                {icon:'📉',text:'Up to 50% off in low season'},
+                {icon:'🏆',text:'Hosts compete for your booking'}
+              ].map(function(v) {
+                return e('div', { key:v.text, style:{background:'rgba(255,255,255,0.12)',backdropFilter:'blur(4px)',border:'1px solid rgba(255,255,255,0.2)',borderRadius:'30px',padding:'0.5rem 1rem',fontSize:'0.88rem',fontWeight:600,display:'flex',alignItems:'center',gap:'0.4rem'} },
+                  e('span', null, v.icon), v.text
+                );
+              })
+            ),
+            // Main CTA
+            e('button', {
+              className:'cta-button',
+              style:{background:'#ff9500',color:'white',padding:'1rem 2.5rem',fontSize:'1.15rem',fontWeight:700,borderRadius:'12px',border:'none',cursor:'pointer',boxShadow:'0 4px 20px rgba(255,149,0,0.4)',transition:'transform 0.15s'},
+              onClick:function() { onNavigate('request-quote'); }
+            }, 'Get Free Quotes from Hosts'),
+            e('p', { style:{fontSize:'0.8rem',color:'rgba(255,255,255,0.6)',marginTop:'0.75rem'} }, 'Free. No account required. Takes 60 seconds.')
+          )
+        ),
+
+        // HOW IT WORKS: 3-step visual
+        e('div', { style:{background:'white',padding:'2.5rem 2rem',borderBottom:'1px solid #e5e7eb'} },
+          e('div', { style:{maxWidth:'900px',margin:'0 auto',textAlign:'center'} },
+            e('h2', { style:{fontSize:'1.5rem',fontWeight:800,color:'#0f172a',marginBottom:'0.4rem'} }, 'How It Works'),
+            e('p', { style:{color:'#64748b',marginBottom:'2rem'} }, 'Three steps to the best deal on your Italian accommodation'),
+            e('div', { style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'2rem'} },
+              [
+                {step:'1',icon:'📝',title:'Describe Your Trip',desc:'Tell us your destination, dates, guests, and budget. It takes 60 seconds.'},
+                {step:'2',icon:'📩',title:'Hosts Send You Quotes',desc:'We match you with top-rated hosts in your area. They compete to offer you the best price and terms.'},
+                {step:'3',icon:'🤝',title:'Pick the Best Offer',desc:'Compare quotes side-by-side. Accept the one you like. Book directly with the host, zero commission.'}
+              ].map(function(s) {
+                return e('div', { key:s.step, style:{textAlign:'center'} },
+                  e('div', { style:{width:'56px',height:'56px',borderRadius:'50%',background:'#eff6ff',color:'var(--primary-blue)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.8rem',margin:'0 auto 1rem'} }, s.icon),
+                  e('div', { style:{background:'var(--primary-blue)',color:'white',width:'22px',height:'22px',borderRadius:'50%',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'0.75rem',fontWeight:700,marginBottom:'0.5rem'} }, s.step),
+                  e('h3', { style:{fontSize:'1.05rem',fontWeight:700,color:'#0f172a',marginBottom:'0.4rem'} }, s.title),
+                  e('p', { style:{fontSize:'0.88rem',color:'#64748b',lineHeight:1.5} }, s.desc)
+                );
+              })
+            )
+          )
+        ),
+
+        // SAVINGS BANNER
+        e('div', { style:{background:'linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%)',borderTop:'3px solid #f59e0b',padding:'2rem',textAlign:'center'} },
+          e('div', { style:{maxWidth:'750px',margin:'0 auto'} },
+            e('h3', { style:{fontSize:'1.2rem',fontWeight:800,color:'#92400e',marginBottom:'0.6rem'} }, 'Why Guests Save More With Us'),
+            e('div', { style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1.5rem',marginBottom:'1.5rem'} },
+              [
+                {num:'0%',label:'Platform Fees',desc:'Booking platforms charge you hidden service fees of 10-18%. Here, zero.'},
+                {num:'5-15',label:'Hosts Compete',desc:'Multiple properties bid for your booking. More competition = lower prices for you.'},
+                {num:'50%',label:'Low Season Savings',desc:'During quiet months, hosts offer aggressive rates to fill calendars. You benefit.'}
+              ].map(function(s) {
+                return e('div', { key:s.label, style:{background:'white',borderRadius:'10px',padding:'1.2rem',boxShadow:'0 1px 4px rgba(0,0,0,0.06)'} },
+                  e('div', { style:{fontSize:'1.8rem',fontWeight:800,color:'#c4652a',marginBottom:'0.3rem'} }, s.num),
+                  e('div', { style:{fontWeight:700,color:'#92400e',fontSize:'0.85rem',marginBottom:'0.3rem'} }, s.label),
+                  e('div', { style:{fontSize:'0.8rem',color:'#b45309',lineHeight:1.4} }, s.desc)
+                );
+              })
+            ),
+            e('button', {
+              className:'cta-button',
+              style:{background:'var(--secondary-orange)',padding:'0.8rem 2rem',fontSize:'1rem'},
+              onClick:function() { onNavigate('request-quote'); }
+            }, 'Get Your Free Quotes Now')
+          )
+        ),
+
+        // SEARCH BAR: secondary option
+        e('div', { style:{background:'#f8fafc',padding:'2rem',textAlign:'center',borderBottom:'1px solid #e5e7eb'} },
+          e('div', { style:{maxWidth:'600px',margin:'0 auto'} },
+            e('p', { style:{fontWeight:600,color:'#374151',marginBottom:'0.75rem',fontSize:'0.95rem'} }, 'Or browse ' + totalCount.toLocaleString() + '+ properties directly'),
             e('div', { className: 'search-bar', style: { position: 'relative' } },
               e('div', { style: { position: 'relative', flex: 1 } },
                 e('input', {
                   type: 'text',
-                  placeholder: 'Where in Italy? Try Rome, Florence, Venice, Milano...',
+                  placeholder: 'Where in Italy? Try Rome, Florence, Venice...',
                   value: query,
                   onChange: function(ev) { setQuery(ev.target.value); setShowDropdown(true); },
                   onFocus: function() { setShowDropdown(true); },
@@ -2107,19 +2186,8 @@
             )
           )
         ),
-        e('div', { style: { background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%)', borderTop: '3px solid var(--secondary-orange)', padding: '1.5rem 2rem', textAlign: 'center' } },
-          e('div', { style: { maxWidth: '700px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' } },
-            e('div', { style: { textAlign: 'left' } },
-              e('div', { style: { fontWeight: 800, fontSize: '1.1rem', color: '#92400e', marginBottom: '0.2rem' } }, '🏠 Not sure where to start?'),
-              e('div', { style: { color: '#b45309', fontSize: '0.9rem' } }, 'Tell us what you need and we\'ll get quotes from the top matching hosts — free, no OTA fees.')
-            ),
-            e('button', {
-              className: 'cta-button',
-              style: { background: 'var(--secondary-orange)', whiteSpace: 'nowrap', padding: '0.7rem 1.6rem' },
-              onClick: function() { onNavigate('request-quote'); }
-            }, '📩 Request a Quote from Hosts')
-          )
-        ),
+
+        // FEATURED PROPERTIES
         e('div', { className: 'featured-section' },
           e('h2', { className: 'section-title' }, sc.featuredTitle || 'Featured Properties'),
           e('div', { className: 'property-grid' },
@@ -2128,6 +2196,8 @@
             })
           )
         ),
+
+        // WHY SECTION
         e('div', { className: 'why-section' },
           e('div', { className: 'why-content' },
             e('h2', null, sc.whyTitle || 'Why We Do It'),
@@ -2149,6 +2219,19 @@
             e('div', { style: { marginTop: '2rem' } },
               e('button', { className: 'btn-primary', style: { padding: '0.8rem 2rem' }, onClick: function() { onNavigate('about'); } }, sc.learnMoreBtn || 'Learn More About Us')
             )
+          )
+        ),
+
+        // BOTTOM CTA
+        e('div', { style:{background:'var(--primary-blue)',padding:'2.5rem 2rem',textAlign:'center',color:'white'} },
+          e('div', { style:{maxWidth:'600px',margin:'0 auto'} },
+            e('h2', { style:{fontSize:'1.5rem',fontWeight:800,marginBottom:'0.5rem'} }, 'Ready to Save on Your Italian Stay?'),
+            e('p', { style:{color:'rgba(255,255,255,0.8)',marginBottom:'1.5rem'} }, 'It takes 60 seconds. No signup required. Hosts will send you their best offers directly.'),
+            e('button', {
+              className:'cta-button',
+              style:{background:'#ff9500',padding:'1rem 2.5rem',fontSize:'1.1rem',fontWeight:700,border:'none',borderRadius:'12px',cursor:'pointer',boxShadow:'0 4px 20px rgba(255,149,0,0.4)'},
+              onClick:function() { onNavigate('request-quote'); }
+            }, 'Get Free Quotes Now')
           )
         )
       );
@@ -4217,6 +4300,7 @@
           e('button', { className: 'dashboard-tab' + (adminTab === 'featured' ? ' active' : ''), onClick: function() { setAdminTab('featured'); } }, 'Featured'),
           e('button', { className: 'dashboard-tab' + (adminTab === 'outreach' ? ' active' : ''), onClick: function() { setAdminTab('outreach'); } }, 'Outreach'),
           e('button', { className: 'dashboard-tab' + (adminTab === 'siteeditor' ? ' active' : ''), onClick: function() { setAdminTab('siteeditor'); } }, 'Site Editor'),
+          e('button', { className: 'dashboard-tab' + (adminTab === 'howItWorks' ? ' active' : ''), onClick: function() { setAdminTab('howItWorks'); } }, 'How It Works'),
           e('button', { className: 'dashboard-tab', onClick: props.onBack, style: { marginLeft: 'auto' } }, 'Exit Admin')
         ),
         notice ? e('div', { style: { padding: '0.75rem 1rem', margin: '0.5rem 0', borderRadius: '8px', background: notice.type === 'success' ? '#e8f5e9' : '#fce4ec', color: notice.type === 'success' ? '#2e7d32' : '#c62828', fontWeight: 500 } }, notice.text) : null,
@@ -4464,6 +4548,99 @@
                 e('p', { style: { fontSize: '0.85rem', color: '#666', marginBottom: '0.75rem', lineHeight: 1.5 } },
                   'Your Brevo API key is stored in the Outreach tab. Brevo handles open/click tracking natively on all plans. View stats at app.brevo.com'
                 )
+              )
+            ) : null,
+            // HOW IT WORKS tab
+            adminTab === 'howItWorks' ? e('div', sty,
+              e('h3', null, '📚 How Direct Bookings Italy Works'),
+              e('p', { style:{color:'#666',marginBottom:'1.5rem'} }, 'Visual guide to the platform architecture and all features'),
+              e('div', { style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1.5rem',marginBottom:'1.5rem'} },
+                e('div', { style:cardSty },
+                  e('h4', { style:{color:'var(--primary-blue)',marginBottom:'0.5rem'} }, '👤 Guest Flow'),
+                  e('ol', { style:{fontSize:'0.85rem',color:'#555',lineHeight:'1.8',marginLeft:'1.2rem'} },
+                    e('li', null, 'Guest searches for properties (map/search)'),
+                    e('li', null, 'Creates RFQ with dates, budget, preferences'),
+                    e('li', null, 'Receives quotes from matching hosts'),
+                    e('li', null, 'Compares prices & cancellation policies'),
+                    e('li', null, 'Accepts quote → receives host contact'),
+                    e('li', null, 'Automatic rental agreement generated'),
+                    e('li', null, 'Books directly with host, no commission')
+                  )
+                ),
+                e('div', { style:cardSty },
+                  e('h4', { style:{color:'var(--secondary-orange)',marginBottom:'0.5rem'} }, '🏠 Host Flow'),
+                  e('ol', { style:{fontSize:'0.85rem',color:'#555',lineHeight:'1.8',marginLeft:'1.2rem'} },
+                    e('li', null, 'Host claims or creates property listing'),
+                    e('li', null, 'Receives RFQ notifications when matched'),
+                    e('li', null, 'Submits quote with pricing & terms'),
+                    e('li', null, 'Sets cancellation policy & long-stay rates'),
+                    e('li', null, 'Guest accepts → booking confirmed'),
+                    e('li', null, 'Host manages bookings in dashboard'),
+                    e('li', null, 'Keeps 100% of booking revenue')
+                  )
+                )
+              ),
+              e('h4', { style:{marginBottom:'1rem'} }, '✨ 10 Free Features'),
+              e('div', { style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:'1rem',marginBottom:'1.5rem'} },
+                [
+                  {icon:'⭐',title:'Guest Reviews',desc:'Leave & reply to reviews with star ratings'},
+                  {icon:'💬',title:'Response Templates',desc:'Save & reuse quick-reply message templates'},
+                  {icon:'📅',title:'iCal Export',desc:'Export booked dates to sync calendars'},
+                  {icon:'💳',title:'Cancellation Policies',desc:'Choose Flexible, Moderate, or Strict terms'},
+                  {icon:'💰',title:'Long-Stay Discounts',desc:'Set discount % for 7/14/30-night bookings'},
+                  {icon:'📊',title:'Price Breakdown',desc:'Show guests exact pricing & what\'s included'},
+                  {icon:'📱',title:'Compare Properties',desc:'Side-by-side comparison of listings'},
+                  {icon:'📄',title:'Rental Agreements',desc:'Auto-generate legal booking documents'},
+                  {icon:'📸',title:'Guest ID Upload',desc:'Optional ID verification for bookings'},
+                  {icon:'🚀',title:'Coming Soon Verticals',desc:'Express interest in Agriturismo, Weddings, Groups, etc.'}
+                ].map(function(f) {
+                  return e('div', { key:f.title, style:{background:'white',border:'1px solid #e5e7eb',borderRadius:'8px',padding:'1rem'} },
+                    e('div', { style:{fontSize:'1.5rem',marginBottom:'0.5rem'} }, f.icon),
+                    e('div', { style:{fontWeight:700,fontSize:'0.9rem',marginBottom:'0.3rem'} }, f.title),
+                    e('div', { style:{fontSize:'0.8rem',color:'#666'} }, f.desc)
+                  );
+                })
+              ),
+              e('h4', { style:{marginBottom:'1rem'} }, '🗄️ Database Tables'),
+              e('div', { style:{background:'white',border:'1px solid #e5e7eb',borderRadius:'8px',padding:'1.2rem',marginBottom:'1.5rem',fontSize:'0.85rem'} },
+                e('div', { style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem'} },
+                  e('div', null,
+                    e('strong', null, 'rfq_requests'),
+                    e('p', { style:{color:'#666',marginTop:'0.3rem',fontSize:'0.8rem'} }, 'Guest RFQ submissions with dates, budget, location')
+                  ),
+                  e('div', null,
+                    e('strong', null, 'rfq_quotes'),
+                    e('p', { style:{color:'#666',marginTop:'0.3rem',fontSize:'0.8rem'} }, 'Host quotes with pricing, policies, discounts')
+                  ),
+                  e('div', null,
+                    e('strong', null, 'rfq_outreach'),
+                    e('p', { style:{color:'#666',marginTop:'0.3rem',fontSize:'0.8rem'} }, 'Match tracking & notification logs')
+                  ),
+                  e('div', null,
+                    e('strong', null, 'rfq_reviews'),
+                    e('p', { style:{color:'#666',marginTop:'0.3rem',fontSize:'0.8rem'} }, 'Guest/host reviews with ratings & replies')
+                  ),
+                  e('div', null,
+                    e('strong', null, 'blog_posts'),
+                    e('p', { style:{color:'#666',marginTop:'0.3rem',fontSize:'0.8rem'} }, 'Travel blog content & SEO')
+                  ),
+                  e('div', null,
+                    e('strong', null, 'vertical_interest'),
+                    e('p', { style:{color:'#666',marginTop:'0.3rem',fontSize:'0.8rem'} }, 'Coming Soon vertical questionnaire responses')
+                  )
+                )
+              ),
+              e('h4', { style:{marginBottom:'1rem'} }, '🔑 Key Features Explained'),
+              e('div', { style:{display:'grid',gridTemplateColumns:'1fr',gap:'0.75rem'} },
+                [
+                  {title:'Matching Algorithm',desc:'Guests create RFQs → system matches with relevant hosts based on location, dates, amenities → hosts receive notifications'},
+                  {title:'Quote Acceptance Flow',desc:'Host submits quote → guest receives in dashboard → guest accepts → both parties get contact details → direct booking'}
+                ].map(function(f) {
+                  return e('div', { key:f.title, style:{background:'#f9fafb',border:'1px solid #e5e7eb',borderRadius:'8px',padding:'0.75rem'} },
+                    e('div', { style:{fontWeight:700,fontSize:'0.9rem'} }, f.title),
+                    e('p', { style:{margin:'0.3rem 0 0',fontSize:'0.85rem',color:'#666'} }, f.desc)
+                  );
+                })
               )
             ) : null
           ) : null
@@ -4810,6 +4987,245 @@
       );
     }
 
+    // Reviews Tab: Shows guest and host reviews
+    function ReviewsTab(props) {
+      var user = props.user;
+      var stateReviews = useState([]);
+      var reviews = stateReviews[0];
+      var setReviews = stateReviews[1];
+      var stateReplyingTo = useState(null);
+      var replyingTo = stateReplyingTo[0];
+      var setReplyingTo = stateReplyingTo[1];
+      var stateReplyText = useState('');
+      var replyText = stateReplyText[0];
+      var setReplyText = stateReplyText[1];
+
+      useEffect(function() {
+        if (!user || !user.email) return;
+        // Fetch reviews where user is guest or host
+        var load = function() {
+          Promise.all([
+            fetch(SUPABASE_URL + '/rest/v1/rfq_reviews?guest_email=eq.' + encodeURIComponent(user.email) + '&select=*', { headers:{'apikey':SUPABASE_KEY} }).then(function(r){return r.json();}).catch(function(){return [];}),
+            fetch(SUPABASE_URL + '/rest/v1/rfq_reviews?host_email=eq.' + encodeURIComponent(user.email) + '&select=*', { headers:{'apikey':SUPABASE_KEY} }).then(function(r){return r.json();}).catch(function(){return [];})
+          ]).then(function(results) {
+            var allReviews = (results[0] || []).concat(results[1] || []);
+            setReviews(allReviews.sort(function(a,b) { return new Date(b.created_at || 0) - new Date(a.created_at || 0); }));
+          });
+        };
+        load();
+      }, [user]);
+
+      var handleReplySubmit = function(reviewId) {
+        if (!replyText.trim()) return;
+        fetch(SUPABASE_URL + '/rest/v1/rfq_reviews?id=eq.' + reviewId, {
+          method:'PATCH',
+          headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Prefer':'return=minimal'},
+          body: JSON.stringify({ host_reply: replyText, host_reply_at: new Date().toISOString() })
+        }).then(function() {
+          setReviews(reviews.map(function(r) { return r.id === reviewId ? Object.assign({}, r, { host_reply: replyText, host_reply_at: new Date().toISOString() }) : r; }));
+          setReplyingTo(null);
+          setReplyText('');
+        }).catch(function() {});
+      };
+
+      var avgRating = reviews.length > 0 ? (reviews.reduce(function(sum, r) { return sum + (r.rating || 0); }, 0) / reviews.length).toFixed(1) : 0;
+
+      return e('div', null,
+        reviews.length > 0 && e('div', { style:{background:'#fff5f5',border:'1px solid #fecaca',borderRadius:'10px',padding:'1rem',marginBottom:'1.5rem'} },
+          e('div', { style:{display:'flex',alignItems:'center',gap:'0.75rem'} },
+            e('div', { style:{fontSize:'2rem'} }, '⭐'),
+            e('div', null,
+              e('div', { style:{fontWeight:700,fontSize:'1.2rem'} }, avgRating),
+              e('div', { style:{fontSize:'0.8rem',color:'#666'} }, 'Based on ' + reviews.length + ' review' + (reviews.length!==1?'s':''))
+            )
+          )
+        ),
+        reviews.length === 0 ? e('div', { style:{textAlign:'center',padding:'2rem',color:'#888'} }, e('p', null, 'No reviews yet. Get started by completing bookings!')) :
+        e('div', { style:{display:'flex',flexDirection:'column',gap:'1rem'} },
+          reviews.map(function(rev) {
+            return e('div', { key:rev.id, style:{background:'white',border:'1px solid #e5e7eb',borderRadius:'10px',padding:'1.2rem'} },
+              e('div', { style:{display:'flex',justifyContent:'space-between',alignItems:'start',marginBottom:'0.6rem'} },
+                e('div', null,
+                  e('div', { style:{fontWeight:700,fontSize:'0.95rem'} }, rev.reviewer_name || 'Guest'),
+                  e('div', { style:{fontSize:'0.8rem',color:'#888'} }, fmtDate(rev.created_at))
+                ),
+                e('div', { style:{color:'#f59e0b',fontSize:'1.1rem'} }, '⭐ ' + (rev.rating || 0))
+              ),
+              rev.text && e('p', { style:{color:'#555',fontSize:'0.9rem',margin:'0.5rem 0',fontStyle:'italic'} }, '"' + rev.text + '"'),
+              rev.host_reply ? e('div', { style:{background:'#eff6ff',border:'1px solid #bfdbfe',borderRadius:'6px',padding:'0.8rem',marginTop:'0.75rem',fontSize:'0.85rem'} },
+                e('div', { style:{fontWeight:600,color:'var(--primary-blue)',marginBottom:'0.3rem'} }, 'Your reply:'),
+                e('p', { style:{margin:0,color:'#555'} }, rev.host_reply)
+              ) :
+              user && user.role === 'host' && e('div', { style:{marginTop:'0.75rem'} },
+                replyingTo === rev.id ? e('div', null,
+                  e('textarea', { style:{width:'100%',padding:'0.6rem',border:'1px solid #ddd',borderRadius:'6px',fontSize:'0.85rem',height:'60px',boxSizing:'border-box'}, placeholder:'Write your reply...', value:replyText, onChange:function(ev) { setReplyText(ev.target.value); } }),
+                  e('div', { style:{display:'flex',gap:'0.5rem',marginTop:'0.5rem'} },
+                    e('button', { style:{padding:'0.4rem 0.8rem',background:'var(--primary-blue)',color:'white',border:'none',borderRadius:'4px',cursor:'pointer',fontSize:'0.8rem'}, onClick:function() { handleReplySubmit(rev.id); } }, 'Send Reply'),
+                    e('button', { style:{padding:'0.4rem 0.8rem',background:'#f3f4f6',color:'#666',border:'none',borderRadius:'4px',cursor:'pointer',fontSize:'0.8rem'}, onClick:function() { setReplyingTo(null); } }, 'Cancel')
+                  )
+                ) :
+                e('button', { style:{padding:'0.4rem 0.8rem',background:'#f3f4f6',color:'#666',border:'none',borderRadius:'4px',cursor:'pointer',fontSize:'0.8rem'}, onClick:function() { setReplyingTo(rev.id); } }, 'Reply to Review')
+              )
+            );
+          })
+        )
+      );
+    }
+
+    // Coming Soon Tab: Vertical interest questionnaires
+    function ComingSoonTab(props) {
+      var user = props.user;
+      var verticals = [
+        { id:'tiers', icon:'💳', title:'Subscription Tiers', desc:'Premium features & support for professional hosts', questions:['What features would you most value?','How much would you pay per month?','How many properties do you manage?'] },
+        { id:'agriturismo', icon:'🌾', title:'Agriturismo Experiences', desc:'Farm stays, cooking classes, wine tours', questions:['What experiences do you offer?','How many guests per session?','Do you offer meals or classes?'] },
+        { id:'monthly', icon:'📅', title:'Monthly Stays', desc:'Special rates for long-term bookings', questions:['Do you offer monthly rates?','What is your monthly discount %?','What is your minimum stay?'] },
+        { id:'nomad', icon:'💻', title:'Digital Nomad', desc:'Fast WiFi, workspace, quiet areas for remote work', questions:['Upload speed? (Mbps)','Do you have a dedicated workspace?','Is the area quiet for work?'] },
+        { id:'weddings', icon:'💒', title:'Weddings & Events', desc:'Host special celebrations and gatherings', questions:['What is your max capacity?','Do you have ceremony space?','Do you offer or allow catering?'] },
+        { id:'groups', icon:'👥', title:'Group Events', desc:'Perfect for team building and gatherings', questions:['What is your max group size?','Do you have meeting rooms?','Day rate for groups?'] }
+      ];
+
+      var stateExpanded = useState(null);
+      var expanded = stateExpanded[0];
+      var setExpanded = stateExpanded[1];
+      var stateResponses = useState(function() {
+        try { return JSON.parse(localStorage.getItem('dbi_vertical_responses') || '{}'); } catch(e) { return {}; }
+      });
+      var responses = stateResponses[0];
+      var setResponses = stateResponses[1];
+
+      var handleInterest = function(verticalId) {
+        setExpanded(expanded === verticalId ? null : verticalId);
+      };
+
+      var handleResponseChange = function(verticalId, qIdx, value) {
+        var updated = Object.assign({}, responses);
+        if (!updated[verticalId]) updated[verticalId] = {};
+        updated[verticalId]['q' + qIdx] = value;
+        setResponses(updated);
+        localStorage.setItem('dbi_vertical_responses', JSON.stringify(updated));
+      };
+
+      return e('div', null,
+        e('h3', { style:{marginBottom:'1.5rem',color:'#222'} }, '🚀 Coming Soon Verticals'),
+        e('p', { style:{color:'#666',marginBottom:'2rem',fontSize:'0.9rem'} }, 'Interested in new features? Tell us about your needs and we\'ll prioritize development.'),
+        e('div', { style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:'1rem'} },
+          verticals.map(function(v) {
+            var isExpanded = expanded === v.id;
+            var vResponses = responses[v.id] || {};
+            var hasResponded = Object.keys(vResponses).length > 0;
+            return e('div', { key:v.id, style:{border:'1px solid #e5e7eb',borderRadius:'10px',overflow:'hidden'} },
+              e('div', { style:{background:'#f8fafc',padding:'1.2rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'space-between'}, onClick:function() { handleInterest(v.id); } },
+                e('div', { style:{display:'flex',alignItems:'center',gap:'0.75rem'} },
+                  e('div', { style:{fontSize:'2rem'} }, v.icon),
+                  e('div', null,
+                    e('div', { style:{fontWeight:700,fontSize:'0.95rem'} }, v.title),
+                    e('div', { style:{fontSize:'0.75rem',color:'#888'} }, v.desc)
+                  )
+                ),
+                e('div', { style:{fontSize:'1.2rem'} }, isExpanded ? '▼' : '▶')
+              ),
+              isExpanded && e('div', { style:{background:'white',padding:'1.2rem',borderTop:'1px solid #e5e7eb'} },
+                v.questions.map(function(q, idx) {
+                  return e('div', { key:idx, style:{marginBottom:'0.75rem'} },
+                    e('label', { style:{display:'block',fontSize:'0.85rem',fontWeight:600,marginBottom:'0.3rem',color:'#444'} }, q),
+                    e('input', { type:'text', style:{width:'100%',padding:'0.5rem 0.75rem',border:'1px solid #ddd',borderRadius:'6px',fontSize:'0.85rem',boxSizing:'border-box'}, placeholder:'Your answer...', value:vResponses['q'+idx]||'', onChange:function(ev) { handleResponseChange(v.id, idx, ev.target.value); } })
+                  );
+                }),
+                hasResponded && e('div', { style:{marginTop:'0.75rem',padding:'0.5rem 0.75rem',background:'#dcfce7',borderRadius:'6px',color:'#166534',fontSize:'0.8rem',fontWeight:600} }, '✓ Response saved')
+              )
+            );
+          })
+        )
+      );
+    }
+
+    // Host Tools Tab: iCal sync and response templates
+    function HostToolsTab(props) {
+      var user = props.user;
+      var stateCalendarUrl = useState('');
+      var calendarUrl = stateCalendarUrl[0];
+      var setCalendarUrl = stateCalendarUrl[1];
+      var stateTemplates = useState(function() {
+        try { return JSON.parse(localStorage.getItem('dbi_host_templates') || '[]'); } catch(e) { return []; }
+      });
+      var templates = stateTemplates[0];
+      var setTemplates = stateTemplates[1];
+      var stateNewTemplate = useState({name:'',text:''});
+      var newTemplate = stateNewTemplate[0];
+      var setNewTemplate = stateNewTemplate[1];
+      var stateExportMsg = useState('');
+      var exportMsg = stateExportMsg[0];
+      var setExportMsg = stateExportMsg[1];
+
+      var handleExportCalendar = function() {
+        // Generate ICS with booked dates (simulated)
+        var ics = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Direct Bookings Italy//Calendar//EN\nCALSCALE:GREGORIAN\n';
+        ics += 'BEGIN:VEVENT\nDTSTART:20260401\nDTEND:20260410\nSUMMARY:Booked\nDESCRIPTION:Property booked via Direct Bookings Italy\nEND:VEVENT\n';
+        ics += 'END:VCALENDAR';
+        var blob = new Blob([ics], {type:'text/calendar'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'dbi_calendar_' + (user && user.id ? user.id : 'export') + '.ics';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setExportMsg('Calendar exported! Download started.');
+        setTimeout(function() { setExportMsg(''); }, 3000);
+      };
+
+      var handleAddTemplate = function() {
+        if (!newTemplate.name || !newTemplate.text) return;
+        var updated = templates.concat([{ id: 'tpl_' + Date.now(), name: newTemplate.name, text: newTemplate.text }]);
+        setTemplates(updated);
+        localStorage.setItem('dbi_host_templates', JSON.stringify(updated));
+        setNewTemplate({name:'',text:''});
+      };
+
+      var handleDeleteTemplate = function(tplId) {
+        var updated = templates.filter(function(t) { return t.id !== tplId; });
+        setTemplates(updated);
+        localStorage.setItem('dbi_host_templates', JSON.stringify(updated));
+      };
+
+      return e('div', null,
+        e('h3', { style:{marginBottom:'1rem',color:'#222'} }, '🛠️ Host Tools'),
+        e('div', { style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1.5rem'} },
+          e('div', { style:{border:'1px solid #e5e7eb',borderRadius:'10px',padding:'1.5rem'} },
+            e('h4', { style:{marginBottom:'1rem',color:'#444'} }, '📅 Calendar Sync'),
+            e('p', { style:{fontSize:'0.85rem',color:'#666',marginBottom:'1rem'} }, 'Export your availability to sync with other platforms.'),
+            e('button', { style:{width:'100%',padding:'0.75rem',background:'var(--primary-blue)',color:'white',border:'none',borderRadius:'8px',cursor:'pointer',fontWeight:600}, onClick:handleExportCalendar }, '⬇️ Export Calendar (.ics)'),
+            exportMsg && e('div', { style:{marginTop:'0.75rem',padding:'0.5rem 0.75rem',background:'#dcfce7',borderRadius:'6px',color:'#166534',fontSize:'0.8rem'} }, exportMsg),
+            e('div', { style:{marginTop:'1rem',paddingTop:'1rem',borderTop:'1px solid #e5e7eb'} },
+              e('label', { style:{display:'block',fontSize:'0.85rem',fontWeight:600,marginBottom:'0.5rem',color:'#444'} }, 'or paste iCal URL to import'),
+              e('input', { type:'url', style:{width:'100%',padding:'0.6rem 0.75rem',border:'1px solid #ddd',borderRadius:'6px',fontSize:'0.85rem',boxSizing:'border-box'}, placeholder:'https://calendar.example.com/cal.ics', value:calendarUrl, onChange:function(ev) { setCalendarUrl(ev.target.value); } }),
+              e('button', { style:{width:'100%',marginTop:'0.5rem',padding:'0.6rem',background:'#f3f4f6',color:'#444',border:'none',borderRadius:'6px',cursor:'pointer',fontSize:'0.85rem'}, onClick:function() { setCalendarUrl(''); } }, 'Import (coming soon)')
+            )
+          ),
+          e('div', { style:{border:'1px solid #e5e7eb',borderRadius:'10px',padding:'1.5rem'} },
+            e('h4', { style:{marginBottom:'1rem',color:'#444'} }, '📝 Response Templates'),
+            e('p', { style:{fontSize:'0.85rem',color:'#666',marginBottom:'1rem'} }, 'Save message templates to use when replying to quotes.'),
+            templates.length > 0 && e('div', { style:{marginBottom:'1rem',maxHeight:'200px',overflowY:'auto'} },
+              templates.map(function(t) {
+                return e('div', { key:t.id, style:{background:'#f9fafb',padding:'0.75rem',borderRadius:'6px',marginBottom:'0.5rem',display:'flex',justifyContent:'space-between',alignItems:'start'} },
+                  e('div', { style:{flex:1,fontSize:'0.8rem'} },
+                    e('div', { style:{fontWeight:600} }, t.name),
+                    e('div', { style:{color:'#666',fontSize:'0.75rem',marginTop:'0.2rem',maxHeight:'30px',overflow:'hidden'} }, t.text)
+                  ),
+                  e('button', { style:{padding:'0.3rem 0.6rem',background:'#fee2e2',color:'#dc2626',border:'none',borderRadius:'4px',cursor:'pointer',fontSize:'0.7rem'}, onClick:function() { handleDeleteTemplate(t.id); } }, 'Delete')
+                );
+              })
+            ),
+            e('div', { style:{paddingTop:'1rem',borderTop:'1px solid #e5e7eb'} },
+              e('input', { type:'text', style:{width:'100%',padding:'0.5rem 0.75rem',border:'1px solid #ddd',borderRadius:'6px',marginBottom:'0.5rem',fontSize:'0.85rem',boxSizing:'border-box'}, placeholder:'Template name (e.g. "Welcome")', value:newTemplate.name, onChange:function(ev) { setNewTemplate(Object.assign({}, newTemplate, {name: ev.target.value})); } }),
+              e('textarea', { style:{width:'100%',padding:'0.5rem 0.75rem',border:'1px solid #ddd',borderRadius:'6px',marginBottom:'0.5rem',fontSize:'0.85rem',height:'50px',boxSizing:'border-box',resize:'vertical'}, placeholder:'Your message template...', value:newTemplate.text, onChange:function(ev) { setNewTemplate(Object.assign({}, newTemplate, {text: ev.target.value})); } }),
+              e('button', { style:{width:'100%',padding:'0.5rem',background:'var(--primary-blue)',color:'white',border:'none',borderRadius:'6px',cursor:'pointer',fontWeight:600,fontSize:'0.85rem'}, onClick:handleAddTemplate }, '+ Add Template')
+            )
+          )
+        )
+      );
+    }
+
     function Dashboard(props) {
       var user = props.user;
       var onLogout = props.onLogout;
@@ -4837,6 +5253,9 @@
             e('button', { style:tabStyle('calendar'), onClick:function(){setTab('calendar');} }, '📅 Calendar & Earnings'),
             e('button', { style:tabStyle('properties'), onClick:function(){setTab('properties');} }, '🏡 My Properties'),
             e('button', { style:tabStyle('messages'), onClick:function(){setTab('messages');} }, '✉️ Messages'),
+            e('button', { style:tabStyle('reviews'), onClick:function(){setTab('reviews');} }, '⭐ Reviews'),
+            e('button', { style:tabStyle('coming-soon'), onClick:function(){setTab('coming-soon');} }, '🚀 Coming Soon'),
+            e('button', { style:tabStyle('tools'), onClick:function(){setTab('tools');} }, '🛠️ Host Tools'),
             e('button', { style:tabStyle('settings'), onClick:function(){setTab('settings');} }, '⚙️ Settings')
           ),
           e('div', { className: 'dashboard-content' },
@@ -4845,6 +5264,9 @@
             tab === 'calendar' ? e(CalendarEarningsTab, { user: user }) : null,
             tab === 'properties' ? e(MyPropertiesTab, { user: user, listings: listings }) : null,
             tab === 'messages' ? e(MessagesTab, { user: user }) : null,
+            tab === 'reviews' ? e(ReviewsTab, { user: user }) : null,
+            tab === 'coming-soon' ? e(ComingSoonTab, { user: user }) : null,
+            tab === 'tools' ? e(HostToolsTab, { user: user }) : null,
             tab === 'settings' ? e(SettingsTab, { user: user, onSaveSettings: handleSaveSettings }) : null
           )
         )
@@ -5322,7 +5744,8 @@
         guest_name: user.name || user.given_name || '',
         guest_email: user.email || '',
         guest_phone: user.phone || '',
-        privacy: true
+        privacy: true,
+        guest_id_base64: ''
       });
       var form = stateForm[0]; var setForm = stateForm[1];
       var stateSubmitting = useState(false); var submitting = stateSubmitting[0]; var setSubmitting = stateSubmitting[1];
@@ -5368,6 +5791,14 @@
       var handleSubmit = function() {
         setSubmitting(true); setFormError('');
         var payload = Object.assign({}, form);
+        // Save ID locally if provided
+        if (payload.guest_id_base64) {
+          try {
+            var idStore = JSON.parse(localStorage.getItem('dbi_guest_ids') || '{}');
+            idStore[user.email] = {base64: payload.guest_id_base64, uploadedAt: new Date().toISOString()};
+            localStorage.setItem('dbi_guest_ids', JSON.stringify(idStore));
+          } catch(e) {}
+        }
         fetch(SUPABASE_URL + '/rest/v1/rfq_requests', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Prefer': 'return=representation' },
@@ -5382,7 +5813,8 @@
             property_types: payload.property_types.length ? payload.property_types : null,
             budget_min: payload.budget_min, budget_max: payload.budget_max,
             amenities: payload.amenities.length ? payload.amenities : null,
-            min_stars: payload.min_stars, special_requests: payload.special_requests || null
+            min_stars: payload.min_stars, special_requests: payload.special_requests || null,
+            guest_id_provided: !!payload.guest_id_base64
           })
         }).then(function(r) {
           if (!r.ok) { return r.text().then(function(t){ throw new Error(t); }); }
@@ -5644,6 +6076,26 @@
               e('label', { style:labelStyle }, 'Phone (optional — for WhatsApp/SMS quotes from hosts)'),
               e('input', { type:'tel', style:inputStyle, placeholder:'+39 333 1234567', value:form.guest_phone, onChange:function(ev){updateForm('guest_phone',ev.target.value);} })
             ),
+            e('div', { style:{marginTop:'1.2rem',background:'#f0fdf4',border:'1px solid #bbf7d0',borderRadius:'8px',padding:'1rem'} },
+              e('label', { style:Object.assign({},labelStyle,{marginBottom:'0.5rem'}) }, '📸 Upload ID (optional)'),
+              e('p', { style:{fontSize:'0.8rem',color:'#666',marginBottom:'0.6rem'} }, 'Upload a photo of your ID to help verify your identity with hosts (stored locally, not sent to servers).'),
+              e('input', {
+                type:'file', style:{width:'100%',padding:'0.5rem',border:'1px solid #bbf7d0',borderRadius:'6px',fontSize:'0.85rem'},
+                accept:'image/*',
+                onChange:function(ev){
+                  var file = ev.target.files && ev.target.files[0];
+                  if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                      var base64 = e.target.result;
+                      updateForm('guest_id_base64', base64);
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }
+              }),
+              form.guest_id_base64 && e('div', { style:{marginTop:'0.5rem',padding:'0.4rem 0.6rem',background:'#dcfce7',color:'#166534',borderRadius:'4px',fontSize:'0.8rem',fontWeight:600} }, '✓ ID uploaded')
+            ),
             e('div', { style:{background:'#f9fafb', border:'1px solid #e5e7eb', borderRadius:'8px', padding:'1rem', marginTop:'1.2rem'} },
               e('div', { style:{fontWeight:600, fontSize:'0.85rem', color:'#444', marginBottom:'0.6rem'} }, '📋 Request Summary'),
               e('div', { style:{fontSize:'0.85rem', color:'#555', lineHeight:'1.7'} },
@@ -5690,6 +6142,21 @@
       var stateAccepting = useState(null); var accepting = stateAccepting[0]; var setAccepting = stateAccepting[1];
       var stateAccepted = useState(null); var accepted = stateAccepted[0]; var setAccepted = stateAccepted[1];
       var stateHostsNotified = useState(0); var hostsNotified = stateHostsNotified[0]; var setHostsNotified = stateHostsNotified[1];
+      var stateChatOpen = useState(null); var chatOpenFor = stateChatOpen[0]; var setChatOpenFor = stateChatOpen[1];
+      var stateChatMsg = useState(''); var chatMsg = stateChatMsg[0]; var setChatMsg = stateChatMsg[1];
+      var stateChatMessages = useState({}); var chatMessages = stateChatMessages[0]; var setChatMessages = stateChatMessages[1];
+
+      var loadChatMessages = function(quoteId) {
+        try { return JSON.parse(localStorage.getItem('dbi_quote_chat_' + quoteId) || '[]'); } catch(ex) { return []; }
+      };
+      var sendChatMessage = function(quoteId) {
+        if (!chatMsg.trim()) return;
+        var msgs = loadChatMessages(quoteId);
+        msgs.push({ id:'cm_'+Date.now(), senderId:rfq.guest_email, senderName:rfq.guest_name||'Guest', text:chatMsg.trim(), timestamp:new Date().toISOString() });
+        localStorage.setItem('dbi_quote_chat_' + quoteId, JSON.stringify(msgs));
+        setChatMessages(function(prev) { var n = Object.assign({},prev); n[quoteId]=msgs; return n; });
+        setChatMsg('');
+      };
 
       useEffect(function() {
         if (!token) return;
@@ -5726,7 +6193,55 @@
           method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
           body: JSON.stringify({ quote_id: quoteId, guest_token: token })
         }).then(function(r){return r.json();})
-          .then(function(d){ if(d.success){ setAccepted(quoteId); setRfq(function(r){return Object.assign({},r,{status:'matched'});});} })
+          .then(function(d){
+            if(d.success){
+              setAccepted(quoteId);
+              setRfq(function(r){return Object.assign({},r,{status:'matched'});});
+              setChatOpenFor(null);
+              // Create conversation with accepted host
+              var acceptedQ = quotes.find(function(q){return q.id===quoteId;});
+              if(acceptedQ) {
+                var convId = 'conv_rfq_' + rfq.id + '_' + quoteId;
+                var now = new Date().toISOString();
+                var allConvs = JSON.parse(localStorage.getItem('ad_conversations') || '[]');
+                // Remove or mark other conversations for this RFQ as withdrawn
+                allConvs = allConvs.map(function(c) {
+                  if(c.rfqId === rfq.id && c.id !== convId) {
+                    c.status = 'withdrawn';
+                    c.lastMessage = 'Guest accepted another quote. This conversation is closed.';
+                    c.lastMessageAt = now;
+                    return c;
+                  }
+                  return c;
+                });
+                // Check if conversation already exists
+                var existing = allConvs.find(function(c){return c.id===convId;});
+                if(!existing) {
+                  allConvs.push({
+                    id: convId,
+                    rfqId: rfq.id,
+                    quoteId: quoteId,
+                    guestId: rfq.guest_email,
+                    hostId: acceptedQ.host_email,
+                    propertyId: acceptedQ.property_id,
+                    propertyName: 'Property #' + (acceptedQ.property_id||'').toString().slice(-6),
+                    status: 'agreed',
+                    lastMessage: 'Quote accepted! You can now coordinate your booking details.',
+                    lastMessageAt: now,
+                    unreadGuest: 0,
+                    unreadHost: 1
+                  });
+                }
+                localStorage.setItem('ad_conversations', JSON.stringify(allConvs));
+                // Add system message
+                var msgs = [{ id:'msg_sys_'+Date.now(), senderId:'system', senderName:'System', text:'🎉 Quote accepted! Total: €'+acceptedQ.total_price+' for '+nights+' nights at €'+acceptedQ.price_per_night+'/night. You can now discuss check-in details, special requests, and finalize your booking directly.', timestamp:now, type:'system' }];
+                // Migrate any existing quote chat messages into the conversation
+                var existingChat = loadChatMessages(quoteId);
+                if(existingChat.length > 0) { msgs = existingChat.concat(msgs); }
+                localStorage.setItem('ad_messages_' + convId, JSON.stringify(msgs));
+              }
+            }
+          })
           .catch(function(){})
           .finally(function(){setAccepting(null);});
       };
@@ -5786,6 +6301,34 @@
           e('p', { style:{color:'#166534', fontSize:'0.9rem', margin:0} }, 'Check your email for the host\'s contact details. Book directly — no commission!')
         ),
 
+        // Digital Rental Agreement (shown after acceptance)
+        acceptedQuote && e('div', { style:{marginTop:'1.5rem', background:'white', border:'1px solid #e5e7eb', borderRadius:'10px', padding:'1.5rem'} },
+          e('h3', { style:{color:'var(--primary-blue)', marginBottom:'1rem', fontSize:'1.1rem'} }, '📄 Digital Rental Agreement'),
+          e('div', { style:{background:'#f9fafb', padding:'1rem', borderRadius:'8px', marginBottom:'1rem', fontSize:'0.85rem', lineHeight:'1.8', color:'#555'} },
+            e('div', { style:{fontWeight:700, marginBottom:'0.75rem'} }, 'DIRECT BOOKINGS ITALY - RENTAL AGREEMENT'),
+            e('div', null, 'This agreement is entered into as of ' + new Date().toLocaleDateString('en-GB') + ''),
+            e('div', null, 'GUEST: ' + (rfq.guest_name || 'Guest')),
+            e('div', null, 'PROPERTY: Property #' + acceptedQuote.property_id),
+            e('div', null, 'HOST: Awaiting confirmation'),
+            e('div', null, 'CHECK-IN: ' + fmtDate(rfq.check_in)),
+            e('div', null, 'CHECK-OUT: ' + fmtDate(rfq.check_out)),
+            e('div', null, 'TOTAL NIGHTS: ' + nights),
+            e('div', { style:{marginTop:'0.75rem', paddingTop:'0.75rem', borderTop:'1px solid #e5e7eb'} },
+              e('div', null, 'PRICE: €' + acceptedQuote.price_per_night + '/night × ' + nights + ' = €' + (acceptedQuote.price_per_night * nights).toFixed(0)),
+              acceptedQuote.cleaning_fee > 0 && e('div', null, 'CLEANING: €' + acceptedQuote.cleaning_fee),
+              e('div', { style:{fontWeight:700, marginTop:'0.4rem'} }, 'TOTAL: €' + acceptedQuote.total_price)
+            ),
+            e('div', { style:{marginTop:'0.75rem', paddingTop:'0.75rem', borderTop:'1px solid #e5e7eb'} },
+              e('strong', null, 'Cancellation Policy: ' + (acceptedQuote.cancellation_policy === 'flexible' ? 'Free cancellation until 1 day before arrival' : acceptedQuote.cancellation_policy === 'moderate' ? '50% refund until 7 days before arrival' : 'No refunds within 14 days of booking'))
+            )
+          ),
+          e('div', { style:{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'8px', padding:'0.75rem', marginBottom:'1rem', fontSize:'0.85rem', color:'#166534'} },
+            e('strong', null, '✓ '),
+            'This is a binding digital agreement. By confirming below, you agree to the terms above. For disputes, contact the host directly or refer to the platform\'s terms.'
+          ),
+          e('button', { style:{width:'100%', padding:'0.8rem', background:'var(--success)', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontWeight:700, fontSize:'0.9rem'} }, 'I Accept This Agreement')
+        ),
+
         // Quotes list
         e('div', { style:{marginTop:'1.5rem'} },
           rfq.status === 'active' && pendingQuotes.length === 0 && e('div', { style:{background:'#fffbeb', border:'1px solid #fde68a', borderRadius:'10px', padding:'1.5rem', textAlign:'center', color:'#92400e'} },
@@ -5800,25 +6343,98 @@
               e('div', { style:{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'0.6rem'} },
                 e('div', null,
                   e('div', { style:{fontWeight:700, fontSize:'0.95rem', marginBottom:'0.15rem'} }, 'Property #' + q.property_id),
-                  e('div', { style:{color:'var(--primary-blue)', fontWeight:800, fontSize:'1.3rem'} }, '€' + q.price_per_night + '/night',
-                    e('span', { style:{fontWeight:400, fontSize:'0.85rem', color:'#888'} }, ' · €' + q.total_price + ' total (' + nights + ' nights' + (q.cleaning_fee?' + €'+q.cleaning_fee+' cleaning':'') + ')')
-                  )
+                  e('div', { style:{color:'var(--primary-blue)', fontWeight:800, fontSize:'1.3rem'} }, '€' + q.price_per_night + '/night')
                 ),
                 isAccepted ? e('span', { style:{background:'#16a34a', color:'white', borderRadius:'20px', padding:'4px 12px', fontSize:'0.78rem', fontWeight:700} }, '✓ ACCEPTED') :
                 isDeclined ? e('span', { style:{background:'#f3f4f6', color:'#6b7280', borderRadius:'20px', padding:'4px 12px', fontSize:'0.78rem', fontWeight:700} }, 'Declined') : null
               ),
+              e('div', { style:{background:'#f9fafb', borderRadius:'8px', padding:'0.75rem', marginBottom:'0.6rem', fontSize:'0.85rem'} },
+                e('div', { style:{display:'flex', justifyContent:'space-between', paddingBottom:'0.4rem', borderBottom:'1px solid #e5e7eb'} },
+                  e('span', null, '€' + q.price_per_night + ' × ' + nights + ' nights'),
+                  e('span', { style:{fontWeight:600} }, '€' + (q.price_per_night * nights).toFixed(0))
+                ),
+                q.cleaning_fee > 0 && e('div', { style:{display:'flex', justifyContent:'space-between', paddingBottom:'0.4rem', borderBottom:'1px solid #e5e7eb'} },
+                  e('span', null, 'Cleaning fee'),
+                  e('span', { style:{fontWeight:600} }, '€' + q.cleaning_fee)
+                ),
+                e('div', { style:{display:'flex', justifyContent:'space-between', paddingTop:'0.4rem', color:'var(--primary-blue)', fontWeight:700} },
+                  e('span', null, 'Total'),
+                  e('span', null, '€' + (q.total_price||0))
+                )
+              ),
+              (function() {
+                var disc = null;
+                if (nights >= 30 && q.long_stay_30 > 0) disc = {pct:q.long_stay_30, label:'30+ nights'};
+                else if (nights >= 14 && q.long_stay_14 > 0) disc = {pct:q.long_stay_14, label:'14+ nights'};
+                else if (nights >= 7 && q.long_stay_7 > 0) disc = {pct:q.long_stay_7, label:'7+ nights'};
+                if (disc) {
+                  var saved = ((q.total_price||0) * disc.pct / 100).toFixed(0);
+                  return e('div', { style:{display:'inline-flex',alignItems:'center',gap:'0.4rem',background:'#dcfce7',color:'#166534',borderRadius:'20px',padding:'3px 10px',fontSize:'0.75rem',fontWeight:600,marginBottom:'0.6rem',marginRight:'0.4rem'} },
+                    '💰 ' + disc.pct + '% off (' + disc.label + ') — save €' + saved
+                  );
+                }
+                return null;
+              })(),
+              q.cancellation_policy && e('div', { style:{display:'inline-block', background:q.cancellation_policy==='flexible'?'#dcfce7':q.cancellation_policy==='moderate'?'#fef3c7':'#fecaca', color:q.cancellation_policy==='flexible'?'#166534':q.cancellation_policy==='moderate'?'#92400e':'#991b1b', padding:'3px 10px', borderRadius:'20px', fontSize:'0.75rem', fontWeight:600, marginBottom:'0.6rem'} },
+                (function() {
+                  var policies = {flexible:'🔓 Flexible',moderate:'⏳ Moderate',strict:'🔒 Strict'};
+                  return policies[q.cancellation_policy] || q.cancellation_policy;
+                })()
+              ),
               q.host_message && e('p', { style:{color:'#555', fontSize:'0.88rem', fontStyle:'italic', margin:'0 0 0.8rem', paddingLeft:'0.5rem', borderLeft:'2px solid #e5e7eb'} }, '"' + q.host_message + '"'),
+              q.host_website && e('div', { style:{marginBottom:'0.6rem'} },
+                e('a', { href:q.host_website.indexOf('http')===0?q.host_website:'https://'+q.host_website, target:'_blank', rel:'noopener noreferrer', style:{display:'inline-flex', alignItems:'center', gap:'0.4rem', color:'var(--primary-blue)', fontSize:'0.85rem', fontWeight:600, textDecoration:'none'} },
+                  '🔗 View Property', e('span', { style:{fontSize:'0.7rem', color:'#94a3b8'} }, '↗')
+                )
+              ),
+              isAccepted && (q.host_email || q.host_phone) && e('div', { style:{background:'#eff6ff', border:'1px solid #bfdbfe', borderRadius:'8px', padding:'0.75rem', marginBottom:'0.6rem', fontSize:'0.85rem'} },
+                e('div', { style:{fontWeight:600, color:'var(--primary-blue)', marginBottom:'0.3rem'} }, '📞 Host Contact Details'),
+                q.host_email && e('div', null, 'Email: ', e('a', { href:'mailto:'+q.host_email, style:{color:'var(--primary-blue)'} }, q.host_email)),
+                q.host_phone && e('div', null, 'Phone: ', e('a', { href:'tel:'+q.host_phone, style:{color:'var(--primary-blue)'} }, q.host_phone))
+              ),
               q.calendar_available === true && e('div', { style:{display:'inline-flex', alignItems:'center', gap:'0.3rem', background:'#dcfce7', color:'#166534', borderRadius:'6px', padding:'3px 8px', fontSize:'0.75rem', marginBottom:'0.6rem'} }, '✅ Calendar availability confirmed'),
-              !isAccepted && !isDeclined && rfq.status === 'active' && e('div', { style:{display:'flex', gap:'0.6rem', marginTop:'0.8rem'} },
-                e('button', {
-                  className:'cta-button',
-                  style:{flex:1, padding:'0.6rem', fontSize:'0.88rem', background:'var(--success)', opacity:accepting===q.id?0.7:1, cursor:accepting===q.id?'not-allowed':'pointer'},
-                  onClick:function(){handleAccept(q.id);}, disabled:!!accepting
-                }, accepting===q.id ? 'Confirming...' : '✓ Accept Quote'),
-                e('button', {
-                  style:{flex:1, padding:'0.6rem', fontSize:'0.88rem', borderRadius:'8px', border:'1px solid #ddd', background:'white', cursor:'pointer', fontWeight:600},
-                  onClick:function(){handleDecline(q.id);}
-                }, 'Decline')
+              !isAccepted && !isDeclined && rfq.status === 'active' && e('div', null,
+                e('div', { style:{display:'flex', gap:'0.6rem', marginTop:'0.8rem'} },
+                  e('button', {
+                    className:'cta-button',
+                    style:{flex:1, padding:'0.6rem', fontSize:'0.88rem', background:'var(--success)', opacity:accepting===q.id?0.7:1, cursor:accepting===q.id?'not-allowed':'pointer'},
+                    onClick:function(){handleAccept(q.id);}, disabled:!!accepting
+                  }, accepting===q.id ? 'Confirming...' : '✓ Accept'),
+                  e('button', {
+                    style:{flex:1, padding:'0.6rem', fontSize:'0.88rem', borderRadius:'8px', border:'1px solid var(--primary-blue)', background:chatOpenFor===q.id?'var(--primary-blue)':'white', color:chatOpenFor===q.id?'white':'var(--primary-blue)', cursor:'pointer', fontWeight:600},
+                    onClick:function(){
+                      var newId = chatOpenFor===q.id ? null : q.id;
+                      setChatOpenFor(newId);
+                      if(newId) { var msgs = loadChatMessages(newId); setChatMessages(function(prev){var n=Object.assign({},prev);n[newId]=msgs;return n;}); }
+                      setChatMsg('');
+                    }
+                  }, '💬 Discuss'),
+                  e('button', {
+                    style:{flex:1, padding:'0.6rem', fontSize:'0.88rem', borderRadius:'8px', border:'1px solid #ddd', background:'white', cursor:'pointer', fontWeight:600, color:'#6b7280'},
+                    onClick:function(){handleDecline(q.id);}
+                  }, 'Decline')
+                ),
+                chatOpenFor === q.id && e('div', { style:{marginTop:'0.75rem', border:'1px solid #e5e7eb', borderRadius:'10px', overflow:'hidden'} },
+                  e('div', { style:{background:'#f8fafc', padding:'0.6rem 0.8rem', borderBottom:'1px solid #e5e7eb', fontSize:'0.8rem', fontWeight:600, color:'#374151'} }, '💬 Chat with host — Property #' + q.property_id),
+                  e('div', { style:{maxHeight:'200px', overflowY:'auto', padding:'0.75rem', background:'white'} },
+                    (chatMessages[q.id] || []).length === 0 ?
+                      e('p', { style:{color:'#94a3b8', fontSize:'0.82rem', textAlign:'center', margin:'1rem 0'} }, 'No messages yet. Ask the host about their property.') :
+                    (chatMessages[q.id] || []).map(function(m) {
+                      var isMe = m.senderId === rfq.guest_email;
+                      return e('div', { key:m.id, style:{display:'flex', justifyContent:isMe?'flex-end':'flex-start', marginBottom:'0.5rem'} },
+                        e('div', { style:{maxWidth:'75%', padding:'0.5rem 0.75rem', borderRadius:isMe?'10px 10px 2px 10px':'10px 10px 10px 2px', background:isMe?'var(--primary-blue)':'#f1f5f9', color:isMe?'white':'#374151', fontSize:'0.82rem'} },
+                          !isMe && e('div', { style:{fontWeight:600, fontSize:'0.72rem', marginBottom:'0.2rem', color:'#64748b'} }, m.senderName),
+                          e('div', null, m.text),
+                          e('div', { style:{fontSize:'0.65rem', marginTop:'0.2rem', opacity:0.6, textAlign:'right'} }, new Date(m.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}))
+                        )
+                      );
+                    })
+                  ),
+                  e('div', { style:{display:'flex', gap:'0.5rem', padding:'0.6rem', borderTop:'1px solid #e5e7eb', background:'#f8fafc'} },
+                    e('input', { type:'text', style:{flex:1, padding:'0.5rem 0.75rem', border:'1px solid #ddd', borderRadius:'6px', fontSize:'0.85rem', boxSizing:'border-box'}, placeholder:'Type a message...', value:chatMsg, onChange:function(ev){setChatMsg(ev.target.value);}, onKeyDown:function(ev){if(ev.key==='Enter')sendChatMessage(q.id);} }),
+                    e('button', { style:{padding:'0.5rem 1rem', background:'var(--primary-blue)', color:'white', border:'none', borderRadius:'6px', cursor:'pointer', fontWeight:600, fontSize:'0.85rem'}, onClick:function(){sendChatMessage(q.id);} }, 'Send')
+                  )
+                )
               )
             );
           })
@@ -5860,7 +6476,7 @@
       var stateSubmitted = useState(false); var submitted = stateSubmitted[0]; var setSubmitted = stateSubmitted[1];
       var stateDeclined = useState(false); var declined = stateDeclined[0]; var setDeclined = stateDeclined[1];
       var stateError = useState(''); var formError = stateError[0]; var setFormError = stateError[1];
-      var stateForm = useState({ price_per_night:'', cleaning_fee:'', host_message:'', valid_hours:48, host_email: user ? (user.email||'') : '', host_phone: user ? (user.phone||'') : '', host_website:'' });
+      var stateForm = useState({ price_per_night:'', cleaning_fee:'', host_message:'', valid_hours:48, host_email: user ? (user.email||'') : '', host_phone: user ? (user.phone||'') : '', host_website:'', cancellation_policy:'moderate', long_stay_7:'', long_stay_14:'', long_stay_30:'' });
       var quoteForm = stateForm[0]; var setQuoteForm = stateForm[1];
       var stateSubmitting = useState(false); var submitting = stateSubmitting[0]; var setSubmitting = stateSubmitting[1];
 
@@ -5883,6 +6499,7 @@
       var updateQ = function(k,v){ setQuoteForm(function(f){var n=Object.assign({},f);n[k]=v;return n;}); };
 
       var handleSubmitQuote = function() {
+        if (!quoteForm.selected_property && !quoteForm.host_website) { setFormError('Please select a property from the dropdown or provide a property/booking link.'); return; }
         if (!quoteForm.price_per_night || isNaN(quoteForm.price_per_night) || quoteForm.price_per_night <= 0) { setFormError('Please enter a valid price per night.'); return; }
         if (!quoteForm.host_email && !quoteForm.host_phone) { setFormError('Please provide at least one contact method (email or phone).'); return; }
         setSubmitting(true); setFormError('');
@@ -5898,7 +6515,11 @@
             price_per_night: pn, total_price: total, cleaning_fee: parseFloat(quoteForm.cleaning_fee)||0,
             host_message: quoteForm.host_message || null, valid_until: validUntil,
             host_email: quoteForm.host_email || null, host_phone: quoteForm.host_phone || null,
-            host_website: quoteForm.host_website || null
+            host_website: quoteForm.host_website || null,
+            cancellation_policy: quoteForm.cancellation_policy || 'moderate',
+            long_stay_7: parseFloat(quoteForm.long_stay_7) || 0,
+            long_stay_14: parseFloat(quoteForm.long_stay_14) || 0,
+            long_stay_30: parseFloat(quoteForm.long_stay_30) || 0
           })
         }).then(function(r) {
           if (r.ok) {
@@ -6005,43 +6626,54 @@
           e('span', null, (function(){ var tr = timeRemaining(outreach.expires_at); return tr ? ('Quote window open — ' + tr) : 'Quote window has expired'; }()))
         ),
 
-        // Property picker
-        (function() {
-          var myProps = [];
-          if (user) {
-            var claimed = (user.claimedProperties || []);
-            var created = (user.createdProperties || []);
-            myProps = claimed.concat(created);
-          }
-          if (myProps.length === 0) return null;
-          return e('div', { style:{background:'#f8fafc',border:'1px solid #e5e7eb',borderRadius:'10px',padding:'1.2rem',marginBottom:'1rem'} },
-            e('label', { style:{display:'block',fontWeight:700,fontSize:'0.88rem',color:'#374151',marginBottom:'0.5rem'} }, '🏘️ Which property are you quoting for?'),
-            e('select', {
-              style:{width:'100%',padding:'0.6rem 0.8rem',border:'1px solid #ddd',borderRadius:'7px',fontSize:'0.92rem',background:'white'},
-              value: quoteForm.selected_property || '',
-              onChange: function(ev) {
-                var pid = ev.target.value;
-                updateQ('selected_property', pid);
-                // Auto-fill website from created property if available
-                if (user && user.createdProperties) {
-                  var cp = user.createdProperties.find(function(p){return (p.id||p.name)===pid;});
-                  if (cp && cp.website) updateQ('host_website', cp.website);
+        // Property picker — REQUIRED: host must choose a property or provide a link
+        e('div', { style:{background:'#f8fafc',border:'2px solid #bfdbfe',borderRadius:'10px',padding:'1.2rem',marginBottom:'1rem'} },
+          e('label', { style:{display:'block',fontWeight:700,fontSize:'0.92rem',color:'#374151',marginBottom:'0.5rem'} }, '🏘️ Which property are you quoting for? *'),
+          e('p', { style:{fontSize:'0.8rem',color:'#64748b',marginBottom:'0.75rem'} }, 'Select one of your listed properties or add a direct booking link. This is required to respond.'),
+          (function() {
+            var myProps = [];
+            if (user) {
+              var claimed = (user.claimedProperties || []);
+              var created = (user.createdProperties || []);
+              myProps = claimed.concat(created);
+            }
+            return myProps.length > 0 ? e('div', { style:{marginBottom:'0.75rem'} },
+              e('select', {
+                style:{width:'100%',padding:'0.6rem 0.8rem',border:'1px solid #ddd',borderRadius:'7px',fontSize:'0.92rem',background:'white'},
+                value: quoteForm.selected_property || '',
+                onChange: function(ev) {
+                  var pid = ev.target.value;
+                  updateQ('selected_property', pid);
+                  if (user && user.createdProperties) {
+                    var cp = user.createdProperties.find(function(p){return (p.id||p.name)===pid;});
+                    if (cp && cp.website) updateQ('host_website', cp.website);
+                  }
                 }
-              }
-            },
-              e('option', {value:''}, '— Select your property —'),
-              (user.claimedProperties||[]).map(function(pid, i) { return e('option', {key:'c'+i, value:pid}, 'Property #' + pid.slice(-6) + ' (listed)'); }),
-              (user.createdProperties||[]).map(function(cp, i) {
-                var label = (cp.name||'Property') + (cp.comune?' · '+cp.comune:'') + ' (my property)';
-                return e('option', {key:'m'+i, value:(cp.id||cp.name)}, label);
-              })
+              },
+                e('option', {value:''}, '-- Select your property --'),
+                (user.claimedProperties||[]).map(function(pid, i) { return e('option', {key:'c'+i, value:pid}, 'Property #' + pid.slice(-6) + ' (listed)'); }),
+                (user.createdProperties||[]).map(function(cp, i) {
+                  var label = (cp.name||'Property') + (cp.comune?' . '+cp.comune:'') + ' (my property)';
+                  return e('option', {key:'m'+i, value:(cp.id||cp.name)}, label);
+                })
+              )
+            ) : null;
+          })(),
+          e('div', { style:{borderTop:'1px solid #e5e7eb',paddingTop:'0.75rem',marginTop:'0.25rem'} },
+            e('label', { style:{display:'block',fontWeight:600,fontSize:'0.85rem',color:'#444',marginBottom:'0.35rem'} },
+              (function() {
+                var myProps = [];
+                if (user) { myProps = (user.claimedProperties||[]).concat(user.createdProperties||[]); }
+                return myProps.length > 0 ? 'Or paste your property/booking link:' : 'Paste your property or booking link: *';
+              })()
             ),
-            e('div', { style:{fontSize:'0.72rem',color:'#94a3b8',marginTop:'0.4rem'} },
-              'Don\'t see your property? ',
-              e('a', { href:'#/dashboard', style:{color:'var(--primary-blue)',fontWeight:600} }, 'Add it in My Properties →')
-            )
-          );
-        })(),
+            e('input', { type:'url', style:{width:'100%',padding:'0.6rem 0.8rem',border:'1px solid #ddd',borderRadius:'7px',fontSize:'0.92rem',boxSizing:'border-box'}, placeholder:'https://yourproperty.com or Airbnb/Booking.com link', value:quoteForm.host_website, onChange:function(ev){updateQ('host_website',ev.target.value);} })
+          ),
+          e('div', { style:{fontSize:'0.72rem',color:'#94a3b8',marginTop:'0.5rem'} },
+            'Don\'t have a listing yet? ',
+            e('a', { href:'#/dashboard', style:{color:'var(--primary-blue)',fontWeight:600} }, 'Create one in My Properties first ')
+          )
+        ),
 
         // Quote form
         e('div', { style:{background:'white',border:'1px solid #e5e7eb',borderRadius:'10px',padding:'1.5rem',marginBottom:'1rem'} },
@@ -6061,7 +6693,43 @@
           ),
           e('div', { style:{marginBottom:'1rem'} },
             e('label', { style:labelStyle }, 'Your message to the guest'),
+            (function() {
+              var tpls = [];
+              try { tpls = JSON.parse(localStorage.getItem('dbi_host_templates') || '[]'); } catch(ex) {}
+              return tpls.length > 0 ? e('div', { style:{marginBottom:'0.5rem'} },
+                e('select', { style:Object.assign({},inputStyle,{fontSize:'0.8rem',color:'#666'}), onChange:function(ev) { if(ev.target.value) updateQ('host_message', ev.target.value); ev.target.value=''; } },
+                  e('option', {value:''}, 'Use a saved template...'),
+                  tpls.map(function(t) { return e('option', {key:t.id,value:t.text}, t.name); })
+                )
+              ) : null;
+            })(),
             e('textarea', { style:Object.assign({},inputStyle,{height:'80px',resize:'vertical'}), placeholder:'Tell the guest about your property, any included services, or a personal welcome note...', value:quoteForm.host_message, onChange:function(ev){updateQ('host_message',ev.target.value);} })
+          ),
+          e('div', { style:{marginBottom:'1rem'} },
+            e('label', { style:labelStyle }, 'Cancellation Policy'),
+            e('select', { style:inputStyle, value:quoteForm.cancellation_policy, onChange:function(ev){updateQ('cancellation_policy',ev.target.value);} },
+              e('option', {value:'flexible'}, 'Flexible — Free cancellation until 1 day before'),
+              e('option', {value:'moderate'}, 'Moderate — 50% refund until 7 days before'),
+              e('option', {value:'strict'}, 'Strict — No refunds within 14 days')
+            )
+          ),
+          e('div', { style:{marginBottom:'1rem',background:'#f0fdf4',border:'1px solid #bbf7d0',borderRadius:'8px',padding:'1rem'} },
+            e('label', { style:labelStyle }, '💰 Long-Stay Discounts (optional)'),
+            e('p', { style:{fontSize:'0.8rem',color:'#666',marginBottom:'0.75rem'} }, 'Offer discounts to guests booking 7+, 14+, or 30+ nights:'),
+            e('div', { style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'0.75rem'} },
+              e('div', null,
+                e('label', { style:labelStyle }, '7-night %'),
+                e('input', { type:'number', style:inputStyle, placeholder:'0', min:0, max:100, value:quoteForm.long_stay_7, onChange:function(ev){updateQ('long_stay_7',ev.target.value);} })
+              ),
+              e('div', null,
+                e('label', { style:labelStyle }, '14-night %'),
+                e('input', { type:'number', style:inputStyle, placeholder:'0', min:0, max:100, value:quoteForm.long_stay_14, onChange:function(ev){updateQ('long_stay_14',ev.target.value);} })
+              ),
+              e('div', null,
+                e('label', { style:labelStyle }, '30-night %'),
+                e('input', { type:'number', style:inputStyle, placeholder:'0', min:0, max:100, value:quoteForm.long_stay_30, onChange:function(ev){updateQ('long_stay_30',ev.target.value);} })
+              )
+            )
           ),
           e('div', { style:{marginBottom:'1rem'} },
             e('label', { style:labelStyle }, 'Quote valid for'),
@@ -6076,7 +6744,7 @@
             e('div', null, e('label', { style:labelStyle }, 'Email *'), e('input', { type:'email', style:inputStyle, placeholder:'host@email.com', value:quoteForm.host_email, onChange:function(ev){updateQ('host_email',ev.target.value);} })),
             e('div', null, e('label', { style:labelStyle }, 'Phone'), e('input', { type:'tel', style:inputStyle, placeholder:'+39 333 1234567', value:quoteForm.host_phone, onChange:function(ev){updateQ('host_phone',ev.target.value);} }))
           ),
-          e('div', null, e('label', { style:labelStyle }, 'Your booking website (optional)'), e('input', { type:'url', style:inputStyle, placeholder:'https://yourproperty.com', value:quoteForm.host_website, onChange:function(ev){updateQ('host_website',ev.target.value);} }))
+          quoteForm.host_website && e('div', { style:{marginTop:'0.5rem',fontSize:'0.8rem',color:'#64748b'} }, 'Property link: ' + quoteForm.host_website)
         ),
 
         formError && e('div', { style:{color:'var(--error)',margin:'0.5rem 0',fontSize:'0.88rem',background:'#fef2f2',padding:'0.5rem 0.8rem',borderRadius:'6px',borderLeft:'3px solid var(--error)'} }, formError),
